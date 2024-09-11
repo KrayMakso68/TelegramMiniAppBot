@@ -1,11 +1,13 @@
 <template>
-  <q-page class="row items-center justify-evenly">
+  <q-page class="row items-center justify-evenly text-white">
     <example-component
       title="Example component"
       active
       :todos="todos"
       :meta="meta"
     ></example-component>
+<!--    <BiometricManager @init="handleInit" />-->
+    <MainButton text="Открой меня" @click="() => showAlert('Hello!')" />
   </q-page>
 </template>
 
@@ -14,9 +16,18 @@ import { ref } from 'vue';
 import { Todo, Meta } from 'components/models';
 import ExampleComponent from 'components/ExampleComponent.vue';
 
+import {MainButton, useWebAppPopup, BiometricManager, useWebAppBiometricManager} from 'vue-tg'
+
+const { showAlert } = useWebAppPopup()
+
 defineOptions({
   name: 'IndexPage'
 });
+
+// const handleInit = () => {
+//     const { requestBiometricAccess,  } = useWebAppBiometricManager()
+//     requestBiometricAccess({reason: 'The bot uses biometrics for testing purposes.'})
+// }
 
 const todos = ref<Todo[]>([
   {
