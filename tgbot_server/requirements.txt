@@ -1,6 +1,7 @@
-aiosqlite==0.20.0
-alembic==1.13.3
-fastapi==0.115.0
-SQLAlchemy==2.0.35
-fastapi-users[sqlalchemy]==13.0.0
-uvicorn==0.30.6
+aiosqlite
+alembic
+fastapi[all]
+SQLAlchemy
+fastapi-users[sqlalchemy]
+uvicorn
+python-dotenv
