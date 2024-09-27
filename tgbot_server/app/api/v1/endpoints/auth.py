@@ -1,11 +1,13 @@
 from fastapi import APIRouter, Depends
+from app.schema.auth_schema import WebAppInitData, Token
 
 router = APIRouter(
-    prefix="/auth",
-    tags=["auth"],
+    prefix="/auth"
 )
 
 
-@router.post("/sing-in")
-def sing_in():
+@router.post("/login")
+def login(
+        form_data: WebAppInitData = Depends()
+) -> Token:
     pass
