@@ -5,3 +5,4 @@ SQLAlchemy
 fastapi-users[sqlalchemy]
 uvicorn
 python-dotenv
+pydantic
