@@ -19,10 +19,8 @@ class BaseRepository:
             query = self.model(**schema.dict())
             try:
                 session.add(query)
-                session.commit()
-                session.refresh(query)
+                await session.commit()
+                await session.refresh(query)
             except IntegrityError as e:
                 raise DuplicatedError(detail=str(e.orig))
             return query.id
-
-    # async def read_by_id(self, id: int) -> T:
