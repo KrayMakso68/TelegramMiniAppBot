@@ -1,4 +1,4 @@
-from typing import TypeVar, AsyncGenerator, Type, Callable
+from typing import TypeVar, Type
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,17 +10,22 @@ T = TypeVar("T", bound=BaseModel)
 
 
 class BaseRepository:
-    def __init__(self, async_session: Callable[..., AsyncGenerator[AsyncSession, None]], model: Type[T]) -> None:
-        self.async_session = async_session
+    def __init__(self, async_session: AsyncSession, model: Type[T]) -> None:
+        self.session = async_session
         self.model = model
 
     async def create(self, schema: T) -> int:
-        async with self.async_session() as session:
-            query = self.model(**schema.dict())
-            try:
-                session.add(query)
-                await session.commit()
-                await session.refresh(query)
-            except IntegrityError as e:
-                raise DuplicatedError(detail=str(e.orig))
-            return query.id
+        query = self.model(**schema.model_dump())
+        try:
+            self.session.add(query)
+            await self.session.commit()
+            await self.session.refresh(query)
+        except IntegrityError as e:
+            raise DuplicatedError(detail=str(e.orig))
+        return query.id
+
+    async def read_by_id(self, id: int) -> T | None:
+        result = await self.session.get(self.model, id)
+        if result:
+            return T.from_orm(result)
+        return result
