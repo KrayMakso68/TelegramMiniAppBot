@@ -1,8 +1,6 @@
-from app.repository.user_repository import UserRepository
-from app.services.base_service import BaseService
+from app.repository.interfaces import IUserRepository
 
 
-class UserService(BaseService):
-    def __init__(self, user_repository: UserRepository):
+class UserService:
+    def __init__(self, user_repository: IUserRepository):
         self.user_repository = user_repository
-        super().__init__(user_repository)

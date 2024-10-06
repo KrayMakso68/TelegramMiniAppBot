@@ -2,7 +2,7 @@ aiosqlite
 alembic
 fastapi[all]
 SQLAlchemy
-fastapi-users[sqlalchemy]
 uvicorn
 python-dotenv
 pydantic
+pyjwt

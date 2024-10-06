@@ -3,14 +3,11 @@ from pydantic import BaseModel
 from app.schema.base_schema import ModelBaseInfo
 
 
-class UserSchema(BaseModel):
+class UserCreate(BaseModel):
     tg_id: int
-    is_active: bool
-    is_superuser: bool
-
-    class Config:
-        orm_mode = True
+    is_active: bool = True
+    is_superuser: bool = False
 
 
-class User(ModelBaseInfo, UserSchema):
+class UserSchema(ModelBaseInfo, UserCreate):
     ...
