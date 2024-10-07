@@ -14,6 +14,7 @@ class AuthService:
 
     async def login(self, login_info: WebAppInitData) -> Token:
         if check_webapp_signature(configs.BOT_TOKEN, login_info):
+
             user: UserSchema | None = await self.user_repository.get_by_tg_id(login_info.user.id)
             if not user:
                 user_create = UserCreate(tg_id=login_info.user.id)

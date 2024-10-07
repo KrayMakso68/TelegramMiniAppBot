@@ -12,15 +12,10 @@ router = APIRouter(
 
 
 @router.post("/login")
-async def login_for_access_token(
-        auth_data: WebAppInitData,
-        service: AuthService = Depends(get_auth_service)
-) -> Token:
+async def login_for_access_token(auth_data: WebAppInitData, service: AuthService = Depends(get_auth_service)) -> Token:
     return await service.login(auth_data)
 
 
 @router.get("/testsecure")
-async def testsecure(
-        current_user: UserSchema = Depends(get_current_active_user)
-):
+async def testsecure(current_user: UserSchema = Depends(get_current_active_user)):
     return current_user
