@@ -1,13 +1,12 @@
 from datetime import datetime
 
-from sqlalchemy.ext.asyncio import AsyncAttrs
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy import DateTime, func, Integer
 
 from app.core.database import Base
 
 
-class BaseModel(AsyncAttrs, Base):
+class BaseModel(Base):
     __abstract__ = True
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True, index=True)
