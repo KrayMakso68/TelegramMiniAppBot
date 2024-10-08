@@ -13,7 +13,7 @@ class Configs(BaseSettings):
     PROJECT_NAME: str = "TelegramMiniAppBot"
 
     # database
-    DATABASE_URI: str = "sqlite+aiosqlite:///sqlite.db"
+    DATABASE_URL: str = "sqlite+aiosqlite:///sqlite.db"
     DB_HOST: str = os.getenv('DB_HOST')
     DB_PORT: int = os.getenv('DB_PORT')
 
