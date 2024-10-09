@@ -5,7 +5,7 @@ from app.model.base_model import BaseModel
 
 
 class User(BaseModel):
-    __tablename__ = 'user'
+    __tablename__ = 'users'
 
     tg_id: Mapped[int] = mapped_column(Integer, nullable=False, unique=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
