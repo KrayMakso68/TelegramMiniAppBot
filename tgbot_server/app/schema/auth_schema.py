@@ -1,6 +1,10 @@
 from pydantic import BaseModel
 
 
+class InitAuthData(BaseModel):
+    query_string: str
+
+
 class WebAppUser(BaseModel):
     id: int
     is_bot: bool | None = None
@@ -30,12 +34,12 @@ class WebAppInitData(BaseModel):
     chat_type: str | None = None
     chat_instance: str | None = None
     start_param: str | None = None
-    can_sand_after: int | None = None
+    can_send_after: int | None = None
     auth_date: int
     hash: str
 
 
-class Token(BaseModel):
+class TokenInfo(BaseModel):
     access_token: str
     token_type: str
 

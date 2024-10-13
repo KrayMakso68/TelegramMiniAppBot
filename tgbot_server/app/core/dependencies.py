@@ -23,7 +23,7 @@ def get_auth_service(user_repository: UserRepository = Depends(get_user_reposito
 async def get_current_user(token: str = Depends(oauth_scheme),
                            user_repository: UserRepository = Depends(get_user_repository)
                            ) -> UserSchema:
-    token_data: TokenData = await decode_access_token(token)
+    token_data: TokenData = decode_access_token(token)
     user: UserSchema | None = await user_repository.get_by_tg_id(token_data.tg_id)
     if user is None:
         raise JwtCredentialsError("Could not validate credentials", {"WWW-Authenticate": "Bearer"})
