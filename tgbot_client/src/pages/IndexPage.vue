@@ -6,6 +6,7 @@
       :todos="todos"
       :meta="meta"
     ></example-component>
+    <TestGetWebAppData></TestGetWebAppData>
 <!--    <BiometricManager @init="handleInit" />-->
     <MainButton text="Открой меня" @click="() => showAlert('Hello!')" />
   </q-page>
@@ -15,6 +16,7 @@
 import { ref } from 'vue';
 import { Todo, Meta } from 'components/models';
 import ExampleComponent from 'components/ExampleComponent.vue';
+import TestGetWebAppData from "components/TestGetWebAppData.vue";
 
 import {MainButton, useWebAppPopup, BiometricManager, useWebAppBiometricManager} from 'vue-tg'
 
