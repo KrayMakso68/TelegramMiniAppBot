@@ -1,11 +1,11 @@
-from pydantic import BaseModel
+from app.schema.base_schema import BaseSchema
 
 
-class InitAuthData(BaseModel):
+class InitAuthData(BaseSchema):
     query_string: str
 
 
-class WebAppUser(BaseModel):
+class WebAppUser(BaseSchema):
     id: int
     is_bot: bool | None = None
     first_name: str
@@ -18,7 +18,7 @@ class WebAppUser(BaseModel):
     photo_url: str | None = None
 
 
-class WebAppChat(BaseModel):
+class WebAppChat(BaseSchema):
     id: int
     type: str
     title: str
@@ -26,7 +26,7 @@ class WebAppChat(BaseModel):
     photo_url: str | None = None
 
 
-class WebAppInitData(BaseModel):
+class WebAppInitData(BaseSchema):
     query_id: str | None = None
     user: WebAppUser | None = None
     receiver: WebAppUser | None = None
@@ -39,10 +39,10 @@ class WebAppInitData(BaseModel):
     hash: str
 
 
-class TokenInfo(BaseModel):
+class TokenInfo(BaseSchema):
     access_token: str
     token_type: str
 
 
-class TokenData(BaseModel):
+class TokenData(BaseSchema):
     tg_id: int
