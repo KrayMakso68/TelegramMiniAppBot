@@ -27,7 +27,7 @@ class Settings(BaseSettings):
 
     # auth
     ALGORITHM: str = "HS256"
-    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "")
+    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30)
 
 
