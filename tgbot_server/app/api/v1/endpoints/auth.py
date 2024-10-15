@@ -13,7 +13,7 @@ router = APIRouter(
 
 @router.post("/login")
 async def login_for_access_token(
-        init_data: InitAuthData = Depends(),
+        init_data: InitAuthData,
         service: AuthService = Depends(get_auth_service)
 ) -> TokenInfo:
     return await service.login(init_data)
