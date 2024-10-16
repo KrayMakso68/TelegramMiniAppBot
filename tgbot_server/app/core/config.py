@@ -10,10 +10,6 @@ BASE_DIR = Path(__file__).parent.parent.parent
 
 DB_PATH = BASE_DIR / "sqlite.db"
 
-ORIGINS = [
-    "",
-]
-
 
 class Settings(BaseSettings):
     API: str = "/api"
@@ -34,8 +30,8 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30)
 
-    # CORS
-    BACKEND_CORS_ORIGINS: list[str] = ORIGINS
+    # # CORS
+    # ALLOWED_ORIGINS: list[str] = [url for url in os.getenv('ALLOWED_ORIGINS', "*").split(',')]
 
 
 settings = Settings()
