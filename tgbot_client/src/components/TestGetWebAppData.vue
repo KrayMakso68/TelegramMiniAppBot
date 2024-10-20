@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useWebApp } from "vue-tg";
-import { getUser } from "../api/userService"
+import { getCurrentUser } from "../api/userService"
 import { login } from "../api/authService"
 import { User } from "src/api/types/userTypes";
+import {InitAuthData} from "src/api/types/authTypes";
 
 
 const {initData} = useWebApp();
@@ -15,14 +16,15 @@ const error = ref();
 
 const loadUser = async () => {
   try {
-    user.value = await getUser();
+    user.value = await getCurrentUser();
   } catch (e) {
     error.value = (e as Error)
   }
 };
 const logIn = async () => {
   try {
-    const response = await login();
+    const data: InitAuthData = { queryString: initData };
+    const response = await login(data);
     logindata.value = {response}
   } catch (e) {
     error.value = (e as Error)

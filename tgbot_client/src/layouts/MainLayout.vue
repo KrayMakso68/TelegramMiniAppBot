@@ -1,6 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
+    <q-header :style="{ backgroundColor: 'var(--tg-theme-header-color)' }" elevated>
       <q-toolbar>
         <q-btn
           flat
