@@ -1,0 +1,25 @@
+:root {
+  --tg-bg-color: var(--tg-theme-bg-color, #ffffff);
+  --tg-text-color: var(--tg-theme-text-color, #000000);
+  --tg-hint-color: var(--tg-theme-hint-color, #888888);
+  --tg-link-color: var(--tg-theme-link-color, #0088cc);
+  --tg-button-color: var(--tg-theme-button-color, #0088cc);
+  --tg-button-text-color: var(--tg-theme-button-text-color, #ffffff);
+  --tg-secondary-bg-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+  --tg-header-bg-color: var(--tg-theme-header-bg-color, #eeeeee);
+  --tg-bottom-bar-bg-color: var(--tg-theme-bottom-bar-bg-color, #dddddd);
+  --tg-accent-text-color: var(--tg-theme-accent-text-color, #ff0000);
+  --tg-section-bg-color: var(--tg-theme-section-bg-color, #ffffff);
+  --tg-section-header-text-color: var(--tg-theme-section-header-text-color, #222222);
+  --tg-section-separator-color: var(--tg-theme-section-separator-color, #cccccc);
+  --tg-subtitle-text-color: var(--tg-theme-subtitle-text-color, #444444);
+  --tg-destructive-text-color: var(--tg-theme-destructive-text-color, #ff0000);
+}
+
+.tg-button {
+  background-color: var(--tg-button-color, #0088cc);
+  color: var(--tg-button-text-color, #ffffff);
+  border-radius: 8px;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
