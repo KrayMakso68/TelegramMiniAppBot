@@ -4,12 +4,9 @@ import {BackButton, SettingsButton} from 'vue-tg'
 
 <template>
   <q-layout view="hHh lpR fFf">
-    <BackButton visible="" ></BackButton>
-    <SettingsButton></SettingsButton>
-    <q-page-container>
+    <q-page-container class="tg-background">
       <router-view />
     </q-page-container>
-
   </q-layout>
 </template>
 

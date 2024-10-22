@@ -16,6 +16,10 @@
   --tg-destructive-text-color: var(--tg-theme-destructive-text-color, #ff0000);
 }
 
+.tg-background{
+  background-color: var(--tg-bg-color);
+}
+
 .tg-button {
   background-color: var(--tg-button-color, #0088cc);
   color: var(--tg-button-text-color, #ffffff);
