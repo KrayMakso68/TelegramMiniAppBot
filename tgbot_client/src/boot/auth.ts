@@ -1,15 +1,15 @@
 import { boot } from 'quasar/wrappers'
-import {InitAuthData, LoginResponse} from "src/api/types/authTypes";
+import { InitAuthData, LoginResponse } from "src/api/types/authTypes";
 import { AuthService } from "src/api";
-import {LocalStorage} from "quasar";
-import {useWebApp} from "vue-tg";
+import { LocalStorage } from "quasar";
+import { useWebApp } from "vue-tg";
 
 
 export default boot(async ({ app, router }) => {
   const { initData } = useWebApp();
 
   if (!initData) {
-    await router.push('/not-from-telegram'); // перенаправление, если не из Telegram
+    await router.push('/not-from-telegram');
     return;
   }
 

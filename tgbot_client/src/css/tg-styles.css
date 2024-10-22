@@ -20,6 +20,10 @@
   background-color: var(--tg-bg-color);
 }
 
+.tg-text{
+  color: var(--tg-text-color);
+}
+
 .tg-button {
   background-color: var(--tg-button-color, #0088cc);
   color: var(--tg-button-text-color, #ffffff);
