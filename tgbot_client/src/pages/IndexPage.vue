@@ -3,17 +3,38 @@
 </script>
 
 <template>
-  <div class="column" style="height: 300px">
-    <div class="col col-3 bg-white">
-      1 of 3
+  <q-page class="q-pa-lg">
+    <div class="column q-gutter-sm align-center justify-start">
+      <div class="q-gutter-md q-pt-lg q-pa-sm">
+        <div class="bg-white">
+          <div>
+            <h4 class="q-pb-none">total</h4>
+          </div>
+          <div>
+
+          </div>
+        </div>
+        <div class="bg-white" style="height: 30px">
+
+        </div>
+      </div>
+      <q-card class="q-pa-sm">
+        <q-card-section>
+          <h6>First title</h6>
+        </q-card-section>
+        <q-separator/>
+        <q-card-section inset>
+          <p>First text</p>
+        </q-card-section>
+      </q-card>
+      <q-card>
+        <q-card-section>
+          <p>Lorem ipsum</p>
+        </q-card-section>
+      </q-card>
     </div>
-    <div class="col col-1 bg-pink">
-      1 of 3
-    </div>
-    <div class="col col-1 bg-amber-8">
-      1 of 3
-    </div>
-  </div>
+
+  </q-page>
 </template>
 
 <style scoped>
