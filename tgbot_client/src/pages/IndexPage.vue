@@ -4,17 +4,22 @@
 
 <template>
   <q-page class="q-pa-lg">
-    <div class="column q-gutter-sm align-center justify-start">
-      <div class="q-gutter-md q-pt-lg q-pa-sm">
-        <div class="bg-white">
-          <div>
-            <h4 class="q-pb-none">total</h4>
-          </div>
-          <div>
-
+    <div class="column q-gutter-sm tg-text">
+      <div class="column q-gutter-md q-pa-sm">
+        <div class="column items-center q-gutter-sm">
+          <div class="text-h6">Total Balance</div>
+          <div class="col">
+            <div class="text-h2 text-bold">
+              $ 250
+              <q-icon
+                name="add_circle"
+                class="q-pb-sm"
+                :size="'md'"
+              />
+            </div>
           </div>
         </div>
-        <div class="bg-white" style="height: 30px">
+        <div class="row justify-center bg-white" style="height: 30px">
 
         </div>
       </div>
