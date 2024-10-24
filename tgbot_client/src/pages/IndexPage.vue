@@ -3,45 +3,59 @@
 </script>
 
 <template>
-  <q-page class="q-pa-lg">
-    <div class="column q-gutter-sm tg-text">
-      <div class="column q-gutter-md q-pa-sm">
-        <div class="column items-center q-gutter-sm">
-          <div class="text-h6">Total Balance</div>
-          <div class="col">
-            <div class="text-h2 text-bold">
-              $ 250
-              <q-icon
-                name="add_circle"
-                class="q-pb-sm"
-                :size="'md'"
-              />
-            </div>
+  <q-page class="">
+    <div class="column tg-text q-gutter-y-md">
+
+      <div class="col column q-px-md q-pb-lg tg-text" style="background-color: var(--tg-bg-color);box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);">
+        <transition name="jump-up" appear>
+          <div class="text-h5">
+            Привет,
           </div>
-        </div>
-        <div class="row justify-center bg-white" style="height: 30px">
-
-        </div>
+        </transition>
+        <transition name="jump-right" appear>
+          <div class="text-h4">
+            Unknown User!
+          </div>
+        </transition>
       </div>
-      <q-card class="q-pa-sm">
-        <q-card-section>
-          <h6>First title</h6>
-        </q-card-section>
-        <q-separator/>
-        <q-card-section inset>
-          <p>First text</p>
-        </q-card-section>
-      </q-card>
-      <q-card>
-        <q-card-section>
-          <p>Lorem ipsum</p>
-        </q-card-section>
-      </q-card>
-    </div>
 
+      <div class="col column q-pa-md" style="background-color: var(--tg-bg-color);">
+        <div class="text-body2">fff</div>
+        <q-list class="q-gutter-y-xs">
+          <q-item v-for="n in 6" class="tg-list-item">
+            <q-item-section>Single line item</q-item-section>
+          </q-item>
+        </q-list>
+      </div>
+
+      <div class="col bg-grey-8">
+        ccc
+      </div>
+    </div>
   </q-page>
 </template>
 
 <style scoped>
-
+.jump-up-enter-active {
+  transition: transform 0.5s ease-in-out, opacity 0.5s;
+}
+.jump-up-enter-from {
+  transform: translateY(-100%);
+  opacity: 0;
+}
+.jump-up-enter-to {
+  transform: translateY(0);
+  opacity: 1;
+}
+.jump-right-enter-active {
+  transition: transform 0.6s ease-in-out, opacity 0.5s;
+}
+.jump-right-enter-from {
+  transform: translateX(-100%);
+  opacity: 0;
+}
+.jump-right-enter-to {
+  transform: translateX(0);
+  opacity: 1;
+}
 </style>
