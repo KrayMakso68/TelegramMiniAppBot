@@ -6,7 +6,7 @@
   <q-page class="">
     <div class="column tg-text q-gutter-y-md">
 
-      <div class="col column q-px-md q-pb-lg tg-text" style="background-color: var(--tg-bg-color);box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);">
+      <div class="col column tg-section q-px-lg q-pb-md q-pb-lg">
         <transition name="jump-up" appear>
           <div class="text-h5">
             Привет,
@@ -19,16 +19,21 @@
         </transition>
       </div>
 
-      <div class="col column q-pa-md" style="background-color: var(--tg-bg-color);">
-        <div class="text-body2">fff</div>
-        <q-list class="q-gutter-y-xs">
-          <q-item v-for="n in 6" class="tg-list-item">
+      <div class="col column tg-section" >
+        <q-item-label header class="q-pb-sm" style="color: var(--tg-section-header-text-color);">
+          <div class="text-subtitle2">
+            Connections list
+          </div>
+
+        </q-item-label>
+        <q-list class="q-gutter-y-xs q-px-sm q-pb-md">
+          <q-item v-for="n in 6" class="">
             <q-item-section>Single line item</q-item-section>
           </q-item>
         </q-list>
       </div>
 
-      <div class="col bg-grey-8">
+      <div class="col tg-section">
         ccc
       </div>
     </div>
