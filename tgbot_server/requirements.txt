@@ -8,3 +8,4 @@ pydantic
 pydantic-settings
 PyJWT
 init-data-py
+httpx

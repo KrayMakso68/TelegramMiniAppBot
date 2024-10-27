@@ -8,6 +8,7 @@ from app.schema.auth_schema import TokenData
 from app.schema.user_schema import UserSchema
 from app.services.auth_service import AuthService
 from app.repository.user_repository import UserRepository
+from app.services.user_service import UserService
 
 
 def get_user_repository(async_session: AsyncSession = Depends(get_async_session)) -> UserRepository:
@@ -17,6 +18,10 @@ def get_user_repository(async_session: AsyncSession = Depends(get_async_session)
 # auth
 def get_auth_service(user_repository: UserRepository = Depends(get_user_repository)) -> AuthService:
     return AuthService(user_repository)
+
+
+def get_user_service(user_repository: UserRepository = Depends(get_user_repository)) -> UserService:
+    return UserService(user_repository)
 
 
 # user
