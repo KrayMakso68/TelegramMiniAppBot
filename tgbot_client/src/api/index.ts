@@ -1,6 +1,6 @@
 // Импорт отдельных сервисов
 import { login } from './authService';
-import { getCurrentUser } from './userService';
+import { getCurrentUser, getUserAvatarUrl } from './userService';
 
 // Экспорт сервисов для упрощенного импорта
 export const AuthService = {
@@ -9,4 +9,5 @@ export const AuthService = {
 
 export const UserService = {
   getCurrentUser,
+  getCurrentUserAvatar: getUserAvatarUrl
 };

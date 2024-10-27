@@ -24,6 +24,6 @@
 
 <script setup lang="ts">
 defineOptions({
-  name: 'ErrorNotFound'
+  text: 'ErrorNotFound'
 });
 </script>
