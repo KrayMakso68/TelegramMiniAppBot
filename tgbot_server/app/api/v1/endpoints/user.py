@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
-from starlette.responses import StreamingResponse
+from fastapi.responses import JSONResponse
+from starlette.responses import JSONResponse
 
 from app.core.dependencies import get_current_active_user
 from app.core.dependencies import get_user_service
@@ -23,5 +24,6 @@ async def get_current_user(
 async def user_avatar(
         current_user: UserSchema = Depends(get_current_active_user),
         service: UserService = Depends(get_user_service)
-) -> StreamingResponse:
-    return await service.get_user_avatar(current_user.tg_id)
+) -> JSONResponse:
+    user_avatar_base64 = await service.get_user_avatar(current_user.tg_id)
+    return JSONResponse(content=f"data:image/jpeg;base64,{user_avatar_base64}")

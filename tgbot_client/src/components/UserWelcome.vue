@@ -4,9 +4,9 @@ import {onMounted, ref} from "vue";
 import {useWebApp} from "vue-tg";
 
 const {initDataUnsafe} = useWebApp();
-const avatarUrl = ref<string | null>(null);
+const avatar = ref<string | null>(null);
 const loadAvatar = async () => {
-  avatarUrl.value = await UserService.getCurrentUserAvatar();
+  avatar.value = await UserService.getCurrentUserAvatar();
 };
 
 onMounted(loadAvatar);
@@ -23,8 +23,8 @@ onMounted(loadAvatar);
       <div class="text-h4">
         {{initDataUnsafe?.user?.first_name}}
       </div>
-      <q-avatar v-if="avatarUrl" size="45px">
-        <img :src="avatarUrl" alt="User Avatar" />
+      <q-avatar v-if="avatar" size="45px">
+        <img :src="avatar" alt="User Avatar" />
       </q-avatar>
       <q-skeleton v-else size="45px" type="QAvatar" />
     </div>

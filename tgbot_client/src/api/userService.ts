@@ -8,13 +8,35 @@ export const getCurrentUser = async (): Promise<User> => {
 }
 
 export const getUserAvatarUrl = async (): Promise<string | null> => {
-  const cachedAvatar = LocalStorage.getItem<string>('userAvatar');
+  const cachedAvatarBase64: string | null = LocalStorage.getItem<string>('userAvatar');
 
-  if (!cachedAvatar) {
-    const response = await api.get(`/user/avatar`, {responseType: 'blob'});
-    const imageUrl = URL.createObjectURL(response.data);
-    LocalStorage.set('userAvatar', imageUrl);
-    return imageUrl;
+  if (!cachedAvatarBase64) {
+    const response = await api.get(`/user/avatar`);
+    const avatarBase64: string = response.data;
+    LocalStorage.set('userAvatar', avatarBase64);
+    return avatarBase64;
   }
-  return cachedAvatar
+
+  return cachedAvatarBase64;
+
+
+  // if (cachedAvatarBase64) {
+  //   await fetch(cachedAvatarUrl)
+  //     .then(() => cachedAvatarUrl)
+  //     .catch((error) => {
+  //       console.error("Ошибка проверки аватара:", error);
+  //       URL.revokeObjectURL(cachedAvatarUrl);
+  //       LocalStorage.remove('userAvatar');
+  //     })
+  // }
+  // try {
+  //   const response = await api.get(`/user/avatar`, {responseType: 'blob'});
+  //   const avatarUrl: string = URL.createObjectURL(response.data);
+  //   LocalStorage.set('userAvatar', avatarUrl);
+  //   return avatarUrl;
+  // } catch (error) {
+  //   console.error("Ошибка при получении аватара с сервера:", error);
+  //   return null;
+  // }
+
 };
