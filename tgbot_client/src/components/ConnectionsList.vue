@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import lottie from 'lottie-web';
-import {onMounted, ref} from "vue";
-
 import {ConnectListItem} from "components/models";
+import NotFoundBanner from "components/NotFoundBanner.vue";
 
 interface Props {
   items?: ConnectListItem[]
@@ -11,19 +9,6 @@ interface Props {
 withDefaults(defineProps<Props>(), {
   items: () => [],
 })
-
-const lottieContainer = ref<HTMLElement | null>(null);
-onMounted(() => {
-  if (lottieContainer.value) {
-    lottie.loadAnimation({
-      container: lottieContainer.value,
-      renderer: 'svg',
-      loop: true,
-      autoplay: true,
-      path: 'stickers/ResistanceDog.json'
-    });
-  }
-});
 
 </script>
 
@@ -59,14 +44,9 @@ onMounted(() => {
     </template>
   </q-list>
 
-  <div class="column q-px-xxl q-py-xl items-center justify-center">
-    <div id="lottie-animation" ref="lottieContainer"></div>
-    <div class="text-h6">Похоже, у вас нет подписок</div>
-  </div>
+  <not-found-banner title="Похоже, у вас нет подписок!"/>
 </template>
 
 <style scoped>
-#lottie-animation {
-  width: 50%;
-}
+
 </style>
