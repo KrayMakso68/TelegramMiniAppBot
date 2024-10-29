@@ -3,14 +3,18 @@
 </script>
 
 <template>
-  <q-page class="flex flex-row items-start justify-center">
-    <q-card class="q-ma-lg text-black">
-      <q-card-section>
-        <h3>Доступ запрещен</h3>
-        <p>Пожалуйста, зайдите через Telegram, чтобы использовать приложение.</p>
-      </q-card-section>
-    </q-card>
-  </q-page>
+  <div class="fullscreen bg-blue text-white text-center q-pa-md flex flex-center">
+    <div>
+      <div style="font-size: 30vh">
+        403
+      </div>
+
+      <div class="text-h2" style="opacity:.4">
+        Access denied.
+      </div>
+
+    </div>
+  </div>
 </template>
 
 <style scoped>
