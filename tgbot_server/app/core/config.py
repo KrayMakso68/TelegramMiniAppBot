@@ -33,5 +33,10 @@ class Settings(BaseSettings):
     # # CORS
     # ALLOWED_ORIGINS: list[str] = [url for url in os.getenv('ALLOWED_ORIGINS', "*").split(',')]
 
+    # 3x-ui
+    XUI_HOST: str = os.getenv("XUI_HOST")
+    XUI_USERNAME: str = os.getenv("XUI_USERNAME")
+    XUI_PASSWORD: str = os.getenv("XUI_PASSWORD")
+
 
 settings = Settings()
