@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import {ConnectListItem} from "components/models";
-import NotFoundBanner from "components/NotFoundBanner.vue";
 
 interface Props {
   items?: ConnectListItem[]
@@ -15,7 +14,7 @@ withDefaults(defineProps<Props>(), {
 <template>
   <q-list v-if="items.length > 0">
     <template v-for="(item, index) in items" :key="index">
-      <q-item :to="item.link" v-ripple>
+      <q-item :to="item.link" v-ripple draggable="false">
         <q-item-section avatar>
           <q-avatar :icon=item.icon class="tg-list-item-icon"/>
         </q-item-section>
@@ -43,8 +42,6 @@ withDefaults(defineProps<Props>(), {
       <q-separator v-if="index < 3" inset="item" class="tg-separator" />
     </template>
   </q-list>
-
-  <not-found-banner title="Похоже, у вас нет подписок!"/>
 </template>
 
 <style scoped>

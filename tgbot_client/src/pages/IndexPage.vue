@@ -22,11 +22,12 @@ const items = ref<ConnectListItem[]>([
       </tg-section>
 
       <tg-section label="Подключения" class="column">
-        <connections-list :items="items"></connections-list>
+        <connections-list :items="items"/>
+        <not-found-banner title="Похоже, у вас нет подписок!"/>
       </tg-section>
 
-      <tg-section label="test" class="">
-        <not-found-banner/>
+      <tg-section label="test">
+
       </tg-section>
     </div>
   </q-page>
