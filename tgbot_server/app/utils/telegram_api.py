@@ -1,15 +1,13 @@
 import base64
-from enum import Enum
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 from httpx import AsyncClient, HTTPError
 
 
 class TelegramApi:
-    request_timeout = 30
-
     def __init__(self, bot_token: str):
         self.bot_token = bot_token
+        self.request_timeout = 30
 
     async def get_user_avatar(self, user_id: int, high_quality: bool = False) -> str:
         base_url = f"https://api.telegram.org/bot{self.bot_token}"
@@ -29,7 +27,7 @@ class TelegramApi:
                 data = response.json()
 
                 if not (data.get("ok") and data.get("result") and data["result"]["total_count"] > 0):
-                    raise HTTPException(status_code=404, detail="User has no profile photos.")
+                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User has no profile photos.")
 
                 photo = data["result"]["photos"][0][quality]
                 file_id = photo["file_id"]
@@ -53,4 +51,4 @@ class TelegramApi:
                     return image_base64
 
             except HTTPError:
-                raise HTTPException(status_code=500, detail="Internal Server Error.")
+                raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal Server Error.")
