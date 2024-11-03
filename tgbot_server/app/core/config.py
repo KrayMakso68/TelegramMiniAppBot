@@ -37,6 +37,7 @@ class Settings(BaseSettings):
     XUI_HOST: str = os.getenv("XUI_HOST")
     XUI_USERNAME: str = os.getenv("XUI_USERNAME")
     XUI_PASSWORD: str = os.getenv("XUI_PASSWORD")
+    SUBSCRIBE_API_URL: str = os.getenv("SUBSCRIBE_API_URL")
 
 
 settings = Settings()

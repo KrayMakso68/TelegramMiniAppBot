@@ -8,7 +8,9 @@ from app.schema.auth_schema import TokenData
 from app.schema.user_schema import UserSchema
 from app.services.auth_service import AuthService
 from app.repository.user_repository import UserRepository
+from app.services.subscribe_service import SubscribeService
 from app.services.user_service import UserService
+from app.utils.subscribe_api import SubscribeApi
 
 
 def get_user_repository(async_session: AsyncSession = Depends(get_async_session)) -> UserRepository:
@@ -39,3 +41,11 @@ async def get_current_active_user(current_user: UserSchema = Depends(get_current
     if not current_user.is_active:
         raise IsActiveUserError("Inactive user")
     return current_user
+
+
+# subscribe
+def get_subscribe_service(
+        current_user: UserSchema = Depends(get_current_active_user)
+) -> SubscribeService:
+    sub_api = SubscribeApi(current_user.sub_uuid)
+    return SubscribeService(sub_api)
