@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
-from starlette.responses import JSONResponse
 
 from app.core.dependencies import get_current_active_user
 from app.core.dependencies import get_user_service
