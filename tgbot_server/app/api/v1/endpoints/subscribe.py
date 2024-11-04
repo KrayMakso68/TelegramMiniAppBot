@@ -9,6 +9,6 @@ router = APIRouter(
 )
 
 
-@router.post("")
+@router.get("")
 async def get_user_subscribes(service: SubscribeService = Depends(get_subscribe_service)) -> list:
     return await service.get_user_subscribes()
