@@ -1,6 +1,8 @@
 from fastapi import Depends
+from py3xui import AsyncApi
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import settings
 from app.core.database import get_async_session
 from app.core.exceptions import JwtCredentialsError, IsActiveUserError
 from app.core.security import oauth_scheme, decode_access_token
@@ -8,6 +10,7 @@ from app.schema.auth_schema import TokenData
 from app.schema.user_schema import UserSchema
 from app.services.auth_service import AuthService
 from app.repository.user_repository import UserRepository
+from app.services.panel_service import PanelService
 from app.services.subscribe_service import SubscribeService
 from app.services.user_service import UserService
 from app.utils.subscribe_api import SubscribeApi
@@ -44,8 +47,15 @@ async def get_current_active_user(current_user: UserSchema = Depends(get_current
 
 
 # subscribe
-def get_subscribe_service(
-        current_user: UserSchema = Depends(get_current_active_user)
-) -> SubscribeService:
+def get_subscribe_service(current_user: UserSchema = Depends(get_current_active_user)) -> SubscribeService:
     sub_api = SubscribeApi(current_user.sub_uuid)
     return SubscribeService(sub_api)
+
+
+# panel
+def get_panel_api() -> AsyncApi:
+    return AsyncApi(settings.XUI_HOST, settings.XUI_USERNAME, settings.XUI_PASSWORD, use_tls_verify=False)
+
+
+def get_panel_service(panel_api: AsyncApi = Depends(get_panel_api)) -> PanelService:
+    return PanelService(panel_api)

@@ -1,17 +1,80 @@
-from py3xui import AsyncApi, Client
+import functools
+import uuid
 
-from app.core.config import settings
+from httpx import HTTPStatusError
+from py3xui import AsyncApi
+from fastapi import status, HTTPException
+
+from app.schema.panel_schema import ClientSchema, ClientCreate
+from app.core.exceptions import NotFoundError
+from app.schema.user_schema import UserSchema
+
+
+def ensure_session_active(method):
+    @functools.wraps(method)
+    async def wrapper(self, *args, **kwargs):
+
+        if not self.api.session:
+            await self.api.login()
+
+        try:
+            response = await method(self, *args, **kwargs)
+            return response
+        except HTTPStatusError as e:
+            if e.response.status_code == status.HTTP_307_TEMPORARY_REDIRECT:
+                await self.api.login()
+                response = await method(self, *args, **kwargs)
+                return response
+            raise HTTPException(e.response.status_code, detail=e.response.text)
+
+    return wrapper
 
 
 class PanelService:
-    def __init__(self):
-        self.panel_api = AsyncApi(settings.XUI_HOST, settings.XUI_USERNAME, settings.XUI_PASSWORD)
+    def __init__(self, panel_api: AsyncApi):
+        self.api = panel_api
 
-    async def get_client_info_by_id(self, client_uuid) -> list[Client]:
-        return await self.panel_api.client.get_traffic_by_id(client_uuid)
+    @ensure_session_active
+    async def get_client_info_by_id(self, client_uuid: str) -> list[ClientSchema]:
+        response: list[ClientSchema] = await self.api.client.get_traffic_by_id(client_uuid)
+        if len(response) == 0:
+            raise NotFoundError(detail="Client Not Found.")
+        return response
 
-    async def get_client_info_by_email(self, client_email) -> Client:
-        return await self.panel_api.client.get_by_email(client_email)
+    @ensure_session_active
+    async def get_client_info_by_email(self, client_email: str) -> ClientSchema:
+        response: ClientSchema | None = await self.api.client.get_by_email(client_email)
+        if response is None:
+            raise NotFoundError(detail="Client Not Found.")
+        return response
 
-    async def add_client(self):
-        return ...
+    # @ensure_session_active
+    # async def add_clients(self, add_list: list[ClientCreate], user: UserSchema):
+    #     for client in add_list:
+    #         new_client = ClientSchema(
+    #             email=client.email + uuid.uuid4(),
+    #             enable=True,
+    #             id=str(uuid.uuid4()),
+    #             expiry_time=28174912,
+    #             flow="xtls-rprx-vision",
+    #             sub_id=user.sub_uuid,
+    #             tg_id=user.tg_id
+    #
+    #         )
+    #     new_clients: list[ClientSchema] = []
+    #     new_client = ClientSchema(
+    #         id=str(uuid.uuid4()),
+    #         email="test",
+    #         enable=True
+    #     )
+    #     return
+
+
+# import uuid
+#             api = py3xui.AsyncApi.from_env()
+#             await api.login()
+#
+#             new_client = py3xui.Client(id=str(uuid.uuid4()), email="test", enable=True)
+#             inbound_id = 1
+#
+#             await api.client.add(inbound_id, [new_client])
