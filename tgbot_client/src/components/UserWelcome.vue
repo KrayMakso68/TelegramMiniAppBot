@@ -23,7 +23,7 @@ onMounted(loadAvatar);
       <div class="text-h4">
         {{initDataUnsafe?.user?.first_name}}
       </div>
-      <q-avatar v-if="avatar" size="45px">
+      <q-avatar v-if="avatar" size="40px">
         <img :src="avatar" alt="User Avatar" draggable="false" />
       </q-avatar>
       <q-skeleton v-else size="45px" type="QAvatar" />
