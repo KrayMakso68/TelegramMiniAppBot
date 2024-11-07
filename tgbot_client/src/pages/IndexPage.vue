@@ -5,6 +5,7 @@ import {ConnectListItem} from "components/models";
 import UserWelcome from "components/UserWelcome.vue";
 import TgSection from "components/TgSection.vue";
 import NotFoundBanner from "components/NotFoundBanner.vue";
+import WalletBalance from "components/WalletBalance.vue";
 
 const items = ref<ConnectListItem[]>([
   { text: 'Item 1', icon: 'vpn_lock', link: 'test-colors' },
@@ -19,6 +20,10 @@ const items = ref<ConnectListItem[]>([
 
       <tg-section class="q-px-lg q-pb-md q-pb-lg">
         <user-welcome/>
+      </tg-section>
+
+      <tg-section label="Баланс кошелька">
+        <wallet-balance/>
       </tg-section>
 
       <tg-section label="Подключения" class="column">
