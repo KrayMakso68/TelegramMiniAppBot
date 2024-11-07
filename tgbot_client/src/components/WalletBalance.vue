@@ -16,6 +16,12 @@ const amount = ref<number | null>(null)
       <q-skeleton type="rect"/>
     </div>
   </div>
+  <div class="row justify-center">
+    <div class="col col-auto">
+      <q-btn class="tg-button">Пополнить</q-btn>
+    </div>
+  </div>
+
 </template>
 
 <style scoped>
