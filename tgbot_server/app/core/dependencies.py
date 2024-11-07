@@ -47,14 +47,14 @@ async def get_current_active_user(current_user: UserSchema = Depends(get_current
 
 
 # subscribe
-def get_subscribe_service(current_user: UserSchema = Depends(get_current_active_user)) -> SubscribeService:
+def get_subscribe_service_for_user(current_user: UserSchema = Depends(get_current_active_user)) -> SubscribeService:
     sub_api = SubscribeApi(current_user.sub_uuid)
     return SubscribeService(sub_api)
 
 
 # panel
 def get_panel_api() -> AsyncApi:
-    return AsyncApi(settings.XUI_HOST, settings.XUI_USERNAME, settings.XUI_PASSWORD, use_tls_verify=False)
+    return AsyncApi(settings.PANEL_HOST, settings.PANEL_USERNAME, settings.PANEL_PASSWORD, use_tls_verify=settings.TLS_VERIFY)
 
 
 def get_panel_service(panel_api: AsyncApi = Depends(get_panel_api)) -> PanelService:

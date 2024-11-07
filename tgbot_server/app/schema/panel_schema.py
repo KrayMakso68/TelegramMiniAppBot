@@ -22,8 +22,8 @@ class ClientSchema(Client, BaseSchema):
             tg_id (str): The Telegram ID of the client. Optional.
             total_gb (int): The total amount of data transferred by the client in GB. Optional.
     """
-    limit_ip: tuple[int] = 1,
-    enable: bool = True,
+    # limit_ip: int = 1,
+    # enable: bool = True,
 
 
 

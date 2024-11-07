@@ -13,7 +13,7 @@ class SubscribeApi:
     async def get_subscribes(self) -> list[VlessConfig]:
         url = self.sub_base_url + self.sub_uuid
 
-        async with AsyncClient(verify=False) as client:
+        async with AsyncClient(verify=settings.TLS_VERIFY) as client:
             try:
                 response = await client.get(url)
                 response.raise_for_status()
