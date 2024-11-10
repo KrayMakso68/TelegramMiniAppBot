@@ -4,9 +4,14 @@ from urllib.parse import urlparse, parse_qs, urlunparse, urlencode
 from app.schema.base_schema import BaseSchema
 
 
-class VlessConfig(BaseSchema):
+class BaseConfig(BaseSchema):
     uuid: str
     address: str
+    inbound_name: str
+    email: str
+
+
+class VlessConfig(BaseConfig):
     port: int
     flow: str
     fingerprint: str
@@ -16,8 +21,6 @@ class VlessConfig(BaseSchema):
     sni: str
     spider_path: str
     connection_type: str
-    inbound_name: str
-    email: str
 
     @model_validator(mode="before")
     @classmethod
@@ -77,3 +80,31 @@ class VlessConfig(BaseSchema):
         ))
 
         return url
+
+
+class ConnectSchema(BaseSchema):
+    connect_url: str
+    uuid: str
+    email: str
+    inbound_name: str
+
+    @model_validator(mode="before")
+    @classmethod
+    def check_fields_not_empty(cls, values):
+        required_fields = ['connect_url', 'uuid', 'inbound_name', 'email']
+        for field in required_fields:
+            if not values.get(field):
+                raise ValueError(f"Field {field} cannot be empty!")
+        return values
+
+    @classmethod
+    def from_url(cls, url: str):
+        parsed_url = urlparse(url)
+        fragment = parsed_url.fragment.split("-")
+
+        return cls(
+            connect_url=url,
+            uuid=parsed_url.username,
+            inbound_name=fragment[0],
+            email=fragment[-1]
+        )
