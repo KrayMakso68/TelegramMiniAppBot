@@ -6,7 +6,7 @@ const amount = ref<number | null>(500)
 </script>
 
 <template>
-  <div class="row justify-start items-center q-px-lg q-pt-sm q-gutter-sm">
+  <div class="row justify-start items-center q-px-lg q-py-xs q-gutter-sm">
     <div class="col-auto tg-subtitle-text">
       <div class="text-h4 text-weight-medium">₽</div>
     </div>

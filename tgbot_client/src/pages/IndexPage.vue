@@ -22,9 +22,6 @@ import WalletBalance from "components/WalletBalance.vue";
         <connections-list/>
       </tg-section>
 
-      <tg-section label="test">
-
-      </tg-section>
     </div>
   </q-page>
 </template>
