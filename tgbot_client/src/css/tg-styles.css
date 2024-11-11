@@ -28,21 +28,19 @@
   color: var(--tg-subtitle-text-color);
 }
 
-.tg-button {
-  background-color: var(--tg-button-color, #0088cc);
-  color: var(--tg-button-text-color, #ffffff);
+.tg-btn {
+  background-color: var(--tg-button-color);
+  color: var(--tg-button-text-color);
   border-radius: 8px;
-  padding: 10px 20px;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  padding: 8px 20px;
 }
 
 .tg-list-item {
-  background-color: var(--tg-secondary-bg-color);
-  border-radius: 8px;
+  color: var(--tg-subtitle-text-color);
 }
 
 .tg-list-item-icon {
-  color: var(--tg-button-color);
+  color: var(--tg-accent-text-color);
 }
 
 .tg-section {

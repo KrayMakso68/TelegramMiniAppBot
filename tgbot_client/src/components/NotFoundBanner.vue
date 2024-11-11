@@ -27,18 +27,21 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="column flex-center q-pb-lg">
-    <div class="col q-pa-xs lottie-animation">
+  <div class="column flex-center q-pb-md q-col-gutter-sm">
+    <div class="col lottie-animation">
       <div ref="lottieContainer"/>
     </div>
-    <div class="col text-center text-h6 tg-text">
+    <div class="col col-8 text-center text-h6 tg-text">
       {{title}}
+    </div>
+    <div class="col col-8">
+      <q-btn class="tg-btn">Подключить</q-btn>
     </div>
   </div>
 </template>
 
 <style scoped>
 .lottie-animation {
-  width: 200px;
+  width: 150px;
 }
 </style>

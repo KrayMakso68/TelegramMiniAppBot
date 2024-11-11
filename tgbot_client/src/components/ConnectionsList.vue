@@ -19,29 +19,41 @@ onMounted(loadConnects);
   <q-slide-transition>
     <div>
       <q-list v-if="loading">
-        <template v-for="index in 3" :key="index">
+        <template v-for="index in 2" :key="index">
           <q-item v-ripple>
             <q-item-section avatar>
               <q-avatar>
-                <q-skeleton size="25px" type="QAvatar"  />
+                <q-skeleton type="QAvatar"/>
               </q-avatar>
             </q-item-section>
             <q-item-section>
-              <q-skeleton width="40%" type="text" animation-speed="2500" />
+              <q-item-label lines="1">
+                <q-skeleton width="40%" type="text"/>
+              </q-item-label>
+              <q-item-label caption>
+                <q-skeleton width="20%" type="text"/>
+              </q-item-label>
+            </q-item-section>
+            <q-item-section side top>
+                <q-avatar icon='navigate_next' class="tg-subtitle-text"/>
             </q-item-section>
           </q-item>
-          <q-separator v-if="index < 3" inset="item" class="tg-separator" />
+          <q-separator v-if="index < 2" inset="item" class="tg-separator"/>
         </template>
       </q-list>
 
       <q-list v-else-if="connects && connects.length">
         <template v-for="(item, index) in connects" :key="index">
           <q-item :to="'test-colors'" v-ripple draggable="false">
-            <q-item-section avatar>
-              <q-avatar icon='vpn_lock' class="tg-list-item-icon"/>
+            <q-item-section avatar class="tg-list-item-icon">
+              <q-avatar icon='vpn_lock' font-size="25px"/>
             </q-item-section>
             <q-item-section>
-              {{ item.email }}
+              <q-item-label lines="1">{{ item.email }}</q-item-label>
+              <q-item-label caption class="tg-subtitle-text">{{ item.inboundName }}</q-item-label>
+            </q-item-section>
+            <q-item-section side top>
+              <q-avatar icon='navigate_next' class="tg-subtitle-text"/>
             </q-item-section>
           </q-item>
           <q-separator v-if="index < connects.length - 1" inset="item" class="tg-separator" />
