@@ -7,7 +7,7 @@ import WalletBalance from "components/WalletBalance.vue";
 </script>
 
 <template>
-  <q-page class="tg-text">
+  <q-page class="tg-text overflow-auto">
     <div class="column q-gutter-y-md">
 
       <tg-section class="q-px-lg q-pb-md q-pb-lg">
