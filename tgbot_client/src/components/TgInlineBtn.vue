@@ -8,13 +8,13 @@ interface Props {
 
 defineProps<Props>();
 
-const emit = defineEmits<{
-  (e: 'click'): void;
-}>();
-
-const handleClick = () => {
-  emit('click');
-};
+// const emit = defineEmits<{
+//   (e: 'click'): void;
+// }>();
+//
+// const handleClick = () => {
+//   emit('click');
+// };
 </script>
 
 <template>

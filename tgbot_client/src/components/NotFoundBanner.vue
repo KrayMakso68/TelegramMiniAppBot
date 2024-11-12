@@ -35,7 +35,7 @@ onMounted(() => {
       {{title}}
     </div>
     <div class="col col-8">
-      <q-btn class="tg-btn">Подключить</q-btn>
+      <slot name="button"/>
     </div>
   </div>
 </template>

@@ -9,10 +9,6 @@ const router = useRouter();
 <template>
   <BackButton @click="() => router.back()"></BackButton>
   <q-page padding class="q-gutter-sm">
-    <!--    <q-btn-->
-    <!--      label="Кнопка"-->
-    <!--      class="tg-button"-->
-    <!--    />-->
     <q-card :style="{ backgroundColor: 'var(--tg-bg-color)' }">
       <q-card-section>
         <p class="tg-text">1) --tg-bg-color</p>
