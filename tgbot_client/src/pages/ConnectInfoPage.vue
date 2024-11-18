@@ -3,6 +3,8 @@ import {BackButton} from "vue-tg";
 import {useRouter} from "vue-router";
 import {Connect} from "src/api/types/subscribeTypes";
 import {copyToClipboard, useQuasar} from "quasar";
+import TgSection from "components/TgSection.vue";
+
 
 const $q = useQuasar();
 const router = useRouter();
@@ -31,28 +33,29 @@ const onCopy = () => {
 
 <template>
   <BackButton @click="() => router.back()"></BackButton>
-  <q-page padding class="text-green-6 ">
-    <div class="copy-container">
-      <q-card square class="copy-card">
-        <q-card-section class="q-pa-none">
-          <div class="text-subtitle2">by John Doe</div>
-        </q-card-section>
-        <q-card-section class="q-pa-none">
-          <div class="text-content">
-            <pre>{{ connectUrl }}</pre>
-          </div>
-        </q-card-section>
-        <q-card-actions vertical class="q-pa-none">
-          <q-btn
-            flat
-            dense
-            icon="content_copy"
-            @click="onCopy"
-            label="Copy"
-          />
-        </q-card-actions>
-      </q-card>
-    </div>
+  <q-page padding>
+    <tg-section label="Connection url">
+      <div class="copy-container">
+        <q-card square class="copy-card" style="background-color: var(--tg-section-bg-color)">
+          <q-card-section class="q-py-none">
+            <div class="text-content">
+              <code>
+                <pre style="color: var(--tg-link-color);">{{ connectUrl }}</pre>
+              </code>
+            </div>
+          </q-card-section>
+          <q-card-actions vertical class="q-pa-none">
+            <q-btn style="color: var(--tg-button-color);"
+              flat
+              size="sm"
+              icon="content_copy"
+              @click="onCopy"
+              label="Copy"
+            />
+          </q-card-actions>
+        </q-card>
+      </div>
+    </tg-section>
   </q-page>
 </template>
 
