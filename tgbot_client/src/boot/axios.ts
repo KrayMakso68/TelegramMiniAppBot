@@ -1,5 +1,6 @@
 import { boot } from 'quasar/wrappers';
 import axios, { AxiosInstance } from 'axios';
+
 import { LocalStorage } from 'quasar';
 import { useWebApp } from 'vue-tg'
 
@@ -14,7 +15,6 @@ const api = axios.create({
   baseURL: 'http://127.0.0.1:8000/api/v1'
 });
 
-// Интерсептор запроса для добавления токена
 api.interceptors.request.use((config) => {
   const token = LocalStorage.getItem('token');
   if (token) {
@@ -25,7 +25,6 @@ api.interceptors.request.use((config) => {
   return Promise.reject(error);
 });
 
-// Интерсептор ответа для обработки ошибок и обновления токенов
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -45,7 +44,6 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (err) {
         console.error('Ошибка обновления токена:', err);
-        // Здесь можно вызвать логаут или перенаправление на страницу входа
       }
     }
 
