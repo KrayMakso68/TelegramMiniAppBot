@@ -6,7 +6,11 @@ import TgSection from "components/TgSection.vue";
 import TgCodeCard from "components/TgCodeCard.vue";
 
 const router = useRouter();
-defineProps<Connect>()
+defineProps<Connect>();
+
+const loadInfo = () => {
+
+};
 </script>
 
 <template>
@@ -18,12 +22,27 @@ defineProps<Connect>()
           {{email}}
         </div>
       </tg-section>
+      <div class="q-px-xs">
+        <tg-code-card title="Connection url" :text=connectUrl />
+      </div>
 
-      <tg-code-card title="Connection url" :text=connectUrl class=""/>
 
-      <tg-section label="Расход трафика">
-        dsfsd
-      </tg-section>
+
+        <q-expansion-item
+        style="background-color: var(--tg-section-bg-color); border-radius: 5px"
+        icon="query_stats"
+        label="Подробная информация"
+        @show="loadInfo"
+      >
+        <q-card>
+          <q-card-section>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius reprehenderit eos corrupti
+            commodi magni quaerat ex numquam, dolorum officiis modi facere maiores architecto suscipit iste
+            eveniet doloribus ullam aliquid.
+          </q-card-section>
+        </q-card>
+      </q-expansion-item>
+
 
     </div>
   </q-page>

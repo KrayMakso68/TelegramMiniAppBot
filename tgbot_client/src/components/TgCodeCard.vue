@@ -29,48 +29,42 @@ const onCopy = () => {
 </script>
 
 <template>
-  <div class="copy-container">
-    <q-card flat class="copy-card">
+  <q-card flat class="copy-card">
 
-      <q-card-section class="q-pa-none q-pl-md transparent-background">
-        <div class="text-caption text-no-wrap">
-          {{ title }}
-        </div>
-      </q-card-section>
+    <q-card-section class="q-pa-none q-pl-md transparent-background">
+      <div class="text-caption text-no-wrap">
+        {{ title }}
+      </div>
+    </q-card-section>
 
-      <q-card-section class="q-py-none">
-        <div class="text-content">
-          <code>
-            <pre>{{ text }}</pre>
-          </code>
-        </div>
-      </q-card-section>
+    <q-card-section class="q-py-none">
+      <div class="text-content">
+        <code>
+          <pre>{{ text }}</pre>
+        </code>
+      </div>
+    </q-card-section>
 
-      <q-card-actions vertical class="q-pa-none">
-        <q-btn style="color: var(--tg-button-color);"
-               flat
-               size="sm"
-               icon="content_copy"
-               @click="onCopy"
-               label="Copy"
-        />
-      </q-card-actions>
+    <q-card-actions vertical class="q-pa-none">
+      <q-btn style="color: var(--tg-button-color);"
+             flat
+             size="sm"
+             icon="content_copy"
+             @click="onCopy"
+             label="Copy"
+      />
+    </q-card-actions>
 
-    </q-card>
-  </div>
+  </q-card>
 </template>
 
 <style scoped>
-.copy-container {
-
-}
-
 .copy-card {
   width: 100%;
   max-width: 600px;
   background-color: var(--tg-section-bg-color);
-  border-radius: 4px;
-  border-left: 3px solid var(--tg-accent-text-color);
+  border-radius: 5px;
+  border-left: 4px solid var(--tg-accent-text-color);
 }
 
 pre {
@@ -95,7 +89,7 @@ pre {
   bottom: 0;
   background-color: var(--tg-accent-text-color);
   border-top-right-radius: 4px;
-  opacity: 0.2;
+  opacity: 0.25;
   z-index: -1;
 }
 </style>
