@@ -18,31 +18,35 @@ const loadInfo = () => {
   <q-page class="tg-text overflow-auto">
     <div class="q-gutter-y-md">
       <tg-section>
-        <div class="text-h5 text-center">
-          {{email}}
+        <div class="q-pa-md">
+          <div class="text-subtitle2" style="color: var(--tg-subtitle-text-color);">
+            Подключение
+          </div>
+          <div class="text-h4 text-weight-bold" style="color: var(--tg-section-header-text-color);">
+            {{email}}
+          </div>
+        </div>
+        <div class="q-pa-sm">
+          <tg-code-card title="Connection url" :text=connectUrl />
         </div>
       </tg-section>
-      <div class="q-px-xs">
-        <tg-code-card title="Connection url" :text=connectUrl />
-      </div>
 
-
-
+      <tg-section>
         <q-expansion-item
-        style="background-color: var(--tg-section-bg-color); border-radius: 5px"
-        icon="query_stats"
-        label="Подробная информация"
-        @show="loadInfo"
-      >
-        <q-card>
-          <q-card-section>
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius reprehenderit eos corrupti
-            commodi magni quaerat ex numquam, dolorum officiis modi facere maiores architecto suscipit iste
-            eveniet doloribus ullam aliquid.
-          </q-card-section>
-        </q-card>
-      </q-expansion-item>
-
+          icon="query_stats"
+          header-class="q-pl-lg"
+          label="Подробная информация"
+          @show="loadInfo"
+        >
+          <q-card style="background-color: var(--tg-section-bg-color);">
+            <q-card-section>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quidem, eius reprehenderit eos corrupti
+              commodi magni quaerat ex numquam, dolorum officiis modi facere maiores architecto suscipit iste
+              eveniet doloribus ullam aliquid.
+            </q-card-section>
+          </q-card>
+        </q-expansion-item>
+      </tg-section>
 
     </div>
   </q-page>

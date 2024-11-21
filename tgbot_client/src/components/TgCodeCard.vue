@@ -29,7 +29,7 @@ const onCopy = () => {
 </script>
 
 <template>
-  <q-card flat class="copy-card">
+  <q-card class="copy-card">
 
     <q-card-section class="q-pa-none q-pl-md transparent-background">
       <div class="text-caption text-no-wrap">
