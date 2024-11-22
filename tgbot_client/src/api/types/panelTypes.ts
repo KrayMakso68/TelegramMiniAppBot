@@ -1,4 +1,4 @@
-export interface ConnectData {
+export interface ConnectInfo {
   "email": string,
   "enable": true,
   "id": number | string,
