@@ -46,7 +46,7 @@ const onCopy = () => {
     </q-card-section>
 
     <q-card-actions vertical class="q-pa-none">
-      <q-btn style="color: var(--tg-button-color);"
+      <q-btn class="copy-btn"
              flat
              size="sm"
              icon="content_copy"
@@ -72,6 +72,10 @@ pre {
   font-size: 12px;
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+.copy-btn {
+  color: var(--tg-button-color);
 }
 
 .transparent-background {
