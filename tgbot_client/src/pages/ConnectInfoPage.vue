@@ -18,6 +18,11 @@ const loadInfo = async () => {
     connectInfo.value = await PanelService.getConnectInfoByEmail(props.email)
   }
 };
+
+function bytesToGB(bytes: number): number {
+  const gigabytes = bytes / (1024 ** 3);
+  return Math.round(gigabytes * 10) / 10;
+}
 </script>
 
 <template>
@@ -47,51 +52,75 @@ const loadInfo = async () => {
         >
           <q-card style="background-color: var(--tg-section-bg-color);">
             <q-card-section>
-              <div class="column">
+              <div class="column text-no-wrap">
 
                 <div class="col row items-center">
                   <div class="col-3">Name:</div>
                   <div class="col-auto">
-                     <q-chip dense color="teal" text-color="white">
-                      {{connectInfo?.email}}
+                    <q-skeleton v-if="!connectInfo" height="21px" type="QChip" class="q-ma-xs"/>
+                    <q-chip v-else dense color="teal" text-color="white" style="margin: 4px">
+                      {{connectInfo.email}}
                     </q-chip>
                   </div>
                 </div>
-                <div class="col row">
-                  <div class="col-3">Active:</div>
-                  <div class="col-auto">{{connectInfo?.enable}}</div>
-                </div>
-                <div class="col row">
-                  <div class="col-3">Expiry time:</div>
-                  <div class="col-auto">{{connectInfo?.expiryTime}}</div>
+                <div class="col row items-center">
+                  <div class="col-3">Active :</div>
+                  <div class="col-auto">
+                    <q-skeleton v-if="!connectInfo" height="21px" width="40px" type="QChip" class="q-ma-xs"/>
+                    <q-chip v-else dense color="green" text-color="white">
+                      {{connectInfo.enable}}
+                    </q-chip>
+                  </div>
                 </div>
                 <div class="col row items-center">
-                  <div class="col-3">
-                    Download:
+                  <div class="col-3">Expiry time:</div>
+                  <div class="col-auto">
+                    <q-skeleton v-if="!connectInfo" height="21px" width="120px" type="QChip" class="q-ma-xs"/>
+                    <q-chip v-else dense color="red" text-color="white">
+                      {{connectInfo.expiryTime}}
+                    </q-chip>
                   </div>
-                  <div class="col-3">
+                </div>
+
+                <div class="col row items-center">
+                  <div class="col-3">Download:</div>
+                  <div class="col-3 q-pa-sm">
                     <q-circular-progress
+                      v-if="!connectInfo"
                       indeterminate
                       rounded
                       size="50px"
                       color="blue"
-                      class=""
                     />
-
-                  </div>
-                  <div class="col-3">
-                    Upload:
-                  </div>
-                  <div class="col-3">
                     <q-circular-progress
+                      v-else
                       show-value
-                      value="30"
+                      :value="bytesToGB(connectInfo.down)"
                       rounded
                       size="50px"
                       color="blue"
-                      class=""
                     >
-                      {{30}} GB
+                      {{bytesToGB(connectInfo.down)}} GB
+                    </q-circular-progress>
+                  </div>
+                  <div class="col-3">Upload:</div>
+                  <div class="col-3 q-pa-sm">
+                    <q-circular-progress
+                      v-if="!connectInfo"
+                      indeterminate
+                      rounded
+                      size="50px"
+                      color="blue"
+                    />
+                    <q-circular-progress
+                      v-else
+                      show-value
+                      :value="bytesToGB(connectInfo.up)"
+                      rounded
+                      size="50px"
+                      color="blue"
+                    >
+                      {{bytesToGB(connectInfo.up)}} GB
                     </q-circular-progress>
                   </div>
                 </div>
