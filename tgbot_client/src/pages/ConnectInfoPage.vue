@@ -23,6 +23,19 @@ function bytesToGB(bytes: number): number {
   const gigabytes = bytes / (1024 ** 3);
   return Math.round(gigabytes * 10) / 10;
 }
+
+function datetimeToString(dateTime: number): string {
+  if (dateTime === 0) {
+    return "unlimited"
+  } else {
+    const formatter = new Intl.DateTimeFormat('ru-RU', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+    });
+    return formatter.format(dateTime);
+  }
+}
 </script>
 
 <template>
@@ -77,7 +90,7 @@ function bytesToGB(bytes: number): number {
                   <div class="col-auto">
                     <q-skeleton v-if="!connectInfo" height="21px" width="120px" type="QChip" class="q-ma-xs"/>
                     <q-chip v-else dense color="red" text-color="white">
-                      {{connectInfo.expiryTime}}
+                      {{datetimeToString(connectInfo.expiryTime)}}
                     </q-chip>
                   </div>
                 </div>

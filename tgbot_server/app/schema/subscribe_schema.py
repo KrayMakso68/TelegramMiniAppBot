@@ -53,7 +53,7 @@ class VlessConfig(BaseConfig):
             spider_path=query_params.get("spx")[0],
             connection_type=query_params.get("type")[0],
             inbound_name=fragment[0],
-            email=fragment[-1]
+            email=fragment[1]
         )
 
     def to_url(self) -> str:
