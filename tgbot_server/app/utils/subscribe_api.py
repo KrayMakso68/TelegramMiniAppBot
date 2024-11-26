@@ -1,5 +1,3 @@
-import logging
-
 from httpx import AsyncClient, HTTPError, RequestError, TimeoutException
 
 from app.core.config import settings

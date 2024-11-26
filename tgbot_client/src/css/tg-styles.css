@@ -35,14 +35,6 @@
   padding: 8px 20px;
 }
 
-.tg-list-item {
-  color: var(--tg-subtitle-text-color);
-}
-
-.tg-list-item-icon {
-  color: var(--tg-accent-text-color);
-}
-
 .tg-section {
   background-color: var(--tg-section-bg-color);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);

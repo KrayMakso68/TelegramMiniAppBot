@@ -3,4 +3,5 @@ export interface Connect {
     "uuid": string,
     "email": string,
     "inboundName": string
+    "remainingSeconds": number
   }

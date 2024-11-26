@@ -1,16 +1,17 @@
 <script setup lang="ts">
 import NotFoundBanner from "components/NotFoundBanner.vue";
-import {onMounted, ref} from "vue";
+import {onMounted, Ref, ref} from "vue";
 import {Connect} from "src/api/types/subscribeTypes";
 import {SubscriberService} from "src/api";
 
 const loading  = ref<boolean>(true);
-const connects = ref<Connect[] | null>(null);
+const connects: Ref<Connect[] | null> = ref<Connect[] | null>(null);
 
 const loadConnects = async () => {
   connects.value = await SubscriberService.getUserConnects();
   loading.value = false;
 };
+
 
 onMounted(loadConnects);
 </script>
@@ -57,10 +58,16 @@ onMounted(loadConnects);
 
             <q-item-section>
               <q-item-label lines="1">{{ connect.email }}</q-item-label>
-              <q-item-label caption class="tg-subtitle-text">{{ connect.inboundName }}</q-item-label>
+              <q-item-label caption class="tg-subtitle-text">
+                {{ connect.inboundName }}
+              </q-item-label>
             </q-item-section>
 
             <q-item-section side top>
+              <q-badge class="tg-list-badge" :label='connect.remainingSeconds' />
+            </q-item-section>
+
+            <q-item-section side>
               <q-avatar icon='navigate_next' class="tg-subtitle-text"/>
             </q-item-section>
 
@@ -81,5 +88,10 @@ onMounted(loadConnects);
 </template>
 
 <style scoped>
-
+.tg-list-item-icon {
+  color: var(--tg-accent-text-color);
+}
+.tg-list-badge {
+  background-color: var(--tg-destructive-text-color);
+}
 </style>

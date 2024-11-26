@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from pydantic import model_validator
 from urllib.parse import urlparse, parse_qs, urlunparse, urlencode
 
@@ -22,15 +24,16 @@ class VlessConfig(BaseConfig):
     spider_path: str
     connection_type: str
 
+
     @model_validator(mode="before")
     @classmethod
     def check_fields_not_empty(cls, values):
         required_fields = [
-            'uuid', 'address', 'port', 'flow', 'fingerprint', "public_key",
-            'security', 'sid', 'sni', 'spider_path', 'connection_type', 'inbound_name', 'email'
+            'uuid', 'address', 'port', 'flow', 'fingerprint', 'public_key', 'security', 'sid',
+            'sni', 'spider_path', 'connection_type', 'inbound_name', 'email'
         ]
         for field in required_fields:
-            if not values.get(field):
+            if values.get(field) is None:
                 raise ValueError(f"Field {field} cannot be empty!")
         return values
 
@@ -52,8 +55,8 @@ class VlessConfig(BaseConfig):
             sni=query_params.get("sni")[0],
             spider_path=query_params.get("spx")[0],
             connection_type=query_params.get("type")[0],
-            inbound_name=fragment[0],
-            email=fragment[1]
+            inbound_name=fragment[0] if len(fragment) > 0 else 'unknown',
+            email=fragment[1] if len(fragment) > 1 else 'unknown'
         )
 
     def to_url(self) -> str:
@@ -87,13 +90,14 @@ class ConnectSchema(BaseSchema):
     uuid: str
     email: str
     inbound_name: str
+    remaining_seconds: int
 
     @model_validator(mode="before")
     @classmethod
     def check_fields_not_empty(cls, values):
-        required_fields = ['connect_url', 'uuid', 'inbound_name', 'email']
+        required_fields = ['connect_url', 'uuid', 'inbound_name', 'email', 'remaining_seconds']
         for field in required_fields:
-            if not values.get(field):
+            if values.get(field) is None:
                 raise ValueError(f"Field {field} cannot be empty!")
         return values
 
@@ -102,9 +106,19 @@ class ConnectSchema(BaseSchema):
         parsed_url = urlparse(url)
         fragment = parsed_url.fragment.split("-")
 
+        time_string = fragment[2] if len(fragment) > 2 else None
+
+        if time_string:
+            days = int(time_string.split('D')[0]) if 'D' in time_string else 0
+            hours = int(time_string.split(',')[1].split('H')[0]) if 'H' in time_string else 0
+            remaining_seconds = int(timedelta(days=days, hours=hours).total_seconds())
+        else:
+            remaining_seconds = 0
+
         return cls(
             connect_url=url,
             uuid=parsed_url.username,
-            inbound_name=fragment[0],
-            email=fragment[-1]
+            inbound_name=fragment[0] if len(fragment) > 0 else 'unknown',
+            email=fragment[1] if len(fragment) > 1 else 'unknown',
+            remaining_seconds=remaining_seconds
         )
