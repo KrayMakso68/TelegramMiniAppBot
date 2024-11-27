@@ -1,4 +1,5 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
+import re
 
 from pydantic import model_validator
 from urllib.parse import urlparse, parse_qs, urlunparse, urlencode
@@ -91,11 +92,12 @@ class ConnectSchema(BaseSchema):
     email: str
     inbound_name: str
     remaining_seconds: int
+    active: bool
 
     @model_validator(mode="before")
     @classmethod
     def check_fields_not_empty(cls, values):
-        required_fields = ['connect_url', 'uuid', 'inbound_name', 'email', 'remaining_seconds']
+        required_fields = ['connect_url', 'uuid', 'inbound_name', 'email', 'remaining_seconds', 'active']
         for field in required_fields:
             if values.get(field) is None:
                 raise ValueError(f"Field {field} cannot be empty!")
@@ -107,18 +109,27 @@ class ConnectSchema(BaseSchema):
         fragment = parsed_url.fragment.split("-")
 
         time_string = fragment[2] if len(fragment) > 2 else None
+        active = True
+        remaining_seconds = 0
 
         if time_string:
-            days = int(time_string.split('D')[0]) if 'D' in time_string else 0
-            hours = int(time_string.split(',')[1].split('H')[0]) if 'H' in time_string else 0
+            days_match = re.search(r'(\d+)D', time_string)
+            hours_match = re.search(r'(\d+)H', time_string)
+            days = int(days_match.group(1)) if days_match else 0
+            hours = int(hours_match.group(1)) if hours_match else 0
             remaining_seconds = int(timedelta(days=days, hours=hours).total_seconds())
         else:
-            remaining_seconds = 0
+            if "N/A" in fragment or "%E2%9B%94%EF%B8%8F" in fragment[0]:
+                active = False
+
+        cleaned_fragment = '-'.join(fragment[:2]) if len(fragment) > 1 else fragment[0]
+        cleaned_url = url.replace(f"#{parsed_url.fragment}", f"#{cleaned_fragment}")
 
         return cls(
-            connect_url=url,
+            connect_url=cleaned_url,
             uuid=parsed_url.username,
             inbound_name=fragment[0] if len(fragment) > 0 else 'unknown',
             email=fragment[1] if len(fragment) > 1 else 'unknown',
-            remaining_seconds=remaining_seconds
+            remaining_seconds=remaining_seconds,
+            active=active
         )

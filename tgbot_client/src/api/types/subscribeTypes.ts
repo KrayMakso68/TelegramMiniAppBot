@@ -4,4 +4,5 @@ export interface Connect {
     "email": string,
     "inboundName": string
     "remainingSeconds": number
+    "active": boolean
   }
