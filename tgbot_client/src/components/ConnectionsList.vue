@@ -64,13 +64,20 @@ onMounted(loadConnects);
             </q-item-section>
 
             <q-item-section side top>
-              <q-badge class="tg-list-badge" :label='connect.remainingSeconds' />
+              <template v-if="connect.active && !connect.remainingSeconds" >
+                <q-badge color="amber-9" label='unlimit' />
+              </template>
+              <template v-else-if="!connect.active">
+                <q-badge color="red" label='expired' />
+              </template>
+              <template v-else>
+                <q-badge color="green" :label='connect.remainingSeconds' />
+              </template>
             </q-item-section>
 
             <q-item-section side>
               <q-avatar icon='navigate_next' class="tg-subtitle-text"/>
             </q-item-section>
-
           </q-item>
           <q-separator v-if="index < connects.length - 1" inset="item" class="tg-separator" />
         </template>

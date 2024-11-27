@@ -122,14 +122,18 @@ class ConnectSchema(BaseSchema):
             if "N/A" in fragment or "%E2%9B%94%EF%B8%8F" in fragment[0]:
                 active = False
 
-        cleaned_fragment = '-'.join(fragment[:2]) if len(fragment) > 1 else fragment[0]
+        if fragment[0].startswith('%'):
+            cleaned_fragment = '-'.join(fragment[1:3])
+        else:
+            cleaned_fragment = '-'.join(fragment[:2]) if len(fragment) > 1 else fragment[0]
+
         cleaned_url = url.replace(f"#{parsed_url.fragment}", f"#{cleaned_fragment}")
 
         return cls(
             connect_url=cleaned_url,
             uuid=parsed_url.username,
-            inbound_name=fragment[0] if len(fragment) > 0 else 'unknown',
-            email=fragment[1] if len(fragment) > 1 else 'unknown',
+            inbound_name=cleaned_fragment.split("-")[0] if len(fragment) > 0 else 'unknown',
+            email=cleaned_fragment.split("-")[1] if len(fragment) > 1 else 'unknown',
             remaining_seconds=remaining_seconds,
             active=active
         )

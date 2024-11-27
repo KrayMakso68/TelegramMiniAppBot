@@ -32,6 +32,8 @@ function datetimeToString(dateTime: number): string {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric'
     });
     return formatter.format(dateTime);
   }
