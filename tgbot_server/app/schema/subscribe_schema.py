@@ -2,88 +2,9 @@ from datetime import timedelta
 import re
 
 from pydantic import model_validator
-from urllib.parse import urlparse, parse_qs, urlunparse, urlencode
+from urllib.parse import urlparse, unquote
 
 from app.schema.base_schema import BaseSchema
-
-
-class BaseConfig(BaseSchema):
-    uuid: str
-    address: str
-    inbound_name: str
-    email: str
-
-
-class VlessConfig(BaseConfig):
-    port: int
-    flow: str
-    fingerprint: str
-    public_key: str
-    security: str
-    sid: str
-    sni: str
-    spider_path: str
-    connection_type: str
-
-
-    @model_validator(mode="before")
-    @classmethod
-    def check_fields_not_empty(cls, values):
-        required_fields = [
-            'uuid', 'address', 'port', 'flow', 'fingerprint', 'public_key', 'security', 'sid',
-            'sni', 'spider_path', 'connection_type', 'inbound_name', 'email'
-        ]
-        for field in required_fields:
-            if values.get(field) is None:
-                raise ValueError(f"Field {field} cannot be empty!")
-        return values
-
-    @classmethod
-    def from_url(cls, url: str):
-        parsed_url = urlparse(url)
-        query_params = parse_qs(parsed_url.query)
-        fragment = parsed_url.fragment.split("-")
-
-        return cls(
-            uuid=parsed_url.username,
-            address=parsed_url.hostname,
-            port=parsed_url.port,
-            flow=query_params.get("flow")[0],
-            fingerprint=query_params.get("fp")[0],
-            public_key=query_params.get("pbk")[0],
-            security=query_params.get("security")[0],
-            sid=query_params.get("sid")[0],
-            sni=query_params.get("sni")[0],
-            spider_path=query_params.get("spx")[0],
-            connection_type=query_params.get("type")[0],
-            inbound_name=fragment[0] if len(fragment) > 0 else 'unknown',
-            email=fragment[1] if len(fragment) > 1 else 'unknown'
-        )
-
-    def to_url(self) -> str:
-        query_params = {
-            "flow": self.flow,
-            "fp": self.fingerprint,
-            "pbk": self.public_key,
-            "security": self.security,
-            "sid": self.sid,
-            "sni": self.sni,
-            "spx": self.spider_path,
-            "type": self.connection_type
-        }
-
-        # query_params = {k: v for k, v in query_params.items() if v}
-
-        url = urlunparse((
-            "vless",
-            f"{self.uuid}@{self.address}:{self.port}",
-            "",
-            "",
-            urlencode(query_params),
-            f"{self.inbound_name}-{self.email}"
-        ))
-
-        return url
 
 
 class ConnectSchema(BaseSchema):
@@ -106,34 +27,61 @@ class ConnectSchema(BaseSchema):
     @classmethod
     def from_url(cls, url: str):
         parsed_url = urlparse(url)
-        fragment = parsed_url.fragment.split("-")
+        fragment = unquote(parsed_url.fragment).split("-")
 
-        time_string = fragment[2] if len(fragment) > 2 else None
-        active = True
-        remaining_seconds = 0
+        if not fragment or len(fragment) == 0:
+            raise ValueError("Invalid fragment in URL.")
 
-        if time_string:
-            days_match = re.search(r'(\d+)D', time_string)
-            hours_match = re.search(r'(\d+)H', time_string)
-            days = int(days_match.group(1)) if days_match else 0
-            hours = int(hours_match.group(1)) if hours_match else 0
-            remaining_seconds = int(timedelta(days=days, hours=hours).total_seconds())
+        if "N/A" in fragment[0] or "⛔" in fragment[0]:
+            active = False
+            remaining_seconds = 0
+        elif len(fragment) > 2:
+            time_string = fragment[2]
+            remaining_seconds = cls._extract_remaining_seconds(time_string)
+            active = True
         else:
-            if "N/A" in fragment or "%E2%9B%94%EF%B8%8F" in fragment[0]:
-                active = False
+            remaining_seconds = 0
+            active = True
 
-        if fragment[0].startswith('%'):
-            cleaned_fragment = '-'.join(fragment[1:3])
-        else:
-            cleaned_fragment = '-'.join(fragment[:2]) if len(fragment) > 1 else fragment[0]
-
+        cleaned_fragment = cls._clean_fragment(fragment)
         cleaned_url = url.replace(f"#{parsed_url.fragment}", f"#{cleaned_fragment}")
+
+        inbound_name, email = cls._extract_name_email(cleaned_fragment)
 
         return cls(
             connect_url=cleaned_url,
             uuid=parsed_url.username,
-            inbound_name=cleaned_fragment.split("-")[0] if len(fragment) > 0 else 'unknown',
-            email=cleaned_fragment.split("-")[1] if len(fragment) > 1 else 'unknown',
+            inbound_name=inbound_name,
+            email=email,
             remaining_seconds=remaining_seconds,
             active=active
         )
+
+    @staticmethod
+    def _extract_remaining_seconds(time_string: str) -> int:
+        """Извлекает оставшееся время в секундах из строки времени."""
+        try:
+            days_match = re.search(r'(\d+)D', time_string)
+            hours_match = re.search(r'(\d+)H', time_string)
+            days = int(days_match.group(1)) if days_match else 0
+            hours = int(hours_match.group(1)) if hours_match else 0
+            return int(timedelta(days=days, hours=hours).total_seconds())
+        except Exception as e:
+            raise ValueError(f"Invalid time format: {time_string}") from e
+
+    @staticmethod
+    def _clean_fragment(fragment: list) -> str:
+        """Очищает фрагмент, убирая лишние символы."""
+        if len(fragment) == 0:
+            return "unknown"
+        if fragment[0].startswith("⛔") or fragment[0].startswith('%'):
+            return '-'.join(fragment[1:3])
+        return '-'.join(fragment[:2]) if len(fragment) > 1 else fragment[0]
+
+    @staticmethod
+    def _extract_name_email(cleaned_fragment: str) -> tuple:
+        """Извлекает имя и email из очищенного фрагмента."""
+        parts = cleaned_fragment.split("-")
+        inbound_name = parts[0] if len(parts) > 0 else 'unknown'
+        email = parts[1] if len(parts) > 1 else 'unknown'
+        return inbound_name, email
