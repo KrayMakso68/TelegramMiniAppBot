@@ -70,28 +70,31 @@ function datetimeToString(dateTime: number): string {
               <div class="column text-no-wrap">
 
                 <div class="col row items-center">
-                  <div class="col-3">Name:</div>
-                  <div class="col-auto">
+                  <div class="col-4">Имя :</div>
+                  <div class="col">
                     <q-skeleton v-if="!connectInfo" height="21px" type="QChip" class="q-ma-xs"/>
-                    <q-chip v-else dense color="teal" text-color="white" style="margin: 4px">
+                    <q-chip v-else dense color="indigo" text-color="white" class="q-px-sm">
                       {{connectInfo.email}}
                     </q-chip>
                   </div>
                 </div>
                 <div class="col row items-center">
-                  <div class="col-3">Active :</div>
-                  <div class="col-auto">
+                  <div class="col-4">Статус :</div>
+                  <div class="col">
                     <q-skeleton v-if="!connectInfo" height="21px" width="40px" type="QChip" class="q-ma-xs"/>
-                    <q-chip v-else dense color="green" text-color="white">
-                      {{connectInfo.enable}}
+                    <q-chip v-else-if="connectInfo.enable" dense color="green" text-color="white" class="q-px-sm">
+                      active
+                    </q-chip>
+                    <q-chip v-else dense color="red" text-color="white" class="q-px-sm">
+                      disable
                     </q-chip>
                   </div>
                 </div>
                 <div class="col row items-center">
-                  <div class="col-3">Expiry time:</div>
-                  <div class="col-auto">
+                  <div class="col-4">Срок окончания:</div>
+                  <div class="col">
                     <q-skeleton v-if="!connectInfo" height="21px" width="120px" type="QChip" class="q-ma-xs"/>
-                    <q-chip v-else dense color="red" text-color="white">
+                    <q-chip v-else dense color="red" text-color="white" class="q-px-sm">
                       {{datetimeToString(connectInfo.expiryTime)}}
                     </q-chip>
                   </div>

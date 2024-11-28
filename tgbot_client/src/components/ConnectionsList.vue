@@ -63,15 +63,15 @@ onMounted(loadConnects);
               </q-item-label>
             </q-item-section>
 
-            <q-item-section side top>
+            <q-item-section side>
               <template v-if="connect.active && !connect.remainingSeconds" >
-                <q-badge color="amber-9" label='unlimit' />
+                <q-badge outline color="amber-9" label='unlimit' />
               </template>
               <template v-else-if="!connect.active">
-                <q-badge color="red" label='expired' />
+                <q-badge outline color="red" label='expired' />
               </template>
               <template v-else>
-                <q-badge color="green" :label='connect.remainingSeconds' />
+                <q-badge outline color="green" label='active' />
               </template>
             </q-item-section>
 
@@ -79,7 +79,7 @@ onMounted(loadConnects);
               <q-avatar icon='navigate_next' class="tg-subtitle-text"/>
             </q-item-section>
           </q-item>
-          <q-separator v-if="index < connects.length - 1" inset="item" class="tg-separator" />
+          <q-separator v-if="index < connects?.length - 1" inset="item" class="tg-separator" />
         </template>
       </q-list>
 
@@ -97,8 +97,5 @@ onMounted(loadConnects);
 <style scoped>
 .tg-list-item-icon {
   color: var(--tg-accent-text-color);
-}
-.tg-list-badge {
-  background-color: var(--tg-destructive-text-color);
 }
 </style>
