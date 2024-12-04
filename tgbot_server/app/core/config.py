@@ -8,8 +8,6 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).parent.parent.parent
 
-DB_PATH = BASE_DIR / "sqlite.db"
-
 
 class Settings(BaseSettings):
     API: str = "/api"
@@ -18,9 +16,12 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "TelegramMiniAppBot"
 
     # database
-    DATABASE_URL: str = f"sqlite+aiosqlite:///{DB_PATH}"
     DB_HOST: str = os.getenv('DB_HOST')
     DB_PORT: int = os.getenv('DB_PORT')
+    DB_NAME: str = os.getenv('DB_NAME')
+    DB_USER: str = os.getenv('DB_USER')
+    DB_PASSWORD: str = os.getenv('DB_PASSWORD')
+    DATABASE_URL: str = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
     # bot
     BOT_TOKEN: str = os.getenv('BOT_TOKEN')
