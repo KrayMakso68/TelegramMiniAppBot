@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./tgbot_client
+      dockerfile: Dockerfile
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    ports:
+      - "443:443"
+      - "80:80"
+    restart: always
+    networks:
+      - app-network
+
+  bot:
+    build:
+      context: ./tgbot_main
+      dockerfile: Dockerfile
+    restart: always
+
+  3x-ui:
+    image: ghcr.io/mhsanaei/3x-ui:latest
+    container_name: 3x-ui
+    hostname: 3x-ui
+    volumes:
+      - .3x-ui/db/:/etc/x-ui/
+      - .3x-ui/cert/:/root/cert/
+    environment:
+      XRAY_VMESS_AEAD_FORCED: "false"
+    tty: true
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
