@@ -5,7 +5,7 @@ FROM nginx:latest
 WORKDIR /usr/share/nginx/html
 
 # Копируем билд проекта Vue.js (предварительно выполните npm run build)
-COPY ./dist /usr/share/nginx/html
+COPY ./dist/spa /usr/share/nginx/html
 
 # Удаляем стандартный конфиг Nginx и добавляем свой
 RUN rm /etc/nginx/conf.d/default.conf
