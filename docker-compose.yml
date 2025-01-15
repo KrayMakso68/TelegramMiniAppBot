@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   frontend:
+    container_name: frontend
     build:
       context: ./tgbot_client
       dockerfile: Dockerfile
@@ -10,49 +11,53 @@ services:
     ports:
       - "443:443"
       - "80:80"
-    depends_on:
-      - pgadmin
-      - fastapi
+#    depends_on:
+#      - pgadmin
+#      - fastapi
     restart: always
     networks:
       - app-network
 
   bot:
+    container_name: bot
     build:
       context: ./tgbot_main
       dockerfile: Dockerfile
     restart: always
 
-  postgres:
-    image: postgres:15
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - ./postgres_data:/var/lib/postgresql/data
-    networks:
-      - app-network
-
-  pgadmin:
-    image: dpage/pgadmin4:latest
-    environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    ports:
-      - "8080:80"
-    networks:
-      - app-network
-
+#  postgres:
+#    image: postgres:15
+#    environment:
+#      POSTGRES_USER: ${POSTGRES_USER}
+#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#      POSTGRES_DB: ${POSTGRES_DB}
+#    volumes:
+#      - ./postgres_data:/var/lib/postgresql/data
+#    networks:
+#      - app-network
+#
+#  pgadmin:
+#    image: dpage/pgadmin4:latest
+#    environment:
+#      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+#      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+#    ports:
+#      - "8080:80"
+#    networks:
+#      - app-network
+#
   fastapi:
+    container_name: fastapi
     build:
       context: ./tgbot_server
       dockerfile: Dockerfile
-    depends_on:
-      - postgres
+    ports:
+      - "8000:8000"
+#    depends_on:
+#      - postgres
     networks:
       - app-network
-
+#
 #volumes:
 #  postgres_data:
 

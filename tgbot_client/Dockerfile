@@ -14,7 +14,7 @@ FROM nginx:latest
 
 WORKDIR /usr/share/nginx/html
 
-COPY --from=builder /app/dist/spa /usr/share/nginx/html
+COPY --from=builder /app/dist/spa /usr/share/nginx/html/spa
 
 RUN rm /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/nginx.conf /etc/nginx/conf.d/default.conf
