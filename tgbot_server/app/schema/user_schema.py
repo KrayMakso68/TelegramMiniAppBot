@@ -7,5 +7,6 @@ class UserCreate(BaseSchema):
 
 class UserSchema(ModelBaseInfo, UserCreate):
     sub_uuid: str
+    balance: float
     is_active: bool
     is_superuser: bool

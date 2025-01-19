@@ -23,3 +23,8 @@ export const getUserAvatarUrl = async (): Promise<string | null> => {
   }
   return cachedAvatarBase64;
 };
+
+export const getCurrentUserBalance = async (): Promise<number> => {
+  const response = await api.get('/user/balance');
+  return response.data;
+}

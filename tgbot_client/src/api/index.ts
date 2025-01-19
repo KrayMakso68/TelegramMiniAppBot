@@ -1,5 +1,5 @@
 import {login} from './authService';
-import {getCurrentUser, getUserAvatarUrl} from './userService';
+import {getCurrentUser, getCurrentUserBalance, getUserAvatarUrl} from './userService';
 import {getUserConnects} from "src/api/subscribeService";
 import {getConnectInfoByEmail} from "src/api/panelService";
 
@@ -9,7 +9,8 @@ export const AuthService = {
 
 export const UserService = {
   getCurrentUser,
-  getCurrentUserAvatar: getUserAvatarUrl
+  getCurrentUserAvatar: getUserAvatarUrl,
+  getCurrentUserBalance
 };
 
 export const SubscriberService = {
