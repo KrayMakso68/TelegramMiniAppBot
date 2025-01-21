@@ -31,6 +31,10 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30)
 
+    # payment
+    YOOMONEY_WALLET: int = os.getenv('YOOMONEY_WALLET')
+    PAY_SUCCESS_URL: str = os.getenv('PAY_SUCCESS_URL')
+
     # # CORS
     # ALLOWED_ORIGINS: list[str] = [url for url in os.getenv('ALLOWED_ORIGINS', "*").split(',')]
 
