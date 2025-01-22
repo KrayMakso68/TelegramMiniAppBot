@@ -8,8 +8,6 @@ load_dotenv()
 
 BASE_DIR = Path(__file__).parent.parent.parent
 
-DB_PATH = BASE_DIR / "sqlite.db"
-
 
 class Settings(BaseSettings):
     API: str = "/api"
@@ -18,9 +16,12 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "TelegramMiniAppBot"
 
     # database
-    DATABASE_URL: str = f"sqlite+aiosqlite:///{DB_PATH}"
     DB_HOST: str = os.getenv('DB_HOST')
     DB_PORT: int = os.getenv('DB_PORT')
+    DB_NAME: str = os.getenv('DB_NAME')
+    DB_USER: str = os.getenv('DB_USER')
+    DB_PASSWORD: str = os.getenv('DB_PASSWORD')
+    DATABASE_URL: str = f"postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 
     # bot
     BOT_TOKEN: str = os.getenv('BOT_TOKEN')
@@ -29,6 +30,10 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = os.getenv('ACCESS_TOKEN_EXPIRE_MINUTES', 30)
+
+    # payment
+    YOOMONEY_WALLET: int = os.getenv('YOOMONEY_WALLET')
+    PAY_SUCCESS_URL: str = os.getenv('PAY_SUCCESS_URL')
 
     # # CORS
     # ALLOWED_ORIGINS: list[str] = [url for url in os.getenv('ALLOWED_ORIGINS', "*").split(',')]

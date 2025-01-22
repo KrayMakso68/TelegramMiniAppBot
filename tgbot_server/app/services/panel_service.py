@@ -48,26 +48,26 @@ class PanelService:
             raise NotFoundError(detail="Client Not Found.")
         return response
 
-    # @ensure_session_active
-    # async def add_clients(self, add_list: list[ClientCreate], user: UserSchema):
-    #     for client in add_list:
-    #         new_client = ClientSchema(
-    #             email=client.email + uuid.uuid4(),
-    #             enable=True,
-    #             id=str(uuid.uuid4()),
-    #             expiry_time=28174912,
-    #             flow="xtls-rprx-vision",
-    #             sub_id=user.sub_uuid,
-    #             tg_id=user.tg_id
-    #
-    #         )
-    #     new_clients: list[ClientSchema] = []
-    #     new_client = ClientSchema(
-    #         id=str(uuid.uuid4()),
-    #         email="test",
-    #         enable=True
-    #     )
-    #     return
+    @ensure_session_active
+    async def add_clients(self, add_list: list[ClientCreate], user: UserSchema):
+        for client in add_list:
+            new_client = ClientSchema(
+                email=client.email + uuid.uuid4(),
+                enable=True,
+                id=str(uuid.uuid4()),
+                expiry_time=28174912,
+                flow="xtls-rprx-vision",
+                sub_id=user.sub_uuid,
+                tg_id=user.tg_id
+
+            )
+        new_clients: list[ClientSchema] = []
+        new_client = ClientSchema(
+            id=str(uuid.uuid4()),
+            email="test",
+            enable=True
+        )
+        return
 
 
 # import uuid

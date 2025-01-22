@@ -3,6 +3,7 @@ export interface User {
   "isActive": boolean,
   "isSuperuser": boolean,
   "id": number,
+  "balance": number,
   "createdAt": Date,
   "updatedAt": Date
 }

@@ -26,3 +26,10 @@ async def user_avatar(
 ) -> JSONResponse:
     user_avatar_base64 = await service.get_user_avatar(current_user.tg_id)
     return JSONResponse(content=f"data:image/jpeg;base64,{user_avatar_base64}")
+
+
+@router.get("/balance")
+async def get_user_balance(
+        current_user: UserSchema = Depends(get_current_active_user),
+) -> float:
+    return current_user.balance

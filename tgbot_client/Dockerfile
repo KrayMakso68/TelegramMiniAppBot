@@ -1,27 +1,30 @@
-# Используем официальный образ Nginx
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+COPY package*.json ./
+
+RUN npm install
+
+COPY . .
+
+RUN npm run build
+
 FROM nginx:latest
 
-# Указываем рабочую директорию для копирования файлов
 WORKDIR /usr/share/nginx/html
 
-# Копируем билд проекта Vue.js (предварительно выполните npm run build)
-COPY ./dist /usr/share/nginx/html
+COPY --from=builder /app/dist/spa /usr/share/nginx/html/spa
 
-# Удаляем стандартный конфиг Nginx и добавляем свой
 RUN rm /etc/nginx/conf.d/default.conf
-COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=builder /app/nginx.conf /etc/nginx/conf.d/default.conf
 
-# Создаём директорию для SSL-сертификатов
 RUN mkdir -p /etc/nginx/ssl
-
-# Генерируем самоподписанный сертификат
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout /etc/nginx/ssl/private.key \
     -out /etc/nginx/ssl/certificate.crt \
     -subj "/C=US/ST=Test/L=Test/O=Test/OU=Test/CN=localhost"
 
-# Открываем порты для HTTP и HTTPS
 EXPOSE 80 443
 
-# Запускаем Nginx
 CMD ["nginx", "-g", "daemon off;"]

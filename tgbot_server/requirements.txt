@@ -1,4 +1,4 @@
-aiosqlite
+asyncpg
 alembic
 fastapi[all]
 SQLAlchemy
