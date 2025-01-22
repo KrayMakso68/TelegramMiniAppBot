@@ -1,7 +1,7 @@
 import uuid
 
 from sqlalchemy import Integer, Boolean, String, Float
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.model.base_model import BaseModel
 
@@ -14,3 +14,5 @@ class User(BaseModel):
     balance: Mapped[float] = mapped_column(Float, default=0.0)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
+
+    payments = relationship("Payment", back_populates="user")

@@ -43,3 +43,17 @@ class UserRepository(IUserRepository):
             return None
         except DatabaseError:
             raise DBError(detail="Database error occurred.")
+
+    async def update_balance(self, id: int, amount: float) -> UserSchema | None:
+        try:
+            stmt = select(User).where(User.id == id)
+            result: Result = await self.session.execute(stmt)
+            user: User | None = result.scalar_one_or_none()
+            if not user:
+                return None
+            user.balance += amount
+            await self.session.commit()
+            await self.session.refresh(user)
+        except DatabaseError:
+            raise DBError(detail="Database error occurred.")
+        return UserSchema.model_validate(user)

@@ -6,11 +6,13 @@ from app.core.config import settings
 from app.core.database import get_async_session
 from app.core.exceptions import JwtCredentialsError, IsActiveUserError
 from app.core.security import oauth_scheme, decode_access_token
+from app.repository.payment_repository import PaymentRepository
 from app.schema.auth_schema import TokenData
 from app.schema.user_schema import UserSchema
 from app.services.auth_service import AuthService
 from app.repository.user_repository import UserRepository
 from app.services.panel_service import PanelService
+from app.services.payment_service import PaymentService
 from app.services.subscribe_service import SubscribeService
 from app.services.user_service import UserService
 from app.utils.subscribe_api import SubscribeApi
@@ -54,8 +56,21 @@ def get_subscribe_service_for_user(current_user: UserSchema = Depends(get_curren
 
 # panel
 def get_panel_api() -> AsyncApi:
-    return AsyncApi(settings.PANEL_HOST, settings.PANEL_USERNAME, settings.PANEL_PASSWORD, use_tls_verify=settings.TLS_VERIFY)
+    return AsyncApi(settings.PANEL_HOST, settings.PANEL_USERNAME, settings.PANEL_PASSWORD,
+                    use_tls_verify=settings.TLS_VERIFY)
 
 
 def get_panel_service(panel_api: AsyncApi = Depends(get_panel_api)) -> PanelService:
     return PanelService(panel_api)
+
+
+# payment
+def get_payment_repository(async_session: AsyncSession = Depends(get_async_session)) -> PaymentRepository:
+    return PaymentRepository(async_session)
+
+
+def get_payment_service(
+        payment_repository: PaymentRepository = Depends(get_payment_repository),
+        user_repository: UserRepository = Depends(get_user_repository)
+) -> PaymentService:
+    return PaymentService(payment_repository, user_repository)

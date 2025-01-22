@@ -7,14 +7,14 @@ from app.model.base_model import BaseModel
 
 
 class PaymentStatus(enum.Enum):
-    PENDING = "pending"
-    COMPLETED = "completed"
-    FAILED = "failed"
+    PENDING = "PENDING"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
 
 
 class OperationType(enum.Enum):
-    DEPOSIT = "deposit"
-    WITHDRAWAL = "withdrawal"
+    DEPOSIT = "DEPOSIT"
+    WITHDRAWAL = "WITHDRAWAL"
 
 
 class Payment(BaseModel):
@@ -22,8 +22,14 @@ class Payment(BaseModel):
 
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
-    status: Mapped[PaymentStatus] = mapped_column(Enum(PaymentStatus), default=PaymentStatus.PENDING)
-    operation_type: Mapped[OperationType] = mapped_column(Enum(OperationType), nullable=False)
+    status: Mapped[PaymentStatus] = mapped_column(
+        Enum(PaymentStatus, name="payment_status_enum"),
+        default=PaymentStatus.PENDING
+    )
+    operation_type: Mapped[OperationType] = mapped_column(
+        Enum(OperationType, name="operation_type_enum"),
+        nullable=False
+    )
 
     user = relationship("User", back_populates="payments")
 

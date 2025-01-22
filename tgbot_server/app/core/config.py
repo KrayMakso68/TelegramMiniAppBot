@@ -33,6 +33,7 @@ class Settings(BaseSettings):
 
     # payment
     YOOMONEY_WALLET: int = os.getenv('YOOMONEY_WALLET')
+    YOOMONEY_SECRET: str = os.getenv('YOOMONEY_SECRET')
     PAY_SUCCESS_URL: str = os.getenv('PAY_SUCCESS_URL')
 
     # # CORS
