@@ -18,6 +18,10 @@ const routes: RouteRecordRaw[] = [
         component: () => import('pages/TelegramColors.vue')
       },
       {
+        path: 'payment-history',
+        component: () => import('pages/PaymentHistory.vue')
+      },
+      {
         path: 'connect-info',
         component: () => import('pages/ConnectInfoPage.vue'),
         props: (route) => ({

@@ -26,7 +26,7 @@ onMounted(loadBalance);
   </div>
   <div class="flex row justify-evenly q-pa-sm q-gutter-sm">
     <tg-inline-btn to="test-colors" class="col" label="Пополнить" icon="add_circle"/>
-    <tg-inline-btn to="" class="col" label="История" icon="history"/>
+    <tg-inline-btn to="payment-history" class="col" label="История" icon="history"/>
   </div>
 
 </template>
