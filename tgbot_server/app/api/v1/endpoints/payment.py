@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
 
 from app.core.dependencies import get_current_active_user, get_payment_service
-from app.schema.payment_schema import PaymentRequest
+from app.schema.payment_schema import PaymentRequest, PaymentSchema
 from app.schema.user_schema import UserSchema
 from app.services.payment_service import PaymentService
 from app.utils import validate_yoomoney
@@ -37,3 +37,13 @@ async def check_yoomoney_payment(
         return {"status": "OK"}
     else:
         return {"status": "Error"}
+
+    # return await service.processing_yoomoney_payment(form_data)
+
+
+@router.get("/history")
+async def get_user_payments_history(
+        user: UserSchema = Depends(get_current_active_user),
+        service: PaymentService = Depends(get_payment_service)
+) -> list[PaymentSchema]:
+    return await service.get_user_history(user.id)

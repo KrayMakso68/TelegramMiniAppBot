@@ -49,3 +49,12 @@ class PaymentRepository(IPaymentRepository):
             return payment
         except NoResultFound:
             return None
+
+    async def get_all(self, user_id: int) -> list[PaymentSchema]:
+        try:
+            stmt = select(Payment).where(Payment.user_id == user_id).order_by(Payment.created_at.desc())
+            result: Result = await self.session.execute(stmt)
+            payments_history = result.scalars().all()
+            return [PaymentSchema.from_orm(payment) for payment in payments_history]
+        except NoResultFound:
+            return []
