@@ -30,15 +30,7 @@ async def check_yoomoney_payment(
         service: PaymentService = Depends(get_payment_service)
 ):
     form_data = await request.form()
-    if validate_yoomoney.verify_hash(form_data):
-        payment_id = int(form_data.get("label"))
-        amount = float(form_data.get("withdraw_amount"))
-        await service.processing_payment(payment_id, amount)
-        return {"status": "OK"}
-    else:
-        return {"status": "Error"}
-
-    # return await service.processing_yoomoney_payment(form_data)
+    return await service.processing_yoomoney_payment(form_data)
 
 
 @router.get("/history")

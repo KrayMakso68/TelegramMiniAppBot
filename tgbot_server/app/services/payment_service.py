@@ -1,6 +1,9 @@
+from starlette.datastructures import FormData
+
 from app.core.config import settings
 from app.repository.interfaces import IPaymentRepository, IUserRepository
 from app.schema.payment_schema import PaymentCreate, OperationType, PaymentStatus, PaymentUpdate, PaymentSchema
+from app.utils import validate_yoomoney
 
 
 class PaymentService:
@@ -21,9 +24,16 @@ class PaymentService:
 
         return quickpay_link
 
-    async def processing_payment(self, payment_id: int, amount: float) -> None:
-        payment = await self.payment_repository.update(payment_id, PaymentUpdate(status=PaymentStatus.COMPLETED))
-        await self.user_repository.update_balance(payment.user_id, amount)
+    async def processing_yoomoney_payment(self, data: FormData) -> dict:
+        if validate_yoomoney.verify_hash(data):
+            payment_id = int(data.get("label"))
+            amount = float(data.get("withdraw_amount"))
+            payment = await self.payment_repository.update(payment_id, PaymentUpdate(status=PaymentStatus.COMPLETED))
+            await self.user_repository.update_balance(payment.user_id, amount)
+
+            return {"status": "OK"}
+        else:
+            return {"status": "Error"}
 
     async def get_user_history(self, user_id: int) -> list[PaymentSchema]:
         return await self.payment_repository.get_all(user_id)
