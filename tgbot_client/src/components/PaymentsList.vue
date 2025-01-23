@@ -52,37 +52,37 @@ onMounted(loadHistory);
             draggable="false"
           >
             <q-item-section avatar class="tg-list-item-icon">
-              <q-avatar icon='vpn_lock' font-size="25px"/>
+              <q-avatar icon='up' font-size="25px"/>
             </q-item-section>
 
             <q-item-section>
-              <q-item-label lines="1">{{ payment.userId }}</q-item-label>
+              <q-item-label lines="1">{{ payment.createdAt }}</q-item-label>
               <q-item-label caption class="tg-subtitle-text">
                 {{ payment.operationType }}
               </q-item-label>
             </q-item-section>
 
-            <q-item-section side>
-              <template v-if="connect.active && !connect.remainingSeconds" >
-                <q-badge outline color="amber-9" label='unlimit' />
-              </template>
-              <template v-else-if="!connect.active">
-                <q-badge outline color="red" label='expired' />
-              </template>
-              <template v-else>
-                <q-badge outline color="green" label='active' />
-              </template>
-            </q-item-section>
+<!--            <q-item-section side>-->
+<!--              <template v-if="connect.active && !connect.remainingSeconds" >-->
+<!--                <q-badge outline color="amber-9" label='unlimit' />-->
+<!--              </template>-->
+<!--              <template v-else-if="!connect.active">-->
+<!--                <q-badge outline color="red" label='expired' />-->
+<!--              </template>-->
+<!--              <template v-else>-->
+<!--                <q-badge outline color="green" label='active' />-->
+<!--              </template>-->
+<!--            </q-item-section>-->
 
             <q-item-section side>
               <q-avatar icon='navigate_next' class="tg-subtitle-text"/>
             </q-item-section>
           </q-item>
-          <q-separator v-if="index < connects?.length - 1" inset="item" class="tg-separator" />
+          <q-separator v-if="index < payments?.length - 1" inset="item" class="tg-separator" />
         </template>
       </q-list>
 
-      <not-found-banner v-else-if="connects" title="Похоже, у вас нет подписок!">
+      <not-found-banner v-else-if="payments" title="Похоже, у вас нет подписок!">
         <template #button>
           <q-btn class="tg-btn">Подключить</q-btn>
         </template>
