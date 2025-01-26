@@ -1,11 +1,11 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, Request
-from fastapi.responses import RedirectResponse
 
 from app.core.dependencies import get_current_active_user, get_payment_service
 from app.schema.payment_schema import PaymentRequest, PaymentSchema
 from app.schema.user_schema import UserSchema
 from app.services.payment_service import PaymentService
-from app.utils import validate_yoomoney
 
 router = APIRouter(
     prefix="/payment",
@@ -18,10 +18,8 @@ async def new_yoomoney_payment(
         request: PaymentRequest,
         user: UserSchema = Depends(get_current_active_user),
         service: PaymentService = Depends(get_payment_service)
-) -> RedirectResponse:
-    payment_url = await service.new_yoomoney_payment(user.id, request.amount)
-
-    return RedirectResponse(url=payment_url)
+) -> str:
+    return await service.new_yoomoney_payment(user.id, request.amount)
 
 
 @router.post("/check/yoomoney")
@@ -34,8 +32,8 @@ async def check_yoomoney_payment(
 
 
 @router.get("/history")
-async def get_user_payments_history(
+async def get_user_payments_history_by_day(
         user: UserSchema = Depends(get_current_active_user),
         service: PaymentService = Depends(get_payment_service)
-) -> list[PaymentSchema]:
-    return await service.get_user_history(user.id)
+) -> dict[str, list[PaymentSchema]]:
+    return await service.get_group_payments_by_day(user.id)

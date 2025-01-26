@@ -21,6 +21,7 @@ class PaymentRequest(BaseSchema):
 class PaymentCreate(BaseSchema):
     user_id: int
     amount: float
+    title: str | None = None
     operation_type: OperationType
 
 
@@ -32,5 +33,6 @@ class PaymentSchema(ModelBaseInfo):
     user_id: int
     amount: float
     status: PaymentStatus
+    title: str | None = None
     operation_type: OperationType
 

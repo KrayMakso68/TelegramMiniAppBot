@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Integer, Float, Enum, ForeignKey
+from sqlalchemy import Integer, Float, Enum, ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.model.base_model import BaseModel
@@ -22,6 +22,7 @@ class Payment(BaseModel):
 
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     amount: Mapped[float] = mapped_column(Float, nullable=False)
+    title: Mapped[str] = mapped_column(String, nullable=True)
     status: Mapped[PaymentStatus] = mapped_column(
         Enum(PaymentStatus, name="payment_status_enum"),
         default=PaymentStatus.PENDING
