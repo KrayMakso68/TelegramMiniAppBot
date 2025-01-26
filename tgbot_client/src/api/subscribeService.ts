@@ -16,3 +16,7 @@ export const getUserConnects = async (): Promise<Connect[] | null> => {
     }
   }
 }
+
+export const importConfig = async (config: string) => {
+  await api.get(`/subscribe/import-config?config=${config}`);
+}

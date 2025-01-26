@@ -38,6 +38,12 @@ function datetimeToString(dateTime: number): string {
     return formatter.format(dateTime);
   }
 }
+
+// const importConfig = async (config: string) => {
+//   await SubscriberService.importConfig(config)
+//   window.location.href = `hiddify://install-config?url=${encodeURIComponent(config)}`;
+//   console.log(`hiddify://install-config?url=${encodeURIComponent(config)}`)
+// };
 </script>
 
 <template>
@@ -56,6 +62,7 @@ function datetimeToString(dateTime: number): string {
         <div class="q-pa-sm">
           <tg-code-card title="Connection url" :text=connectUrl />
         </div>
+<!--        <q-btn @click="importConfig(connectUrl)">Импортировать</q-btn>-->
       </tg-section>
 
       <tg-section>

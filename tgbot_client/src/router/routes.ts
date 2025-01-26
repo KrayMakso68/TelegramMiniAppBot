@@ -19,7 +19,11 @@ const routes: RouteRecordRaw[] = [
       },
       {
         path: 'payment-history',
-        component: () => import('pages/PaymentHistory.vue')
+        component: () => import('pages/PaymentHistoryPage.vue')
+      },
+      {
+        path: 'payment-new',
+        component: () => import('pages/PaymentNewPage.vue')
       },
       {
         path: 'connect-info',
