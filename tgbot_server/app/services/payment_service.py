@@ -21,8 +21,7 @@ class PaymentService:
     async def new_yoomoney_payment(self, user_id: int, amount: float) -> str:
         create_payment = PaymentCreate(amount=amount,
                                        user_id=user_id,
-                                       operation_type=OperationType.DEPOSIT,
-                                       title="Пополнение счёта"
+                                       operation_type=OperationType.DEPOSIT
                                        )
         new_payment = await self.payment_repository.add(create_payment)
         quickpay_link = f"https://yoomoney.ru/quickpay/confirm.xml?receiver={settings.YOOMONEY_WALLET}&quickpay-form=button&paymentType=SB&sum={amount}&&label={new_payment.id}&successURL={settings.PAY_SUCCESS_URL}"
