@@ -1,8 +1,8 @@
-"""Add title to payments
+"""Add title for payment table
 
-Revision ID: cd5b643a519c
+Revision ID: 9e41ed2f2892
 Revises: fc46f64e276b
-Create Date: 2025-01-27 17:35:52.199637
+Create Date: 2025-01-24 21:09:21.178018
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = 'cd5b643a519c'
+revision: str = '9e41ed2f2892'
 down_revision: Union[str, None] = 'fc46f64e276b'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None

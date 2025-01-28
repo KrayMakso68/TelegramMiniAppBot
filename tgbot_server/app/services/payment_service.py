@@ -1,11 +1,9 @@
 from collections import defaultdict
-from datetime import datetime
-
-from starlette.datastructures import FormData
 
 from app.core.config import settings
 from app.repository.interfaces import IPaymentRepository, IUserRepository
-from app.schema.payment_schema import PaymentCreate, OperationType, PaymentStatus, PaymentUpdate, PaymentSchema
+from app.schema.payment_schema import PaymentCreate, OperationType, PaymentStatus, PaymentUpdate, PaymentSchema, \
+    YooMoneyData
 from app.utils import validate_yoomoney
 
 
@@ -27,10 +25,10 @@ class PaymentService:
         quickpay_link = f"https://yoomoney.ru/quickpay/confirm.xml?receiver={settings.YOOMONEY_WALLET}&quickpay-form=button&paymentType=SB&sum={amount}&&label={new_payment.id}&successURL={settings.PAY_SUCCESS_URL}"
         return quickpay_link
 
-    async def processing_yoomoney_payment(self, data: FormData) -> dict:
+    async def processing_yoomoney_payment(self, data: YooMoneyData) -> dict:
         if validate_yoomoney.verify_hash(data):
-            payment_id = int(data.get("label"))
-            amount = float(data.get("withdraw_amount"))
+            payment_id = int(data.label)
+            amount = float(data.withdraw_amount)
             payment = await self.payment_repository.update(payment_id, PaymentUpdate(status=PaymentStatus.COMPLETED))
             await self.user_repository.update_balance(payment.user_id, amount)
 

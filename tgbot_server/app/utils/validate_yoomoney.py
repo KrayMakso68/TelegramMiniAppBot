@@ -1,26 +1,23 @@
 import hashlib
 
-from starlette.datastructures import FormData
 from app.core.config import settings
+from app.schema.payment_schema import YooMoneyData
 
 
-def verify_hash(data: FormData) -> bool:
-    received_hash = data.get("sha1_hash")
-    if not received_hash:
-        return False
-
+def verify_hash(data: YooMoneyData) -> bool:
     hash_string = "&".join([
-        data.get("notification_type", ""),
-        data.get("operation_id", ""),
-        data.get("amount", ""),
-        data.get("currency", ""),
-        data.get("datetime", ""),
-        data.get("sender", ""),
-        data.get("codepro", ""),
+        data.notification_type,
+        data.operation_id,
+        f"{data.amount:.2f}",
+        str(data.currency),
+        data.datetime.isoformat(),
+        data.sender or "",
+        "true" if data.codepro else "false",
         settings.YOOMONEY_SECRET,
-        data.get("label", ""),
+        data.label or ""
     ])
 
     calculated_hash = hashlib.sha1(hash_string.encode("utf-8")).hexdigest()
 
-    return calculated_hash == received_hash
+    return calculated_hash.lower() == data.sha1_hash.lower()
+

@@ -1,9 +1,9 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Form
 
 from app.core.dependencies import get_current_active_user, get_payment_service
-from app.schema.payment_schema import PaymentRequest, PaymentSchema
+from app.schema.payment_schema import PaymentRequest, PaymentSchema, YooMoneyData
 from app.schema.user_schema import UserSchema
 from app.services.payment_service import PaymentService
 
@@ -24,11 +24,33 @@ async def new_yoomoney_payment(
 
 @router.post("/check/yoomoney")
 async def check_yoomoney_payment(
-        request: Request,
+        notification_type: str = Form(...),
+        operation_id: str = Form(...),
+        amount: float = Form(...),
+        withdraw_amount: float = Form(...),
+        currency: str = Form(...),
+        datetime: datetime = Form(...),
+        sender: str = Form(''),
+        codepro: bool = Form(...),
+        label: str = Form(''),
+        sha1_hash: str = Form(...),
+        unaccepted: bool = Form(False),
         service: PaymentService = Depends(get_payment_service)
 ):
-    form_data = await request.form()
-    return await service.processing_yoomoney_payment(form_data)
+    data = YooMoneyData(
+        notification_type=notification_type,
+        operation_id=operation_id,
+        amount=amount,
+        withdraw_amount=withdraw_amount,
+        currency=currency,
+        datetime=datetime,
+        sender=sender,
+        codepro=codepro,
+        label=label,
+        sha1_hash=sha1_hash,
+        unaccepted=unaccepted
+    )
+    return await service.processing_yoomoney_payment(data)
 
 
 @router.get("/history")

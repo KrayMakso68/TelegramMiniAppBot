@@ -10,3 +10,4 @@ PyJWT
 init-data-py
 httpx
 py3xui
+python-multipart

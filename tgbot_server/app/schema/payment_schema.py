@@ -1,4 +1,5 @@
 from enum import Enum
+from datetime import datetime
 
 from app.schema.base_schema import BaseSchema, ModelBaseInfo
 
@@ -36,3 +37,16 @@ class PaymentSchema(ModelBaseInfo):
     title: str | None = None
     operation_type: OperationType
 
+
+class YooMoneyData(BaseSchema):
+    notification_type: str
+    operation_id: str
+    amount: float
+    withdraw_amount: float
+    currency: str
+    datetime: datetime
+    sender: str = ''
+    codepro: bool
+    label: str = ''
+    sha1_hash: str
+    unaccepted: bool = False
