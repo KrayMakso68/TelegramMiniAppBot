@@ -1,14 +1,26 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 import TgSection from "components/TgSection.vue";
-import {BackButton, MainButton, useWebAppNavigation} from "vue-tg";
+import {BackButton, MainButton, useWebAppNavigation, useWebAppMainButton} from "vue-tg";
 import {PaymentService} from "src/api";
-import {ref} from "vue";
+import {computed, onMounted, ref, watchEffect} from "vue";
+import {PaymentOptions} from "src/api/types/paymentTypes";
 
 const router = useRouter();
 const {openLink} = useWebAppNavigation();
+const {disableMainButton, enableMainButton, showMainButtonProgress, hideMainButton, showMainButton} = useWebAppMainButton();
 
-const input = ref<number>(0)
+
+const inputValue = ref<number | null>(null);
+const selectValue = ref<object | null>(null);
+const options = ref<PaymentOptions[]>([]);
+const isLoading = ref(true);
+
+
+const loadPaymentOptions = async () => {
+  options.value = await PaymentService.getPaymentOptions();
+  isLoading.value = false;
+};
 
 const newYoomoneyPayment = async (amount: number) => {
   let url = await PaymentService.newYoomoneyPayment(amount)
@@ -16,30 +28,113 @@ const newYoomoneyPayment = async (amount: number) => {
     openLink(url);
   }
 };
+
+watchEffect(() => {
+  if (inputValue.value !== null && selectValue.value !== null && isValid.value) {
+    // showMainButton();
+    enableMainButton();
+  } else {
+    // hideMainButton();
+    disableMainButton();
+  }
+});
+
+const isValid = computed(() => inputValue.value && inputValue.value >= 2 && inputValue.value <= 15000)
+
+onMounted(() => {
+  // hideMainButton();
+  disableMainButton();
+  loadPaymentOptions();
+});
 </script>
 
 <template>
   <BackButton @click="() => router.back()"></BackButton>
-  <MainButton text="PAY" @click="newYoomoneyPayment(120)"></MainButton>
+  <MainButton text="PAY" @click="newYoomoneyPayment(inputValue)"></MainButton>
   <q-page class="tg-text overflow-auto">
     <div class="q-gutter-y-md">
       <tg-section label="Новый платёж">
-        <div class="q-ml-md q-mt-xl">
-          <div>Пополнение на</div>
+        <div class="q-mx-md q-mt-xl q-pb-lg">
+          <div style="font-size: 16px;" class="tg-subtitle-text">Сумма пополнения</div>
           <q-input
-            v-model="input"
+            class="payment-input hide-spin-buttons"
+            input-class="input"
+            type="number"
             borderless
+            clearable
             autofocus
-          >
-          </q-input>
+            prefix="₽"
+            mask="#.##"
+            error-message="Cумма от 2₽ до 15000₽"
+            :error="!isValid"
+            v-model="inputValue"
+          />
+          <q-select
+            v-model="selectValue"
+            :loading="isLoading"
+            :options="options"
+            borderless
+            dark
+            class="payment-type q-mt-sm"
+            clearable
+            label="Способ оплаты"
+          />
         </div>
+
       </tg-section>
     </div>
   </q-page>
-
-
 </template>
 
 <style scoped>
+.payment-input {
+  font-size: 35px;
+  caret-color: var(--tg-accent-text-color);
+}
 
+::v-deep(
+.hide-spin-buttons input[type="number"]::-webkit-inner-spin-button,
+.hide-spin-buttons input[type="number"]::-webkit-outer-spin-button
+) {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+::v-deep(.hide-spin-buttons input[type="number"]) {
+  -moz-appearance: textfield;
+}
+
+::v-deep(.input) {
+  color: var(--tg-accent-text-color);
+}
+
+::v-deep(.payment-input .q-field__prefix) {
+  color: var(--tg-subtitle-text-color);
+  font-weight: 500;
+}
+
+::v-deep(.payment-input .q-field__append) {
+  color: var(--tg-subtitle-text-color);
+}
+
+::v-deep(.payment-input .q-field__bottom) {
+  margin-left: 25px;
+  padding-top: 0;
+}
+
+
+::v-deep(.payment-type .q-field__native) {
+  font-size: 20px;
+  color: var(--tg-accent-text-color);
+  padding-left: 20px;
+  padding-top: 4px;
+  padding-bottom: 0;
+}
+::v-deep(.payment-type .q-field__label) {
+  color: var(--tg-subtitle-text-color);
+}
+::v-deep(.payment-type .q-field__append) {
+  color: var(--tg-subtitle-text-color);
+  padding-top: 15px;
+}
 </style>

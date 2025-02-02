@@ -3,7 +3,7 @@ from datetime import datetime
 from fastapi import APIRouter, Depends, Form
 
 from app.core.dependencies import get_current_active_user, get_payment_service
-from app.schema.payment_schema import PaymentRequest, PaymentSchema, YooMoneyData
+from app.schema.payment_schema import PaymentRequest, PaymentSchema, YooMoneyData, PaymentOptionSchema
 from app.schema.user_schema import UserSchema
 from app.services.payment_service import PaymentService
 
@@ -59,3 +59,11 @@ async def get_user_payments_history_by_day(
         service: PaymentService = Depends(get_payment_service)
 ) -> dict[str, list[PaymentSchema]]:
     return await service.get_group_payments_by_day(user.id)
+
+
+@router.get("/options")
+async def get_payment_options(
+        user: UserSchema = Depends(get_current_active_user),
+        service: PaymentService = Depends(get_payment_service)
+) -> list[PaymentOptionSchema]:
+    return await service.get_payment_options()

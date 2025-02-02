@@ -3,7 +3,7 @@ from collections import defaultdict
 from app.core.config import settings
 from app.repository.interfaces import IPaymentRepository, IUserRepository
 from app.schema.payment_schema import PaymentCreate, OperationType, PaymentStatus, PaymentUpdate, PaymentSchema, \
-    YooMoneyData
+    YooMoneyData, PaymentOptionSchema
 from app.utils import validate_yoomoney
 
 
@@ -43,3 +43,6 @@ class PaymentService:
             date = payment.created_at.date().strftime("%d.%m.%Y")
             grouped[date].append(payment)
         return grouped
+
+    async def get_payment_options(self) -> list[PaymentOptionSchema]:
+        return await self.payment_repository.get_options()

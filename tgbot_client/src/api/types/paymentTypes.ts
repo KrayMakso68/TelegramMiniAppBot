@@ -19,3 +19,8 @@ export interface Payment {
   createdAt: Date,
   updatedAt: Date
 }
+
+export interface PaymentOptions {
+  label: string,
+  path: string
+}

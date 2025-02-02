@@ -36,3 +36,10 @@ class Payment(BaseModel):
 
     def __repr__(self):
         return f"<Payment(id={self.id}, user_id={self.user_id}, amount={self.amount}, status={self.status}, created_at={self.created_at})>"
+
+
+class PaymentOptions(BaseModel):
+    __tablename__ = 'payment_options'
+
+    label: Mapped[str] = mapped_column(String, nullable=False)
+    path: Mapped[str] = mapped_column(String, nullable=False)

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from app.schema.payment_schema import PaymentCreate, PaymentSchema, PaymentUpdate
+from app.schema.payment_schema import PaymentCreate, PaymentSchema, PaymentUpdate, PaymentOptionSchema
 from app.schema.user_schema import UserCreate, UserSchema
 
 
@@ -37,4 +37,8 @@ class IPaymentRepository(ABC):
 
     @abstractmethod
     async def update(self, payment_id: int, payment_update: PaymentUpdate) -> PaymentSchema:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_options(self) -> list[PaymentOptionSchema]:
         raise NotImplementedError

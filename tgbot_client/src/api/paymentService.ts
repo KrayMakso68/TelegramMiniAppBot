@@ -1,5 +1,5 @@
 import { api } from "boot/axios";
-import {Payment} from "src/api/types/paymentTypes";
+import {Payment, PaymentOptions} from "src/api/types/paymentTypes";
 import {HttpStatusCode} from "axios";
 
 export const getPaymentHistoryByDay = async (): Promise<Record<string, Payment[]> | [] | null> => {
@@ -32,4 +32,15 @@ export const newYoomoneyPayment = async (amount: number): Promise<string | null>
   }
 };
 
+
+export const getPaymentOptions = async (): Promise<PaymentOptions[]> => {
+  try {
+    const response = await api.get('/payment/options');
+    return response.data;
+  } catch (error: any) {
+    console.error("Error getting payment options from server:", error);
+    return [];
+  }
+
+}
 

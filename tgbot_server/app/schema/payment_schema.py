@@ -50,3 +50,13 @@ class YooMoneyData(BaseSchema):
     label: str = ''
     sha1_hash: str
     unaccepted: bool = False
+
+
+class PaymentOptionSchema(BaseSchema):
+    label: str
+    path: str
+    
+
+class PaymentOptionBase(ModelBaseInfo):
+    label: str
+    path: str

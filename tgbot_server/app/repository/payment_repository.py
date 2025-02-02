@@ -4,8 +4,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import DBError, DuplicatedError
 from app.model import Payment
+from app.model.payment_model import PaymentOptions
 from app.repository.interfaces import IPaymentRepository
-from app.schema.payment_schema import PaymentCreate, PaymentSchema, PaymentUpdate
+from app.schema.payment_schema import PaymentCreate, PaymentSchema, PaymentUpdate, PaymentOptionSchema
 
 
 class PaymentRepository(IPaymentRepository):
@@ -56,5 +57,15 @@ class PaymentRepository(IPaymentRepository):
             result: Result = await self.session.execute(stmt)
             payments_history = result.scalars().all()
             return [PaymentSchema.from_orm(payment) for payment in payments_history]
+        except NoResultFound:
+            return []
+
+    async def get_options(self) -> list[PaymentOptionSchema]:
+        try:
+            result = await self.session.execute(
+                select(PaymentOptions)
+            )
+            options = result.scalars().all()
+            return [PaymentOptionSchema.from_orm(option) for option in options]
         except NoResultFound:
             return []
