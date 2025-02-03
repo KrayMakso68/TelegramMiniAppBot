@@ -4,16 +4,16 @@ import TgSection from "components/TgSection.vue";
 import {BackButton, MainButton, useWebAppNavigation, useWebAppMainButton} from "vue-tg";
 import {PaymentService} from "src/api";
 import {computed, onMounted, ref, watchEffect} from "vue";
-import {PaymentOptions} from "src/api/types/paymentTypes";
+import {PaymentOption} from "src/api/types/paymentTypes";
 
 const router = useRouter();
 const {openLink} = useWebAppNavigation();
-const {disableMainButton, enableMainButton, showMainButtonProgress, hideMainButton, showMainButton} = useWebAppMainButton();
+const {disableMainButton, enableMainButton} = useWebAppMainButton();
 
 
 const inputValue = ref<number | null>(null);
-const selectValue = ref<object | null>(null);
-const options = ref<PaymentOptions[]>([]);
+const selectValue = ref<PaymentOption | null>(null);
+const options = ref<PaymentOption[]>([]);
 const isLoading = ref(true);
 
 
@@ -22,19 +22,27 @@ const loadPaymentOptions = async () => {
   isLoading.value = false;
 };
 
-const newYoomoneyPayment = async (amount: number) => {
-  let url = await PaymentService.newYoomoneyPayment(amount)
-  if (url) {
-    openLink(url);
+const newPayment = async () => {
+  let path = selectValue.value?.path
+  let amount = inputValue.value;
+
+  if (path && amount) {
+    let url = await PaymentService.newPayment(path, amount);
+    if (url) {
+      openLink(url);
+
+      window.addEventListener('focus', () => {
+        router.push('/');
+      }, { once: true });
+
+    }
   }
 };
 
 watchEffect(() => {
   if (inputValue.value !== null && selectValue.value !== null && isValid.value) {
-    // showMainButton();
     enableMainButton();
   } else {
-    // hideMainButton();
     disableMainButton();
   }
 });
@@ -42,7 +50,6 @@ watchEffect(() => {
 const isValid = computed(() => inputValue.value && inputValue.value >= 2 && inputValue.value <= 15000)
 
 onMounted(() => {
-  // hideMainButton();
   disableMainButton();
   loadPaymentOptions();
 });
@@ -50,7 +57,7 @@ onMounted(() => {
 
 <template>
   <BackButton @click="() => router.back()"></BackButton>
-  <MainButton text="PAY" @click="newYoomoneyPayment(inputValue)"></MainButton>
+  <MainButton text="PAY" @click="newPayment"></MainButton>
   <q-page class="tg-text overflow-auto">
     <div class="q-gutter-y-md">
       <tg-section label="Новый платёж">
@@ -69,6 +76,7 @@ onMounted(() => {
             :error="!isValid"
             v-model="inputValue"
           />
+          <q-separator class="tg-separator"></q-separator>
           <q-select
             v-model="selectValue"
             :loading="isLoading"

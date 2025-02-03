@@ -2,7 +2,7 @@ import {login} from './authService';
 import {getCurrentUser, getCurrentUserBalance, getUserAvatarUrl} from './userService';
 import {getUserConnects, importConfig} from "src/api/subscribeService";
 import {getConnectInfoByEmail} from "src/api/panelService";
-import {getPaymentHistoryByDay, newYoomoneyPayment, getPaymentOptions} from "src/api/paymentService";
+import {getPaymentHistoryByDay, newPayment, getPaymentOptions} from "src/api/paymentService";
 
 export const AuthService = {
   login,
@@ -25,6 +25,6 @@ export const PanelService = {
 
 export const PaymentService = {
   getPaymentHistoryByDay,
-  newYoomoneyPayment,
+  newPayment,
   getPaymentOptions
 }

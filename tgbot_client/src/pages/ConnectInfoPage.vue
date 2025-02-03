@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {BackButton} from "vue-tg";
+import {BackButton, useWebAppNavigation} from "vue-tg";
 import {useRouter} from "vue-router";
 import {Connect} from "src/api/types/subscribeTypes";
 import {ConnectInfo} from "src/api/types/panelTypes";
@@ -8,7 +8,9 @@ import TgCodeCard from "components/TgCodeCard.vue";
 import {Ref, ref} from "vue";
 import {PanelService} from "src/api";
 
+
 const router = useRouter();
+const {openLink} = useWebAppNavigation();
 const props = defineProps<Connect>();
 
 const connectInfo: Ref<ConnectInfo | null> = ref<ConnectInfo | null>(null)
@@ -39,10 +41,14 @@ function datetimeToString(dateTime: number): string {
   }
 }
 
-// const importConfig = async (config: string) => {
-//   await SubscriberService.importConfig(config)
-//   window.location.href = `hiddify://install-config?url=${encodeURIComponent(config)}`;
-//   console.log(`hiddify://install-config?url=${encodeURIComponent(config)}`)
+// const importConfig = () => {
+//   if (props.connectUrl) {
+//     let encodedConfig = encodeURIComponent(props.connectUrl);
+//     let configUrl = `hiddify://install-config?url=${encodedConfig}`;
+//     console.log(configUrl)
+//
+//     openLink(configUrl);
+//   }
 // };
 </script>
 
@@ -62,7 +68,7 @@ function datetimeToString(dateTime: number): string {
         <div class="q-pa-sm">
           <tg-code-card title="Connection url" :text=connectUrl />
         </div>
-<!--        <q-btn @click="importConfig(connectUrl)">Импортировать</q-btn>-->
+<!--        <q-btn @click="importConfig">Импортировать</q-btn>-->
       </tg-section>
 
       <tg-section>

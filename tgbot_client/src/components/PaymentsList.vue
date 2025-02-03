@@ -5,7 +5,7 @@ import {PaymentService} from "src/api";
 import {OperationType, Payment, PaymentStatus} from "src/api/types/paymentTypes";
 
 const loading = ref<boolean>(true);
-const paymentsGroups: Ref<Record<string, Payment[]> | [] | null> = ref<Record<string, Payment[]> | [] | null>(null);
+const paymentsGroups: Ref<Record<string, Payment[]> | null> = ref<Record<string, Payment[]> | null>(null);
 
 const loadHistory = async () => {
   paymentsGroups.value = await PaymentService.getPaymentHistoryByDay()
@@ -46,7 +46,7 @@ onMounted(loadHistory);
       </template>
     </q-list>
 
-    <q-list v-if="paymentsGroups">
+    <q-list v-else-if="paymentsGroups && Object.keys(paymentsGroups).length !== 0">
       <div v-for="(payments, date) in paymentsGroups" :key="date">
         <div class="text-subtitle2 tg-subtitle-text q-ml-md q-mt-md">{{ date }}</div>
         <template v-for="(payment, index) in payments" :key="index">
@@ -95,9 +95,10 @@ onMounted(loadHistory);
         </template>
         <q-separator class="tg-separator" />
       </div>
+      {{paymentsGroups}}
     </q-list>
 
-    <not-found-banner v-else-if="!loading" title="Нет записей"/>
+    <not-found-banner v-else title="Нет записей" class="q-mt-md"/>
 
   </div>
 </template>

@@ -20,7 +20,7 @@ export interface Payment {
   updatedAt: Date
 }
 
-export interface PaymentOptions {
+export interface PaymentOption {
   label: string,
   path: string
 }
