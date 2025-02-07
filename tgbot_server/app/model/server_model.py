@@ -13,12 +13,16 @@ class Country(Base):
 
     servers = relationship("Server", back_populates="country_rel")
 
+
 class Server(BaseModel):
     __tablename__ = 'servers'
 
     name: Mapped[str] = mapped_column(String, nullable=False)
-    ip_address: Mapped[str] = mapped_column(String, nullable=False)
-    country: Mapped[str] = mapped_column(String(2), ForeignKey("countries.code"), nullable=False)
+    panel_url: Mapped[str] = mapped_column(String, nullable=False)
+    username: Mapped[str] = mapped_column(String, nullable=False)
+    password: Mapped[str] = mapped_column(String, nullable=False)
+    subscribe_url: Mapped[str] = mapped_column(String, nullable=False)
+    country_code: Mapped[str] = mapped_column(String(2), ForeignKey("countries.code"), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
     country_rel = relationship("Country", back_populates="servers")
