@@ -1,4 +1,5 @@
 from collections import defaultdict
+from decimal import Decimal
 
 from app.core.config import settings
 from app.repository.interfaces import IPaymentRepository, IUserRepository
@@ -28,7 +29,7 @@ class PaymentService:
     async def processing_yoomoney_payment(self, data: YooMoneyData) -> dict:
         if validate_yoomoney.verify_hash(data):
             payment_id = int(data.label)
-            amount = float(data.withdraw_amount)
+            amount = Decimal(data.withdraw_amount)
             payment = await self.payment_repository.update(payment_id, PaymentUpdate(status=PaymentStatus.COMPLETED))
             await self.user_repository.update_balance(payment.user_id, amount)
 

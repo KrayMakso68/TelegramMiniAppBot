@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError, DatabaseError
@@ -44,7 +46,7 @@ class UserRepository(IUserRepository):
         except DatabaseError:
             raise DBError(detail="Database error occurred.")
 
-    async def update_balance(self, id: int, amount: float) -> UserSchema | None:
+    async def update_balance(self, id: int, amount: Decimal) -> UserSchema | None:
         try:
             stmt = select(User).where(User.id == id)
             result: Result = await self.session.execute(stmt)
