@@ -32,7 +32,7 @@ class Payment(BaseModel):
         nullable=False
     )
 
-    user = relationship("User", back_populates="payments")
+    user_rel = relationship("User", back_populates="payments")
 
     def __repr__(self):
         return f"<Payment(id={self.id}, user_id={self.user_id}, amount={self.amount}, status={self.status}, created_at={self.created_at})>"

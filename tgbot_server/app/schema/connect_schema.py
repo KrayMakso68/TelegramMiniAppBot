@@ -85,3 +85,5 @@ class ConnectSchema(BaseSchema):
         inbound_name = parts[0] if len(parts) > 0 else 'unknown'
         email = parts[1] if len(parts) > 1 else 'unknown'
         return inbound_name, email
+
+

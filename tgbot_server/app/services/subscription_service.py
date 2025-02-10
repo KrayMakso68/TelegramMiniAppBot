@@ -1,8 +1,8 @@
-from app.schema.subscribe_schema import ConnectSchema
+from app.schema.connect_schema import ConnectSchema
 from app.utils.subscribe_api import SubscribeApi
 
 
-class SubscribeService:
+class SubscriptionService:
     def __init__(self, sub_api: SubscribeApi):
         self.api = sub_api
 

@@ -2,7 +2,7 @@ from httpx import AsyncClient, HTTPError, RequestError, TimeoutException
 
 from app.core.config import settings
 from app.core.exceptions import NotFoundError, InternalServerError, ServiceUnavailableError
-from app.schema.subscribe_schema import ConnectSchema
+from app.schema.connect_schema import ConnectSchema
 
 
 class SubscribeApi:

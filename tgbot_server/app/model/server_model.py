@@ -1,4 +1,4 @@
-from sqlalchemy import Integer, Float, String, Boolean, ForeignKey
+from sqlalchemy import String, Boolean, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -26,3 +26,4 @@ class Server(BaseModel):
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
     country_rel = relationship("Country", back_populates="servers")
+    subscriptions = relationship("Subscription", back_populates="server_rel")

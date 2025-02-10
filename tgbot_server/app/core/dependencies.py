@@ -13,7 +13,7 @@ from app.services.auth_service import AuthService
 from app.repository.user_repository import UserRepository
 from app.services.panel_service import PanelService
 from app.services.payment_service import PaymentService
-from app.services.subscribe_service import SubscribeService
+from app.services.subscription_service import SubscriptionService
 from app.services.user_service import UserService
 from app.utils.subscribe_api import SubscribeApi
 
@@ -49,9 +49,9 @@ async def get_current_active_user(current_user: UserSchema = Depends(get_current
 
 
 # subscribe
-def get_subscribe_service_for_user(current_user: UserSchema = Depends(get_current_active_user)) -> SubscribeService:
+def get_subscribe_service_for_user(current_user: UserSchema = Depends(get_current_active_user)) -> SubscriptionService:
     sub_api = SubscribeApi(current_user.sub_uuid)
-    return SubscribeService(sub_api)
+    return SubscriptionService(sub_api)
 
 
 # panel

@@ -15,4 +15,5 @@ class User(BaseModel):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    payments = relationship("Payment", back_populates="user")
+    payments = relationship("Payment", back_populates="user_rel")
+    subscriptions = relationship("Subscription", back_populates="user_rel")
