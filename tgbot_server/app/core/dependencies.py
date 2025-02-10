@@ -15,7 +15,7 @@ from app.services.panel_service import PanelService
 from app.services.payment_service import PaymentService
 from app.services.subscription_service import SubscriptionService
 from app.services.user_service import UserService
-from app.utils.subscribe_api import SubscribeApi
+from app.utils.panel_subscription_api import PanelSubscriptionApi
 
 
 def get_user_repository(async_session: AsyncSession = Depends(get_async_session)) -> UserRepository:
@@ -50,7 +50,7 @@ async def get_current_active_user(current_user: UserSchema = Depends(get_current
 
 # subscribe
 def get_subscribe_service_for_user(current_user: UserSchema = Depends(get_current_active_user)) -> SubscriptionService:
-    sub_api = SubscribeApi(current_user.sub_uuid)
+    sub_api = PanelSubscriptionApi(current_user.sub_uuid)
     return SubscriptionService(sub_api)
 
 

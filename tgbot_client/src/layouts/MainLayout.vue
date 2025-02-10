@@ -7,7 +7,7 @@ const router = useRouter()
 
 <template>
   <q-layout view="hHh lpR fFf">
-    <SettingsButton  @click="() => router.push('test-colors')"></SettingsButton>
+    <SettingsButton @click="() => router.push('test-colors')"></SettingsButton>
     <q-page-container class="tg-background">
       <router-view />
     </q-page-container>

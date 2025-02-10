@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     PANEL_HOST: str = os.getenv("PANEL_HOST")
     PANEL_USERNAME: str = os.getenv("PANEL_USERNAME")
     PANEL_PASSWORD: str = os.getenv("PANEL_PASSWORD")
-    SUBSCRIBE_API_URL: str = os.getenv("SUBSCRIBE_API_URL")
+    SUBSCRIPTION_API_URL: str = os.getenv("SUBSCRIPTION_API_URL")
 
 
 settings = Settings()

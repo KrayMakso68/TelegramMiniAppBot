@@ -95,7 +95,6 @@ onMounted(loadHistory);
         </template>
         <q-separator class="tg-separator" />
       </div>
-      {{paymentsGroups}}
     </q-list>
 
     <not-found-banner v-else title="Нет записей" class="q-mt-md"/>

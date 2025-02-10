@@ -5,12 +5,12 @@ from app.core.exceptions import NotFoundError, InternalServerError, ServiceUnava
 from app.schema.connect_schema import ConnectSchema
 
 
-class SubscribeApi:
+class PanelSubscriptionApi:
     def __init__(self, sub_uuid):
-        self.url = settings.SUBSCRIBE_API_URL + sub_uuid
+        self.url = settings.SUBSCRIPTION_API_URL + sub_uuid
         self.timeout = 30
 
-    async def get_subscribe_connects(self) -> list[ConnectSchema]:
+    async def get_connects(self) -> list[ConnectSchema]:
         async with AsyncClient(verify=settings.TLS_VERIFY) as client:
             try:
                 response = await client.get(self.url, timeout=self.timeout)
