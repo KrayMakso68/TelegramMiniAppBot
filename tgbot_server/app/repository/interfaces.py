@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from app.schema.payment_schema import PaymentCreate, PaymentSchema, PaymentUpdate, PaymentOptionSchema
+from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema
 from app.schema.user_schema import UserCreate, UserSchema
 
 
@@ -42,3 +43,14 @@ class IPaymentRepository(ABC):
     @abstractmethod
     async def get_options(self) -> list[PaymentOptionSchema]:
         raise NotImplementedError
+
+
+class ISubscriptionRepository(ABC):
+    @abstractmethod
+    async def add(self, subscription_create: SubscriptionCreate) -> SubscriptionSchema:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_id(self, id: int) -> SubscriptionSchema | None:
+        raise NotImplementedError
+

@@ -3,18 +3,18 @@ import urllib.parse
 from fastapi import APIRouter, Depends
 from starlette.responses import RedirectResponse
 
-from app.core.dependencies import get_subscribe_service_for_user
+from app.core.dependencies import get_subscription_service_for_user
 from app.schema.connect_schema import ConnectSchema
 from app.services.subscription_service import SubscriptionService
 
 router = APIRouter(
-    prefix="/subscribe",
-    tags=["subscribe"]
+    prefix="/subscription",
+    tags=["subscription"]
 )
 
 
-@router.get("/connects")
-async def get_user_subscribes(service: SubscriptionService = Depends(get_subscribe_service_for_user)) -> list[ConnectSchema]:
+@router.get("/subscriptions")
+async def get_user_subscriptions(service: SubscriptionService = Depends(get_subscription_service_for_user)) -> list[ConnectSchema]:
     return await service.get_user_connects()
 
 

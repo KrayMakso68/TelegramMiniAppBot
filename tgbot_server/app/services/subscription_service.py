@@ -8,3 +8,4 @@ class SubscriptionService:
 
     async def get_user_connects(self) -> list[ConnectSchema]:
         return await self.api.get_connects()
+

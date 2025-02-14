@@ -10,7 +10,7 @@ class SubscriptionCreate(BaseSchema):
     url: str = Field(..., example="vless://16289ed8-3489-4f90...")
     user_id: int
     server_id: int
-    end_date: datetime | None  = None
+    end_date: datetime | None = None
     is_active: bool = True
 
 

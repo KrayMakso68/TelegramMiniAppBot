@@ -49,7 +49,7 @@ async def get_current_active_user(current_user: UserSchema = Depends(get_current
 
 
 # subscribe
-def get_subscribe_service_for_user(current_user: UserSchema = Depends(get_current_active_user)) -> SubscriptionService:
+def get_subscription_service_for_user(current_user: UserSchema = Depends(get_current_active_user)) -> SubscriptionService:
     sub_api = PanelSubscriptionApi(current_user.sub_uuid)
     return SubscriptionService(sub_api)
 
