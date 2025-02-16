@@ -54,3 +54,7 @@ class ISubscriptionRepository(ABC):
     async def get_by_id(self, id: int) -> SubscriptionSchema | None:
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_all_grouped(self, user_id: int) -> dict[str, list[SubscriptionSchema]]:
+        raise NotImplementedError
+

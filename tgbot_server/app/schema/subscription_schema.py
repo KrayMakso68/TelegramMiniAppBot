@@ -19,7 +19,16 @@ class SubscriptionUpdate(BaseSchema):
     is_active: bool | None = None
 
 
-class SubscriptionSchema(ModelBaseInfo):
+class SubscriptionSchema(BaseSchema):
+    email_name: str
+    url: str
+    user_id: int
+    server_id: int
+    end_date: datetime | None = None
+    is_active: bool
+
+
+class SubscriptionModelSchema(ModelBaseInfo):
     email_name: str
     url: str
     user_id: int

@@ -1,11 +1,11 @@
-from app.schema.connect_schema import ConnectSchema
-from app.utils.panel_subscription_api import PanelSubscriptionApi
+from app.repository.interfaces import ISubscriptionRepository
+from app.schema.subscription_schema import SubscriptionSchema
 
 
 class SubscriptionService:
-    def __init__(self, sub_api: PanelSubscriptionApi):
-        self.api = sub_api
+    def __init__(self, subscription_repository: ISubscriptionRepository):
+        self.repository = subscription_repository
 
-    async def get_user_connects(self) -> list[ConnectSchema]:
-        return await self.api.get_connects()
+    async def get_user_subscriptions_by_server(self, user_id: int) -> dict[str, list[SubscriptionSchema]]:
+        return await self.repository.get_all_grouped(user_id)
 

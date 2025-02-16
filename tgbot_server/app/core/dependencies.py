@@ -7,6 +7,7 @@ from app.core.database import get_async_session
 from app.core.exceptions import JwtCredentialsError, IsActiveUserError
 from app.core.security import oauth_scheme, decode_access_token
 from app.repository.payment_repository import PaymentRepository
+from app.repository.subscription_repository import SubscriptionRepository
 from app.schema.auth_schema import TokenData
 from app.schema.user_schema import UserSchema
 from app.services.auth_service import AuthService
@@ -18,20 +19,12 @@ from app.services.user_service import UserService
 from app.utils.panel_subscription_api import PanelSubscriptionApi
 
 
+# _________________________________________________________________________________________________________
+# user
 def get_user_repository(async_session: AsyncSession = Depends(get_async_session)) -> UserRepository:
     return UserRepository(async_session)
 
 
-# auth
-def get_auth_service(user_repository: UserRepository = Depends(get_user_repository)) -> AuthService:
-    return AuthService(user_repository)
-
-
-def get_user_service(user_repository: UserRepository = Depends(get_user_repository)) -> UserService:
-    return UserService(user_repository)
-
-
-# user
 async def get_current_user(token: str = Depends(oauth_scheme),
                            user_repository: UserRepository = Depends(get_user_repository)
                            ) -> UserSchema:
@@ -48,22 +41,47 @@ async def get_current_active_user(current_user: UserSchema = Depends(get_current
     return current_user
 
 
-# subscribe
-def get_subscription_service_for_user(current_user: UserSchema = Depends(get_current_active_user)) -> SubscriptionService:
-    sub_api = PanelSubscriptionApi(current_user.sub_uuid)
-    return SubscriptionService(sub_api)
+# _________________________________________________________________________________________________________
+# auth
+def get_auth_service(user_repository: UserRepository = Depends(get_user_repository)) -> AuthService:
+    return AuthService(user_repository)
 
 
+def get_user_service(user_repository: UserRepository = Depends(get_user_repository)) -> UserService:
+    return UserService(user_repository)
+
+
+# _________________________________________________________________________________________________________
+# subscription
+def get_subscription_repository(async_session: AsyncSession = Depends(get_async_session)) -> SubscriptionRepository:
+    return SubscriptionRepository(async_session)
+
+
+def get_subscription_service(
+        subscription_repository: SubscriptionRepository = Depends(get_subscription_repository)
+) -> SubscriptionService:
+    return SubscriptionService(subscription_repository)
+
+
+# _________________________________________________________________________________________________________
 # panel
 def get_panel_api() -> AsyncApi:
     return AsyncApi(settings.PANEL_HOST, settings.PANEL_USERNAME, settings.PANEL_PASSWORD,
                     use_tls_verify=settings.TLS_VERIFY)
 
 
-def get_panel_service(panel_api: AsyncApi = Depends(get_panel_api)) -> PanelService:
-    return PanelService(panel_api)
+def get_sub_api() -> PanelSubscriptionApi:
+    return PanelSubscriptionApi(settings.SUBSCRIPTION_API_PORT, settings.SUBSCRIPTION_API_PATH)
 
 
+def get_panel_service(
+        panel_api: AsyncApi = Depends(get_panel_api),
+        sub_api: PanelSubscriptionApi = Depends(get_sub_api)
+) -> PanelService:
+    return PanelService(panel_api, sub_api)
+
+
+# _________________________________________________________________________________________________________
 # payment
 def get_payment_repository(async_session: AsyncSession = Depends(get_async_session)) -> PaymentRepository:
     return PaymentRepository(async_session)

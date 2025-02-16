@@ -24,3 +24,8 @@ async def get_client_by_email(
         service: PanelService = Depends(get_panel_service)
 ) -> ClientSchema:
     return await service.get_client_info_by_email(client_email)
+
+
+@router.put("/subscription/{sub_uuid}")
+async def update_clients():
+    ...

@@ -10,7 +10,7 @@ import {PanelService} from "src/api";
 
 
 const router = useRouter();
-const {openLink} = useWebAppNavigation();
+// const {openLink} = useWebAppNavigation();
 const props = defineProps<Connect>();
 
 const connectInfo: Ref<ConnectInfo | null> = ref<ConnectInfo | null>(null)

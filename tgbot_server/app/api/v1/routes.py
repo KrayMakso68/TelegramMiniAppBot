@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 from app.api.v1.endpoints.auth import router as auth_router
 from app.api.v1.endpoints.user import router as user_router
-from app.api.v1.endpoints.connect import router as subscribe_router
+from app.api.v1.endpoints.subscription import router as subscribe_router
 from app.api.v1.endpoints.panel import router as panel_router
 from app.api.v1.endpoints.payment import router as payment_router
 
