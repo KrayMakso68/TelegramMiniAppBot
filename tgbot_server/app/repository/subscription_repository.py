@@ -1,13 +1,14 @@
 from itertools import groupby
 
 from sqlalchemy import select, Result
-from sqlalchemy.exc import NoResultFound, DatabaseError
+from sqlalchemy.exc import NoResultFound, DatabaseError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.core.exceptions import DBError, NotFoundError
+from app.core.exceptions import DBError, NotFoundError, DuplicatedError
 from app.model import Subscription, Server
 from app.repository.interfaces import ISubscriptionRepository
+from app.schema.connect_schema import ConnectSchema
 from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema
 
 
@@ -16,7 +17,16 @@ class SubscriptionRepository(ISubscriptionRepository):
         self.session = async_session
 
     async def add(self, subscription_create: SubscriptionCreate) -> SubscriptionSchema:
-        ...
+        query: Subscription = Subscription(**subscription_create.model_dump())
+        try:
+            self.session.add(query)
+            await self.session.commit()
+            await self.session.refresh(query)
+        except IntegrityError as e:
+            raise DuplicatedError(detail=str(e.orig))
+        except DatabaseError:
+            raise DBError(detail="Database error occurred.")
+        return SubscriptionSchema.model_validate(query)
 
     async def get_by_id(self, id: int) -> SubscriptionSchema | None:
         ...
@@ -26,7 +36,7 @@ class SubscriptionRepository(ISubscriptionRepository):
             result = await self.session.execute(
                 select(Subscription)
                 .options(selectinload(Subscription.server_rel))
-                .filter(Subscription.user_id == user_id)
+                .filter(Subscription.user_id.c == user_id)
                 .order_by(Server.name)
             )
             subscriptions = result.scalars().all()
@@ -41,3 +51,28 @@ class SubscriptionRepository(ISubscriptionRepository):
 
         except DatabaseError:
             raise DBError(detail="Database error occurred.")
+
+    async def get_all_from_server(self, user_id: int, server_id: int) -> list[SubscriptionSchema]:
+        try:
+            stmt = select(Subscription).where(Subscription.user_id.c == user_id, Subscription.server_id.c == server_id)
+            result: Result = await self.session.execute(stmt)
+            subscriptions = result.scalars().all()
+            return [SubscriptionSchema.model_validate(subscription) for subscription in subscriptions]
+        except NoResultFound:
+            return []
+
+    async def update_subscription_by_connect(self, sub_id: int, connect: ConnectSchema) -> SubscriptionSchema:
+        try:
+            subscription: Subscription | None = await self.session.get(Subscription, sub_id)
+
+            subscription.url = connect.connect_url
+
+            await self.session.commit()
+            await self.session.refresh(subscription)
+
+        except NoResultFound:
+            raise NotFoundError(detail="Subscription not found.")
+        except DatabaseError:
+            raise DBError(detail="Database error occurred.")
+
+        return SubscriptionSchema.model_validate(subscription)

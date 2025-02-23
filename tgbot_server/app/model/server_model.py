@@ -21,7 +21,7 @@ class Server(BaseModel):
     panel_url: Mapped[str] = mapped_column(String, nullable=False)
     username: Mapped[str] = mapped_column(String, nullable=False)
     password_enc: Mapped[str] = mapped_column(String, nullable=False)
-    subscribe_url: Mapped[str] = mapped_column(String, nullable=False)
+    subscription_url: Mapped[str] = mapped_column(String, nullable=False)
     country_code: Mapped[str] = mapped_column(String(2), ForeignKey("countries.code"), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False)
 

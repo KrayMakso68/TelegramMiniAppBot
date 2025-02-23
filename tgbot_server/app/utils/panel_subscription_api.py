@@ -1,21 +1,20 @@
 from httpx import AsyncClient, HTTPError, RequestError, TimeoutException
 
-from app.core.config import settings
 from app.core.exceptions import NotFoundError, InternalServerError, ServiceUnavailableError
 from app.schema.connect_schema import ConnectSchema
 
 
 class PanelSubscriptionApi:
 
-    def __init__(self, port: str, path: str):
-        self.port = port
-        self.path = path
+    def __init__(self, subscription_url: str, use_tls_verify: bool = True):
+        self.subscription_url = subscription_url
+        self.use_tls_verify = use_tls_verify
         self.timeout = 30
 
-    async def get_connects_from_server(self, server_ip: str, user_sub_uuid: str) -> list[ConnectSchema]:
-        url = self._create_url(server_ip, user_sub_uuid)
+    async def get_connects_for_user(self, user_sub_uuid: str) -> list[ConnectSchema]:
+        url = self._create_user_url(user_sub_uuid)
 
-        async with AsyncClient(verify=settings.TLS_VERIFY) as client:
+        async with AsyncClient(verify=self.use_tls_verify) as client:
             try:
                 response = await client.get(url, timeout=self.timeout)
 
@@ -32,5 +31,5 @@ class PanelSubscriptionApi:
             except (RequestError, TimeoutException):
                 raise ServiceUnavailableError(detail="Connection error.")
 
-    def _create_url(self, server_ip: str, user_sub_uuid: str) -> str:
-        return f'https://{server_ip}:{self.port}/{self.path}/{user_sub_uuid}'
+    def _create_user_url(self, user_sub_uuid: str) -> str:
+        return self.subscription_url + user_sub_uuid

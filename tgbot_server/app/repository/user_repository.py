@@ -48,9 +48,7 @@ class UserRepository(IUserRepository):
 
     async def update_balance(self, id: int, amount: Decimal) -> UserSchema | None:
         try:
-            stmt = select(User).where(User.id == id)
-            result: Result = await self.session.execute(stmt)
-            user: User | None = result.scalar_one_or_none()
+            user: User | None = await self.session.get(User, id)
             if not user:
                 return None
             user.balance += amount

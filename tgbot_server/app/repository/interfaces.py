@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 
+from app.schema.connect_schema import ConnectSchema
 from app.schema.payment_schema import PaymentCreate, PaymentSchema, PaymentUpdate, PaymentOptionSchema
+from app.schema.server_schema import ServerSchema
 from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema
 from app.schema.user_schema import UserCreate, UserSchema
 
@@ -58,3 +60,20 @@ class ISubscriptionRepository(ABC):
     async def get_all_grouped(self, user_id: int) -> dict[str, list[SubscriptionSchema]]:
         raise NotImplementedError
 
+    @abstractmethod
+    async def get_all_from_server(self, user_id: int, server_id: int) -> list[SubscriptionSchema]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update_subscription_by_connect(self, sub_id: int, connect: ConnectSchema) -> SubscriptionSchema:
+        raise NotImplementedError
+
+
+class IServerRepository(ABC):
+    @abstractmethod
+    async def get_all(self) -> list[ServerSchema]:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_id(self, id: int) -> ServerSchema | None:
+        raise NotImplementedError

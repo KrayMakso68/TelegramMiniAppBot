@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends
 
-from app.core.dependencies import get_panel_service
+from app.core.dependencies import get_panel_service, get_current_active_user
 from app.schema.panel_schema import ClientSchema
+from app.schema.user_schema import UserSchema
 from app.services.panel_service import PanelService
 
 router = APIRouter(
@@ -10,22 +11,27 @@ router = APIRouter(
 )
 
 
-@router.get("/client/info_by_uuid/{client_uuid}")
+@router.get("/{server_id}/client/info_by_uuid/{client_uuid}")
 async def get_clients_by_uuid(
+        server_id: int,
         client_uuid: str,
         service: PanelService = Depends(get_panel_service)
 ) -> list[ClientSchema]:
-    return await service.get_client_info_by_id(client_uuid)
+    return await service.get_client_info_by_id(server_id, client_uuid)
 
 
-@router.get("/client/info_by_email/{client_email}")
+@router.get("/{server_id}/client/info_by_email/{client_email}")
 async def get_client_by_email(
+        server_id: int,
         client_email: str,
         service: PanelService = Depends(get_panel_service)
 ) -> ClientSchema:
-    return await service.get_client_info_by_email(client_email)
+    return await service.get_client_info_by_email(server_id, client_email)
 
 
-@router.put("/subscription/{sub_uuid}")
-async def update_clients():
-    ...
+@router.put("/subscription/update")
+async def update_clients(
+        user: UserSchema = Depends(get_current_active_user),
+        service: PanelService = Depends(get_panel_service)
+):
+    await service.update_user_subscriptions(user)
