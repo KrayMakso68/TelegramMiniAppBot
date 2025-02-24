@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {BackButton, useWebAppNavigation} from "vue-tg";
 import {useRouter} from "vue-router";
-import {Connect} from "src/api/types/subscribeTypes";
+import {Connect} from "src/api/types/panelTypes";
 import {ConnectInfo} from "src/api/types/panelTypes";
 import TgSection from "components/TgSection.vue";
 import TgCodeCard from "components/TgCodeCard.vue";
@@ -11,13 +11,17 @@ import {PanelService} from "src/api";
 
 const router = useRouter();
 // const {openLink} = useWebAppNavigation();
-const props = defineProps<Connect>();
+
+interface Props {
+  connect: Connect
+}
+const props = defineProps<Props>();
 
 const connectInfo: Ref<ConnectInfo | null> = ref<ConnectInfo | null>(null)
 
 const loadInfo = async () => {
   if (!connectInfo.value) {
-    connectInfo.value = await PanelService.getConnectInfoByEmail(props.email)
+    connectInfo.value = await PanelService.getConnectInfoByEmail(props.connect.email)
   }
 };
 
@@ -62,11 +66,11 @@ function datetimeToString(dateTime: number): string {
             Подключение
           </div>
           <div class="text-h4 text-weight-bold" style="color: var(--tg-section-header-text-color);">
-            {{email}}
+            {{connect.email}}
           </div>
         </div>
         <div class="q-pa-sm">
-          <tg-code-card title="Connection url" :text=connectUrl />
+          <tg-code-card title="Connection url" :text=connect.connectUrl />
         </div>
 <!--        <q-btn @click="importConfig">Импортировать</q-btn>-->
       </tg-section>

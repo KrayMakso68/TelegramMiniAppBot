@@ -1,6 +1,6 @@
 import {login} from './authService';
 import {getCurrentUser, getCurrentUserBalance, getUserAvatarUrl} from './userService';
-import {getUserConnects, importConfig} from "src/api/subscribeService";
+import {getUserSubscriptionsByServer} from "src/api/subscriptionService";
 import {getConnectInfoByEmail} from "src/api/panelService";
 import {getPaymentHistoryByDay, newPayment, getPaymentOptions} from "src/api/paymentService";
 
@@ -15,8 +15,7 @@ export const UserService = {
 };
 
 export const SubscriberService = {
-  getUserConnects,
-  importConfig
+  getUserSubscriptions: getUserSubscriptionsByServer
 }
 
 export const PanelService = {

@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import NotFoundBanner from "components/NotFoundBanner.vue";
 import {onMounted, Ref, ref} from "vue";
-import {Connect} from "src/api/types/subscribeTypes";
+import {Subscription} from "src/api/types/subscriptionTypes";
 import {SubscriberService} from "src/api";
 
 const loading  = ref<boolean>(true);
-const connects: Ref<Connect[] | null> = ref<Connect[] | null>(null);
+const subscriptionsByServer: Ref<Record<string, Subscription[]> | null> = ref<Record<string, Subscription[]> | null>(null);
 
 const loadConnects = async () => {
-  connects.value = await SubscriberService.getUserConnects();
+  subscriptionsByServer.value = await SubscriberService.getUserSubscriptions();
   loading.value = false;
 };
 
@@ -45,7 +45,7 @@ onMounted(loadConnects);
         </template>
       </q-list>
 
-      <q-list v-else-if="connects && connects.length">
+      <q-list v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length !== 0">
         <template v-for="(connect, index) in connects" :key="index">
           <q-item
             :to="{ path: 'connect-info', query: connect }"
@@ -83,7 +83,7 @@ onMounted(loadConnects);
         </template>
       </q-list>
 
-      <not-found-banner v-else-if="connects" title="Похоже, у вас нет подписок!">
+      <not-found-banner v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length === 0" title="Похоже, у вас нет подписок!">
         <template #button>
           <q-btn class="tg-btn">Подключить</q-btn>
         </template>
