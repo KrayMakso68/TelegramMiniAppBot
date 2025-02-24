@@ -11,12 +11,12 @@ router = APIRouter(
 )
 
 
-@router.get("/subscriptions")
+@router.get("/servers")
 async def get_user_subscriptions_by_server(
         user: UserSchema = Depends(get_current_active_user),
         service: SubscriptionService = Depends(get_subscription_service)
 ) -> dict[str, list[SubscriptionSchema]]:
-    return await service.get_user_subscriptions_by_server(user.id)
+    return await service.user_subscriptions_filtered_by_server(user.id)
 
 
 # @router.get("/import-config")
