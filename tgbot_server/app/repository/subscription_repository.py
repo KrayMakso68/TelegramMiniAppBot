@@ -1,3 +1,4 @@
+from datetime import datetime, UTC, timedelta
 from itertools import groupby
 
 from sqlalchemy import select, Result
@@ -66,6 +67,7 @@ class SubscriptionRepository(ISubscriptionRepository):
             subscription: Subscription | None = await self.session.get(Subscription, sub_id)
 
             subscription.url = connect.connect_url
+            subscription.end_date = datetime.now(UTC) + timedelta(seconds=connect.remaining_seconds)
 
             await self.session.commit()
             await self.session.refresh(subscription)
