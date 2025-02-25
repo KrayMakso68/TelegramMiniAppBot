@@ -70,16 +70,23 @@ class SubscriptionRepository(ISubscriptionRepository):
     async def update_subscription_by_connect(self, sub_id: int, connect: ConnectSchema) -> SubscriptionSchema:
         try:
             subscription: Subscription | None = await self.session.get(Subscription, sub_id)
+            print(subscription)
+            if subscription:
 
-            subscription.url = connect.connect_url
-            subscription.end_date = datetime.now(UTC) + timedelta(seconds=connect.remaining_seconds)
+                subscription.url = connect.connect_url
+                subscription.is_active = connect.active
 
-            await self.session.commit()
-            await self.session.refresh(subscription)
+                if connect.remaining_seconds:
+                    subscription.end_date = datetime.now(UTC) + timedelta(seconds=connect.remaining_seconds)
+                elif connect.remaining_seconds is None:
+                    subscription.end_date = None
+
+                await self.session.commit()
+                await self.session.refresh(subscription)
+
+                return SubscriptionSchema.model_validate(subscription)
 
         except NoResultFound:
             raise NotFoundError(detail="Subscription not found.")
         except DatabaseError:
             raise DBError(detail="Database error occurred.")
-
-        return SubscriptionSchema.model_validate(subscription)

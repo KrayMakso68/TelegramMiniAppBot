@@ -128,8 +128,13 @@ class PanelService:
                         url=connect_schema.connect_url,
                         user_id=user.id,
                         server_id=server.id,
-                        end_date=datetime.now(UTC) + timedelta(seconds=connect_schema.remaining_seconds)
+                        is_active=connect_schema.active
                     )
+                    if connect_schema.remaining_seconds:
+                        new_subscription.end_date = datetime.now(UTC) + timedelta(seconds=connect_schema.remaining_seconds)
+                    elif not connect_schema.active:
+                        new_subscription.end_date = datetime.now(UTC) - timedelta(days=1)
+
                     await self.subscription_repository.add(new_subscription)
 
 

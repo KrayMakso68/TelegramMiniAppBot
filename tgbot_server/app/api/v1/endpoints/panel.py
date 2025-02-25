@@ -11,7 +11,7 @@ router = APIRouter(
 )
 
 
-@router.get("/{server_id}/client/info_by_uuid/{client_uuid}")
+@router.get("/{server_id}/client/info-by-uuid/{client_uuid}")
 async def get_clients_by_uuid(
         server_id: int,
         client_uuid: str,
@@ -20,7 +20,7 @@ async def get_clients_by_uuid(
     return await service.get_client_info_by_id(server_id, client_uuid)
 
 
-@router.get("/{server_id}/client/info_by_email/{client_email}")
+@router.get("/{server_id}/client/info-by-email/{client_email}")
 async def get_client_by_email(
         server_id: int,
         client_email: str,
@@ -29,9 +29,10 @@ async def get_client_by_email(
     return await service.get_client_info_by_email(server_id, client_email)
 
 
-@router.put("/subscription/update")
+@router.post("/subscription/update-all")
 async def update_clients(
         user: UserSchema = Depends(get_current_active_user),
         service: PanelService = Depends(get_panel_service)
 ):
     await service.update_user_subscriptions(user)
+    return {"message": "Subscriptions updated successfully"}

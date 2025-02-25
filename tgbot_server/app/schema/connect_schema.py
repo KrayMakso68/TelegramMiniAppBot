@@ -12,13 +12,13 @@ class ConnectSchema(BaseSchema):
     uuid: str
     email: str
     inbound_name: str
-    remaining_seconds: int
+    remaining_seconds: int | None
     active: bool
 
     @model_validator(mode="before")
     @classmethod
     def check_fields_not_empty(cls, values):
-        required_fields = ['connect_url', 'uuid', 'inbound_name', 'email', 'remaining_seconds', 'active']
+        required_fields = ['connect_url', 'uuid', 'inbound_name', 'email', 'active']
         for field in required_fields:
             if values.get(field) is None:
                 raise ValueError(f"Field {field} cannot be empty!")
@@ -40,7 +40,7 @@ class ConnectSchema(BaseSchema):
             remaining_seconds = cls._extract_remaining_seconds(time_string)
             active = True
         else:
-            remaining_seconds = 0
+            remaining_seconds = None
             active = True
 
         cleaned_fragment = cls._clean_fragment(fragment)
