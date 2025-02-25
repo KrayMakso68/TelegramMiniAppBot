@@ -121,7 +121,7 @@ class PanelService:
                 if connect_schema.email in existing_subscriptions_dict:
                     existing_sub = existing_subscriptions_dict[connect_schema.email]
 
-                    await self.subscription_repository.update_subscription_by_connect(existing_sub.server_id, connect_schema)
+                    await self.subscription_repository.update_subscription_by_connect(existing_sub.id, connect_schema)
                 else:
                     new_subscription = SubscriptionCreate(
                         email_name=connect_schema.email,

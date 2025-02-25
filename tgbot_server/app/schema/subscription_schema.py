@@ -20,6 +20,7 @@ class SubscriptionUpdate(BaseSchema):
 
 
 class SubscriptionSchema(BaseSchema):
+    id: int
     email_name: str
     url: str
     user_id: int
