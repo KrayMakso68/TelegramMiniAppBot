@@ -1,8 +1,8 @@
-"""Add servers and subscriptions tables
+"""Add server, country and subscription tables
 
-Revision ID: 87a28f0353ac
+Revision ID: b1d3d196dc52
 Revises: b2be59fcd256
-Create Date: 2025-02-16 17:09:14.393834
+Create Date: 2025-02-25 12:37:52.242843
 
 """
 from typing import Sequence, Union
@@ -12,7 +12,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '87a28f0353ac'
+revision: str = 'b1d3d196dc52'
 down_revision: Union[str, None] = 'b2be59fcd256'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -30,7 +30,7 @@ def upgrade() -> None:
     sa.Column('panel_url', sa.String(), nullable=False),
     sa.Column('username', sa.String(), nullable=False),
     sa.Column('password_enc', sa.String(), nullable=False),
-    sa.Column('subscribe_url', sa.String(), nullable=False),
+    sa.Column('subscription_url', sa.String(), nullable=False),
     sa.Column('country_code', sa.String(length=2), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.Column('id', sa.Integer(), autoincrement=True, nullable=False),

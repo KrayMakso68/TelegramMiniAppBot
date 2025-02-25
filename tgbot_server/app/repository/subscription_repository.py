@@ -2,7 +2,7 @@ from datetime import datetime, UTC, timedelta
 from itertools import groupby
 
 from sqlalchemy import select, Result
-from sqlalchemy.exc import NoResultFound, DatabaseError, IntegrityError
+from sqlalchemy.exc import NoResultFound, DatabaseError, IntegrityError, SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -34,16 +34,21 @@ class SubscriptionRepository(ISubscriptionRepository):
 
     async def get_all_grouped(self, user_id: int) -> dict[str, list[SubscriptionSchema]]:
         try:
-            result = await self.session.execute(
+            stmt = (
                 select(Subscription)
-                .options(selectinload(Subscription.server_rel))
-                .filter(Subscription.user_id.c == user_id)
-                .order_by(Server.name)
+                .join(Server)  # Join the Server table
+                .options(selectinload(Subscription.server_rel))  # Load the server relationship
+                .where(Subscription.user_id == user_id)
+                .order_by(Server.name)  # Order by server name
             )
+
+            # Execute the query
+            result = await self.session.execute(stmt)
             subscriptions = result.scalars().all()
+
             grouped_subscriptions = {
                 server_name: [SubscriptionSchema.model_validate(sub) for sub in group]
-                for server_name, group in groupby(subscriptions, key=lambda sub: sub.server.name)
+                for server_name, group in groupby(subscriptions, key=lambda sub: sub.server_rel.name)
             }
             return grouped_subscriptions
 
@@ -55,7 +60,7 @@ class SubscriptionRepository(ISubscriptionRepository):
 
     async def get_all_from_server(self, user_id: int, server_id: int) -> list[SubscriptionSchema]:
         try:
-            stmt = select(Subscription).where(Subscription.user_id.c == user_id, Subscription.server_id.c == server_id)
+            stmt = select(Subscription).where(Subscription.user_id == user_id, Subscription.server_id == server_id)
             result: Result = await self.session.execute(stmt)
             subscriptions = result.scalars().all()
             return [SubscriptionSchema.model_validate(subscription) for subscription in subscriptions]
