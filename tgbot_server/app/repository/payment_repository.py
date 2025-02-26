@@ -36,7 +36,7 @@ class PaymentRepository(IPaymentRepository):
 
     async def update(self, payment_id: int, payment_update: PaymentUpdate) -> PaymentSchema | None:
         try:
-            stmt = select(Payment).where(Payment.id.c == payment_id)
+            stmt = select(Payment).where(Payment.id == payment_id)
             result: Result = await self.session.execute(stmt)
             payment = result.scalar_one()
 
@@ -53,7 +53,7 @@ class PaymentRepository(IPaymentRepository):
 
     async def get_all(self, user_id: int) -> list[PaymentSchema]:
         try:
-            stmt = select(Payment).where(Payment.user_id.c == user_id).order_by(Payment.created_at.desc())
+            stmt = select(Payment).where(Payment.user_id == user_id).order_by(Payment.created_at.desc())
             result: Result = await self.session.execute(stmt)
             payments_history = result.scalars().all()
             return [PaymentSchema.model_validate(payment) for payment in payments_history]

@@ -1,14 +1,20 @@
 <script setup lang="ts">
-interface Props {
-  label?: string
-}
-defineProps<Props>()
+import {computed} from "vue";
 
+interface Props {
+  label?: string;
+  labelSize?: string;
+}
+const props = defineProps<Props>()
+
+const labelStyle = computed(() => ({
+  fontSize: props.labelSize || "15px", // Значение по умолчанию
+}));
 </script>
 
 <template>
   <div class="col tg-section" >
-    <q-item-label v-if="label" header class="tg-section-header">
+    <q-item-label v-if="label" :style="labelStyle" header class="tg-section-header">
       {{ label }}
     </q-item-label>
     <slot></slot>

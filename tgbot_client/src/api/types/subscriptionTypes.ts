@@ -1,8 +1,8 @@
 export interface Subscription {
-  email_name: string;
+  emailName: string;
   url: string;
-  user_id: number;
-  server_id: number;
-  end_date: Date | null;
-  is_active: boolean;
+  userId: number;
+  serverId: number;
+  endDate: Date | null;
+  isActive: boolean;
 }

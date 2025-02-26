@@ -70,7 +70,7 @@ class SubscriptionRepository(ISubscriptionRepository):
     async def update_subscription_by_connect(self, sub_id: int, connect: ConnectSchema) -> SubscriptionSchema:
         try:
             subscription: Subscription | None = await self.session.get(Subscription, sub_id)
-            print(subscription)
+
             if subscription:
 
                 subscription.url = connect.connect_url
