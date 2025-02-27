@@ -13,7 +13,9 @@ const router = useRouter();
 // const {openLink} = useWebAppNavigation();
 
 interface Props {
-  connect: Connect
+  emailName: string;
+  serverId: number;
+  url: string
 }
 const props = defineProps<Props>();
 
@@ -21,7 +23,7 @@ const connectInfo: Ref<ConnectInfo | null> = ref<ConnectInfo | null>(null)
 
 const loadInfo = async () => {
   if (!connectInfo.value) {
-    connectInfo.value = await PanelService.getConnectInfoByEmail(props.connect.email)
+    connectInfo.value = await PanelService.getConnectInfoByEmail(props.serverId, props.emailName)
   }
 };
 
@@ -66,11 +68,11 @@ function datetimeToString(dateTime: number): string {
             Подключение
           </div>
           <div class="text-h4 text-weight-bold" style="color: var(--tg-section-header-text-color);">
-            {{connect.email}}
+            {{emailName}}
           </div>
         </div>
         <div class="q-pa-sm">
-          <tg-code-card title="Connection url" :text=connect.connectUrl />
+          <tg-code-card title="Connection url" :text=url />
         </div>
 <!--        <q-btn @click="importConfig">Импортировать</q-btn>-->
       </tg-section>

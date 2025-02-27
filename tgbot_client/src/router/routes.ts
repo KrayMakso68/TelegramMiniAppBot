@@ -29,10 +29,9 @@ const routes: RouteRecordRaw[] = [
         path: 'connect-info',
         component: () => import('pages/ConnectInfoPage.vue'),
         props: (route) => ({
-          connectUrl: route.query.connectUrl as string,
-          uuid: route.query.uuid as string,
-          email: route.query.email as string,
-          inboundName: route.query.inboundName as string
+          emailName: route.query.emailName as string ?? "",
+          serverId: Number(route.query.serverId) ?? 0,
+          url: route.query.url as string ?? "",
         }),
         meta: { transition: 'slide-right' },
       },

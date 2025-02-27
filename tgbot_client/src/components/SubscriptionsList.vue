@@ -50,10 +50,17 @@ onMounted(loadSubscriptions);
 
       <q-list>
         <template v-for="(subscriptions, server) in subscriptionsByServer" :key="server">
-          <tg-section :label=server label-size="14px">
+          <tg-section :label=server custom-class="custom-tg-section-header">
             <template v-for="(subscription, index) in subscriptions" :key="subscription.email_name">
               <q-item
-                :to="{ path: 'connect-info', query: subscription }"
+                :to="{
+                      path: 'connect-info',
+                      query: {
+                        emailName: subscription.emailName,
+                        serverId: subscription.serverId,
+                        url: subscription.url
+                      }
+                     }"
                 v-ripple
                 draggable="false"
               >
@@ -105,5 +112,12 @@ onMounted(loadSubscriptions);
 <style scoped>
 .tg-list-item-icon {
   color: var(--tg-subtitle-text-color);
+}
+:deep(.custom-tg-section-header) {
+  color: var(--tg-subtitle-text-color);
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 18px;
+  padding-bottom: 5px;
 }
 </style>
