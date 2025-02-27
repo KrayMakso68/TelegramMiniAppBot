@@ -18,7 +18,7 @@ class ServerSchema(BaseSchema):
     username: str
     password_enc: str
     subscription_url: str = Field(..., example="https://server_ip:sub_port/server_sub_path/")
-    country_code: str = Field(..., example="RU, US, GB, etc.")
+    country_code: str = Field(..., example="ru, us, gb, etc.")
     is_active: bool
 
 

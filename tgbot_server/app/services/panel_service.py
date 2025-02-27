@@ -1,5 +1,5 @@
 import functools
-import uuid
+
 from datetime import datetime, timedelta, UTC
 
 from httpx import HTTPStatusError
@@ -14,25 +14,35 @@ from app.core.exceptions import NotFoundError
 from app.schema.server_schema import ServerSchema
 from app.schema.subscription_schema import SubscriptionCreate
 from app.schema.user_schema import UserSchema
-from app.services.subscription_service import SubscriptionService
 from app.utils.panel_subscription_api import PanelSubscriptionApi
 
 
 def ensure_panel_session_active(method):
     @functools.wraps(method)
     async def wrapper(self, *args, **kwargs):
+        server_id = kwargs.get("server_id") or (args[0] if args else None)
+        if server_id is None:
+            raise HTTPException(status_code=400, detail="server_id is require")
 
-        if not self.panel_api.session:
-            await self.panel_api.login()
+        server = await self.server_repository.get_by_id(server_id)
+        if server is None:
+            raise NotFoundError(detail="Server Not Found.")
+
+        if server_id in self._panel_sessions:
+            panel_api = self._panel_sessions[server_id]
+        else:
+            panel_api = self.get_panel_api(server)
+            self._panel_sessions[server_id] = panel_api
+
+        if not panel_api.session:
+            await panel_api.login()
 
         try:
-            response = await method(self, *args, **kwargs)
-            return response
+            return await method(self, panel_api=panel_api, *args, **kwargs)
         except HTTPStatusError as e:
             if e.response.status_code == status.HTTP_307_TEMPORARY_REDIRECT:
-                await self.panel_api.login()
-                response = await method(self, *args, **kwargs)
-                return response
+                await panel_api.login()
+                return await method(self, panel_api=panel_api, *args, **kwargs)
             raise HTTPException(e.response.status_code, detail=e.response.text)
 
     return wrapper
@@ -43,14 +53,10 @@ class PanelService:
     def __init__(self, subscription_repository: ISubscriptionRepository, server_repository: IServerRepository):
         self.subscription_repository = subscription_repository
         self.server_repository = server_repository
+        self._panel_sessions = {}
 
     @ensure_panel_session_active
-    async def get_client_info_by_id(self, server_id: int, client_uuid: str) -> list[ClientSchema]:
-        server = await self.server_repository.get_by_id(server_id)
-        if server is None:
-            raise NotFoundError(detail="Server Not Found.")
-
-        panel_api = self.get_panel_api(server)
+    async def get_client_info_by_id(self, server_id: int, client_uuid: str, panel_api) -> list[ClientSchema]:
         response: list[ClientSchema] = await panel_api.client.get_traffic_by_id(client_uuid)
 
         if len(response) == 0:
@@ -59,12 +65,7 @@ class PanelService:
         return response
 
     @ensure_panel_session_active
-    async def get_client_info_by_email(self, server_id: int, client_email: str) -> ClientSchema:
-        server = await self.server_repository.get_by_id(server_id)
-        if server is None:
-            raise NotFoundError(detail="Server Not Found.")
-
-        panel_api = self.get_panel_api(server)
+    async def get_client_info_by_email(self, server_id: int, client_email: str, panel_api) -> ClientSchema:
         response: ClientSchema | None = await panel_api.client.get_by_email(client_email)
 
         if response is None:
