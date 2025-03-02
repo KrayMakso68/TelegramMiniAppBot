@@ -13,6 +13,9 @@ const loadSubscriptions = async () => {
   loading.value = false;
 };
 
+function formatDate(date: Date | null): string {
+  return date ? new Date(date).toLocaleDateString() : "";
+}
 
 onMounted(loadSubscriptions);
 </script>
@@ -20,35 +23,35 @@ onMounted(loadSubscriptions);
 <template>
   <q-slide-transition>
     <div>
-<!--      <q-list v-if="loading">-->
-<!--        <template v-for="index in 2" :key="index">-->
-<!--          <q-item v-ripple>-->
-<!--            <q-item-section avatar>-->
-<!--              <q-avatar>-->
-<!--                <q-skeleton type="QAvatar"/>-->
-<!--              </q-avatar>-->
-<!--            </q-item-section>-->
+      <q-list v-if="loading">
+        <template v-for="index in 2" :key="index">
+          <q-item v-ripple>
+            <q-item-section avatar>
+              <q-avatar>
+                <q-skeleton type="QAvatar"/>
+              </q-avatar>
+            </q-item-section>
 
-<!--            <q-item-section>-->
-<!--              <q-item-label lines="1">-->
-<!--                <q-skeleton width="40%" type="text"/>-->
-<!--              </q-item-label>-->
-<!--              <q-item-label caption>-->
-<!--                <q-skeleton width="20%" type="text"/>-->
-<!--              </q-item-label>-->
-<!--            </q-item-section>-->
+            <q-item-section>
+              <q-item-label lines="1">
+                <q-skeleton width="40%" type="text"/>
+              </q-item-label>
+              <q-item-label caption>
+                <q-skeleton width="20%" type="text"/>
+              </q-item-label>
+            </q-item-section>
 
-<!--            <q-item-section side top>-->
-<!--                <q-avatar icon='navigate_next' class="tg-subtitle-text"/>-->
-<!--            </q-item-section>-->
-<!--          </q-item>-->
-<!--          <q-separator v-if="index < 2" inset="item" class="tg-separator"/>-->
-<!--        </template>-->
-<!--      </q-list>-->
+            <q-item-section side top>
+                <q-avatar icon='navigate_next' class="tg-subtitle-text"/>
+            </q-item-section>
+          </q-item>
+          <q-separator v-if="index < 2" inset="item" class="tg-separator"/>
+        </template>
+      </q-list>
 
-<!--      <q-list v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length !== 0">-->
+      <q-list v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length !== 0">
 
-      <q-list>
+
         <template v-for="(subscriptions, server) in subscriptionsByServer" :key="server">
           <tg-section :label=server custom-class="custom-tg-section-header">
             <template v-for="(subscription, index) in subscriptions" :key="subscription.email_name">
@@ -70,9 +73,9 @@ onMounted(loadSubscriptions);
 
                 <q-item-section>
                   <q-item-label lines="1">{{ subscription.emailName }}</q-item-label>
-<!--                  <q-item-label caption class="tg-subtitle-text">-->
-<!--                    {{ subscription.emailName }}-->
-<!--                  </q-item-label>-->
+                  <q-item-label v-if="subscription.endDate" caption class="tg-subtitle-text">
+                    До: {{ formatDate(subscription.endDate) }}
+                  </q-item-label>
                 </q-item-section>
 
                 <q-item-section side>
@@ -98,13 +101,13 @@ onMounted(loadSubscriptions);
 
       </q-list>
 
-<!--      <not-found-banner v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length === 0" title="Похоже, у вас нет подписок!">-->
-<!--        <template #button>-->
-<!--          <q-btn class="tg-btn">Подключить</q-btn>-->
-<!--        </template>-->
-<!--      </not-found-banner>-->
+      <not-found-banner v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length === 0" title="Похоже, у вас нет подписок!">
+        <template #button>
+          <q-btn class="tg-btn">Подключить</q-btn>
+        </template>
+      </not-found-banner>
 
-<!--      <not-found-banner v-else title="Ошибка получения подписок ;("/>-->
+      <not-found-banner v-else title="Ошибка получения подписок ;("/>
     </div>
   </q-slide-transition>
 </template>
@@ -114,7 +117,7 @@ onMounted(loadSubscriptions);
   color: var(--tg-subtitle-text-color);
 }
 :deep(.custom-tg-section-header) {
-  color: var(--tg-subtitle-text-color);
+  color: var(--tg-hint-color);
   font-size: 14px;
   font-weight: 500;
   line-height: 18px;

@@ -8,13 +8,29 @@ interface Props {
 const props = defineProps<Props>()
 
 const labelClass = computed(() => props.customClass || 'tg-section-header');
+
+function reload() {
+  console.log("Перезагрузка...");
+  // Здесь можно вызвать метод обновления данных
+}
 </script>
 
 <template>
-  <div class="col tg-section" >
-    <q-item-label v-if="label" :style="labelStyle" header :class="labelClass">
-      {{ label }}
-    </q-item-label>
+  <div class="tg-section" >
+<!--    <q-item-label v-if="label" header :class="labelClass">-->
+<!--      {{ label }}-->
+<!--    </q-item-label>-->
+    <q-item class="q-pa-none">
+      <q-item-section class="q-pa-none">
+        <q-item-label v-if="label" header :class="labelClass">
+          {{ label }}
+        </q-item-label>
+      </q-item-section>
+
+      <q-item-section side>
+        <q-btn flat dense round icon="refresh" @click="reload" />
+      </q-item-section>
+    </q-item>
     <slot></slot>
   </div>
 </template>
