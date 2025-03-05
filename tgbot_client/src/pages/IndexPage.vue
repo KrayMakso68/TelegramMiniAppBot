@@ -18,7 +18,7 @@ import WalletBalance from "components/WalletBalance.vue";
         <wallet-balance/>
       </tg-section>
 
-      <tg-section label="Подключения" class="column">
+      <tg-section label="Подключения" :reload="true">
         <subscriptions-list/>
       </tg-section>
 

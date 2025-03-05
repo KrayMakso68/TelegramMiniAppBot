@@ -44,8 +44,6 @@
   color: var(--tg-section-header-text-color);
   font-size: 15px;
   font-weight: 500;
-  line-height: 18px;
-  padding-bottom: 5px;
 }
 
 .tg-separator {

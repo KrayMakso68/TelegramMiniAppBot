@@ -7,6 +7,15 @@ import {OperationType, Payment, PaymentStatus} from "src/api/types/paymentTypes"
 const loading = ref<boolean>(true);
 const paymentsGroups: Ref<Record<string, Payment[]> | null> = ref<Record<string, Payment[]> | null>(null);
 
+
+const formattedPrice = (amount: number) => {
+  return new Intl.NumberFormat("ru-RU", {
+    style: "currency",
+    currency: "RUB",
+    minimumFractionDigits: 2,
+  }).format(amount);
+};
+
 const loadHistory = async () => {
   paymentsGroups.value = await PaymentService.getPaymentHistoryByDay()
   loading.value = false;
@@ -61,34 +70,32 @@ onMounted(loadHistory);
 
             <q-item-section>
               <template v-if="payment.operationType === OperationType.DEPOSIT">
-                <q-item-label lines="1">
+                <q-item-label>
                   Пополнение баланса
                 </q-item-label>
               </template>
               <template v-else>
-                <q-item-label lines="1">
-                  Оплата
-                </q-item-label>
-                <q-item-label caption class="tg-subtitle-text">
-                  {{ payment?.title }}
+                <q-item-label>
+                  Оплата:
+                  <span class="tg-subtitle-text">{{ payment?.title }}</span>
                 </q-item-label>
               </template>
+
+              <q-item-label caption>
+                <template v-if="payment.status === PaymentStatus.COMPLETED" >
+                  <q-badge outline color="positive" label='Ок' />
+                </template>
+                <template v-else-if="payment.status === PaymentStatus.PENDING">
+                  <q-badge outline color="warning" label='Обработка' />
+                </template>
+                <template v-else>
+                  <q-badge outline color="negative" label='Ошибка' />
+                </template>
+              </q-item-label>
             </q-item-section>
 
             <q-item-section side>
-              <template v-if="payment.status === PaymentStatus.COMPLETED" >
-                <q-badge outline color="positive" label='Ок' />
-              </template>
-              <template v-else-if="payment.status === PaymentStatus.PENDING">
-                <q-badge outline color="warning" label='Обработка' />
-              </template>
-              <template v-else>
-                <q-badge outline color="negative" label='Ошибка' />
-              </template>
-            </q-item-section>
-
-            <q-item-section side>
-              <div class="text-subtitle1 text-weight-bold">{{ payment.amount }} ₽</div>
+              <div class="text-subtitle1 text-weight-bold">{{ formattedPrice(payment.amount) }}</div>
             </q-item-section>
           </q-item>
           <q-separator v-if="index < payments?.length - 1" inset="item" class="tg-separator" />

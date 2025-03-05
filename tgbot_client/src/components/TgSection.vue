@@ -3,35 +3,36 @@ import {computed} from "vue";
 
 interface Props {
   label?: string;
-  customClass?: string;
+  reload?: boolean;
+  customLabelClass?: string;
 }
 const props = defineProps<Props>()
 
-const labelClass = computed(() => props.customClass || 'tg-section-header');
+const labelClass = computed(() => props.customLabelClass || 'tg-section-header');
 
-function reload() {
-  console.log("Перезагрузка...");
-  // Здесь можно вызвать метод обновления данных
-}
+const emit = defineEmits<{
+  (e: "reload"): void;
+}>();
 </script>
 
 <template>
   <div class="tg-section" >
-<!--    <q-item-label v-if="label" header :class="labelClass">-->
-<!--      {{ label }}-->
-<!--    </q-item-label>-->
-    <q-item class="q-pa-none">
-      <q-item-section class="q-pa-none">
-        <q-item-label v-if="label" header :class="labelClass">
+    <q-item v-if="label || reload" class="q-pa-none">
+
+      <q-item-section v-if="label">
+        <q-item-label header :class="labelClass">
           {{ label }}
         </q-item-label>
       </q-item-section>
 
-      <q-item-section side>
-        <q-btn flat dense round icon="refresh" @click="reload" />
+      <q-item-section v-if="reload" side class="q-mr-md">
+        <q-btn flat dense round icon="sync" @click="emit('reload')"/>
       </q-item-section>
+
     </q-item>
+
     <slot></slot>
+
   </div>
 </template>
 

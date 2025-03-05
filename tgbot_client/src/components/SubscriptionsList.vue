@@ -50,10 +50,12 @@ onMounted(loadSubscriptions);
       </q-list>
 
       <q-list v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length !== 0">
-
-
         <template v-for="(subscriptions, server) in subscriptionsByServer" :key="server">
-          <tg-section :label=server custom-class="custom-tg-section-header">
+
+            <div class="custom-tg-section-header">
+              {{server}}
+            </div>
+
             <template v-for="(subscription, index) in subscriptions" :key="subscription.email_name">
               <q-item
                 :to="{
@@ -96,9 +98,8 @@ onMounted(loadSubscriptions);
               </q-item>
               <q-separator v-if="index < subscriptions?.length - 1" inset="item" class="tg-separator" />
             </template>
-          </tg-section>
-        </template>
 
+        </template>
       </q-list>
 
       <not-found-banner v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length === 0" title="Похоже, у вас нет подписок!">
@@ -121,6 +122,6 @@ onMounted(loadSubscriptions);
   font-size: 14px;
   font-weight: 500;
   line-height: 18px;
-  padding-bottom: 5px;
+  padding: 5px 0 5px 16px;
 }
 </style>
