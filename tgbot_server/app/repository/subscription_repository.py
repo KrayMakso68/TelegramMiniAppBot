@@ -36,13 +36,12 @@ class SubscriptionRepository(ISubscriptionRepository):
         try:
             stmt = (
                 select(Subscription)
-                .join(Server)  # Join the Server table
-                .options(selectinload(Subscription.server_rel))  # Load the server relationship
+                .join(Server)
+                .options(selectinload(Subscription.server_rel))
                 .where(Subscription.user_id == user_id)
-                .order_by(Server.name)  # Order by server name
+                .order_by(Server.name)
             )
 
-            # Execute the query
             result = await self.session.execute(stmt)
             subscriptions = result.scalars().all()
 

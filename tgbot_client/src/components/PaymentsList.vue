@@ -59,10 +59,9 @@ onMounted(loadHistory);
       <div v-for="(payments, date) in paymentsGroups" :key="date">
         <div class="text-subtitle2 tg-subtitle-text q-ml-md q-mt-md">{{ date }}</div>
         <template v-for="(payment, index) in payments" :key="index">
-          <q-item
-            v-ripple
-            draggable="false"
-          >
+
+          <q-item v-ripple draggable="false">
+
             <q-item-section avatar>
               <q-avatar v-if="payment.operationType === OperationType.DEPOSIT" icon='east' font-size="25px" class="pay-deposit"/>
               <q-avatar v-else icon='west' font-size="25px" class="pay-withdrawal"/>
@@ -81,7 +80,7 @@ onMounted(loadHistory);
                 </q-item-label>
               </template>
 
-              <q-item-label caption>
+              <q-item-label>
                 <template v-if="payment.status === PaymentStatus.COMPLETED" >
                   <q-badge outline color="positive" label='Ок' />
                 </template>
@@ -97,10 +96,12 @@ onMounted(loadHistory);
             <q-item-section side>
               <div class="text-subtitle1 text-weight-bold">{{ formattedPrice(payment.amount) }}</div>
             </q-item-section>
+
           </q-item>
+
           <q-separator v-if="index < payments?.length - 1" inset="item" class="tg-separator" />
+
         </template>
-        <q-separator class="tg-separator" />
       </div>
     </q-list>
 

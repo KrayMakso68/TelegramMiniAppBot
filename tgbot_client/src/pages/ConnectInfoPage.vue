@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import {BackButton, useWebAppNavigation} from "vue-tg";
 import {useRouter} from "vue-router";
-import {Connect} from "src/api/types/panelTypes";
 import {ConnectInfo} from "src/api/types/panelTypes";
 import TgSection from "components/TgSection.vue";
 import TgCodeCard from "components/TgCodeCard.vue";

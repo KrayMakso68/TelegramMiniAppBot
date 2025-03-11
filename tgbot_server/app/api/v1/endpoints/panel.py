@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 
 from app.core.dependencies import get_panel_service, get_current_active_user
 from app.schema.panel_schema import ClientSchema
+from app.schema.subscription_schema import SubscriptionSchema
 from app.schema.user_schema import UserSchema
 from app.services.panel_service import PanelService
 
@@ -32,7 +33,6 @@ async def get_client_by_email(
 @router.post("/subscription/update-all")
 async def update_clients(
         user: UserSchema = Depends(get_current_active_user),
-        service: PanelService = Depends(get_panel_service)
-):
-    await service.update_user_subscriptions(user)
-    return {"message": "Subscriptions updated successfully"}
+        service: PanelService = Depends(get_panel_service),
+) -> dict[str, list[SubscriptionSchema]]:
+    return await service.update_user_subscriptions(user)

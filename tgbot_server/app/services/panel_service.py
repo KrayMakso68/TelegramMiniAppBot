@@ -7,6 +7,7 @@ from py3xui import AsyncApi
 from fastapi import status, HTTPException
 
 from app.core.config import settings
+from app.repository import subscription_repository
 from app.repository.interfaces import ISubscriptionRepository, IServerRepository
 from app.schema.connect_schema import ConnectSchema
 from app.schema.panel_schema import ClientSchema, ClientCreate
@@ -137,6 +138,7 @@ class PanelService:
                         new_subscription.end_date = datetime.now(UTC) - timedelta(days=1)
 
                     await self.subscription_repository.add(new_subscription)
+        return await self.subscription_repository.get_all_grouped(user.id)
 
 
 
