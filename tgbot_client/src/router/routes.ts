@@ -35,6 +35,10 @@ const routes: RouteRecordRaw[] = [
         }),
         meta: { transition: 'slide-right' },
       },
+      {
+        path: 'subscription-new',
+        component: () => import('pages/SubscriptionNewPage.vue')
+      },
     ],
   },
   {

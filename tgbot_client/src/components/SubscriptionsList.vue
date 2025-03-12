@@ -110,13 +110,13 @@ onMounted(loadSubscriptions);
 
           <q-item-section side>
             <template v-if="subscription.isActive && !subscription.endDate" >
-              <q-badge outline color="amber-9" label='unlimit' />
+              <q-badge outline color="amber-9" label='безлимит' />
             </template>
             <template v-else-if="!subscription.isActive">
-              <q-badge outline color="red" label='expired' />
+              <q-badge outline color="red" label='истекло' />
             </template>
             <template v-else>
-              <q-badge outline color="green" label='active' />
+              <q-badge outline color="green" label='активно' />
             </template>
           </q-item-section>
 
@@ -133,7 +133,7 @@ onMounted(loadSubscriptions);
           clickable
           draggable="false"
           class="q-py-none"
-          @click=""
+          :to="'subscription-new'"
         >
           <q-item-section avatar>
             <q-avatar icon='add_circle' font-size="24px"/>
@@ -166,11 +166,18 @@ onMounted(loadSubscriptions);
 
   <not-found-banner v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length === 0" title="Похоже, у вас нет подписок!">
     <template #button>
-      <q-btn class="tg-btn">Подключить</q-btn>
+      <div class="row q-gutter-sm">
+        <q-btn class="col tg-btn" :to="'subscription-new'">Подключить</q-btn>
+        <q-btn class="col tg-btn" @click="updateSubscriptions">Обновить</q-btn>
+      </div>
     </template>
   </not-found-banner>
 
-  <not-found-banner v-else title="Ошибка получения подписок ;("/>
+  <not-found-banner v-else title="Ошибка получения подписок ;(">
+    <template #button>
+      <q-btn class="tg-btn" @click="updateSubscriptions">Обновить</q-btn>
+    </template>
+  </not-found-banner>
 
 </template>
 
