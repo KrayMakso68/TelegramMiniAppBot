@@ -76,14 +76,14 @@ onMounted(() => {
             :error="!isValid"
             v-model="inputValue"
           />
-          <q-separator class="tg-separator"></q-separator>
+
           <q-select
             v-model="selectValue"
             :loading="isLoading"
             :options="options"
             borderless
             dark
-            class="payment-type q-mt-sm"
+            class="payment-type"
             clearable
             label="Способ оплаты"
           />
@@ -134,7 +134,7 @@ onMounted(() => {
 ::v-deep(.payment-type .q-field__native) {
   font-size: 20px;
   color: var(--tg-accent-text-color);
-  padding-left: 20px;
+  padding-left: 10px;
   padding-top: 4px;
   padding-bottom: 0;
 }
