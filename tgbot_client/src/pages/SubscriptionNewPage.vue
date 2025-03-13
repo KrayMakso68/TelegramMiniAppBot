@@ -3,9 +3,10 @@
 import {BackButton, MainButton} from "vue-tg";
 import TgSection from "components/TgSection.vue";
 import {useRouter} from "vue-router";
+import {ref} from "vue";
 
 const router = useRouter();
-
+const text = ref('')
 </script>
 
 <template>
@@ -43,8 +44,18 @@ const router = useRouter();
 <!--            label="Способ оплаты"-->
 <!--          />-->
 <!--        </div>-->
-        <div>
-          <q-input borderless v-model="text" label="Label (stacked)" stack-label style="border: 1.5px solid var(--tg-hint-color); border-radius: 14px; padding-left: 10px;" />
+        <div class="q-mt-md q-pa-sm">
+          <q-input
+            type="text"
+            clearable
+            autofocus
+            dense
+            borderless
+            v-model="text"
+            label="Имя подключения"
+            stack-label
+          />
+
         </div>
       </tg-section>
     </div>
@@ -53,5 +64,45 @@ const router = useRouter();
 </template>
 
 <style scoped>
-
+::v-deep(.q-field__label) {
+  position: absolute;
+  top: -4px;
+  left: 8px;
+  background: var(--tg-section-bg-color);
+  padding: 0 6px;
+  color: var(--tg-subtitle-text-color);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 147%;
+  letter-spacing: 0.01em;
+  z-index: 10;
+}
+::v-deep(.q-field--focused .q-field__label) {
+  color: var(--tg-accent-text-color);
+}
+::v-deep(.q-field__control) {
+  border: 1.8px solid var(--tg-hint-color);
+  border-radius: 14px;
+  height: 50px;
+}
+::v-deep(.q-field--focused .q-field__control) {
+  border-color: var(--tg-accent-text-color);
+}
+::v-deep(.q-field__native) {
+  padding-top: 0 !important;
+  padding-left: 14px;
+  color: var(--tg-text-color);
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  caret-color: var(--tg-accent-text-color);
+}
+::v-deep(.q-field__append) {
+  color: var(--tg-subtitle-text-color);
+  padding-top: 7px;
+  padding-right: 10px;
+}
+::v-deep(.q-field--focused .q-field__append) {
+  color: var(--tg-accent-text-color);
+}
 </style>
