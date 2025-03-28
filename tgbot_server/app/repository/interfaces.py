@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 
 from app.schema.connect_schema import ConnectSchema
 from app.schema.payment_schema import PaymentCreate, PaymentSchema, PaymentUpdate, PaymentOptionSchema
-from app.schema.server_schema import ServerSchema
+from app.schema.server_schema import ServerSchema, ServerInfo
 from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema
 from app.schema.user_schema import UserCreate, UserSchema
 
@@ -76,4 +76,8 @@ class IServerRepository(ABC):
 
     @abstractmethod
     async def get_by_id(self, id: int) -> ServerSchema | None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_all_short_info(self) -> list[ServerInfo]:
         raise NotImplementedError

@@ -82,7 +82,6 @@ onMounted(() => {
             :loading="isLoading"
             :options="options"
             borderless
-            dark
             class="payment-type"
             clearable
             label="Способ оплаты"

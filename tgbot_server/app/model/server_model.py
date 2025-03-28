@@ -1,4 +1,4 @@
-from sqlalchemy import String, Boolean, ForeignKey
+from sqlalchemy import String, Boolean, ForeignKey, DECIMAL
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -22,6 +22,7 @@ class Server(BaseModel):
     username: Mapped[str] = mapped_column(String, nullable=False)
     password_enc: Mapped[str] = mapped_column(String, nullable=False)
     subscription_url: Mapped[str] = mapped_column(String, nullable=False)
+    month_price: Mapped[DECIMAL] = mapped_column(DECIMAL(10, 2), default=0.00)
     country_code: Mapped[str] = mapped_column(String(2), ForeignKey("countries.code"), nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, nullable=False)
 

@@ -15,6 +15,7 @@ from app.services.auth_service import AuthService
 from app.repository.user_repository import UserRepository
 from app.services.panel_service import PanelService
 from app.services.payment_service import PaymentService
+from app.services.server_service import ServerService
 from app.services.subscription_service import SubscriptionService
 from app.services.user_service import UserService
 from app.utils.panel_subscription_api import PanelSubscriptionApi
@@ -68,6 +69,10 @@ def get_subscription_service(
 # server
 def get_server_repository(async_session: AsyncSession = Depends(get_async_session)) -> ServerRepository:
     return ServerRepository(async_session)
+
+
+def get_server_service(server_repository: ServerRepository = Depends(get_server_repository)) -> ServerService:
+    return ServerService(server_repository)
 
 
 # _________________________________________________________________________________________________________

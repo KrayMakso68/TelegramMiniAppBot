@@ -3,6 +3,7 @@ import {getCurrentUser, getCurrentUserBalance, getUserAvatarUrl} from './userSer
 import {getUserSubscriptionsByServer} from "src/api/subscriptionService";
 import {getConnectInfoByEmail, updateUserSubscriptions} from "src/api/panelService";
 import {getPaymentHistoryByDay, newPayment, getPaymentOptions} from "src/api/paymentService";
+import {getServersInfo} from "src/api/serverService"
 
 export const AuthService = {
   login,
@@ -27,4 +28,8 @@ export const PaymentService = {
   getPaymentHistoryByDay,
   newPayment,
   getPaymentOptions
+}
+
+export const ServerService = {
+  getServersInfo
 }
