@@ -111,7 +111,7 @@ class PanelService:
             sub_api = self.get_sub_api(server)
             try:
                 connects_data: list[ConnectSchema] = await sub_api.get_connects_for_user(user.sub_uuid)
-            except NotFoundError:
+            except Exception as e:
                 continue
 
             existing_subscriptions = await self.subscription_repository.get_all_from_server(user.id, server.id)
@@ -133,15 +133,13 @@ class PanelService:
                         is_active=connect_schema.active
                     )
                     if connect_schema.remaining_seconds:
-                        new_subscription.end_date = datetime.now(UTC) + timedelta(seconds=connect_schema.remaining_seconds)
+                        new_subscription.end_date = datetime.now(UTC) + timedelta(
+                            seconds=connect_schema.remaining_seconds)
                     elif not connect_schema.active:
                         new_subscription.end_date = datetime.now(UTC) - timedelta(days=1)
 
                     await self.subscription_repository.add(new_subscription)
         return await self.subscription_repository.get_all_grouped(user.id)
-
-
-
 
     @staticmethod
     def get_panel_api(server: ServerSchema) -> AsyncApi:

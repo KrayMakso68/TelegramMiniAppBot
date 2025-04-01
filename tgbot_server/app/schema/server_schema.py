@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from pydantic import Field
+from pydantic import Field, ConfigDict
 
 from app.schema.base_schema import BaseSchema, ModelBaseInfo
 
@@ -31,6 +31,12 @@ class ServerInfo(BaseSchema):
     month_price: Decimal = Field(..., gt=0, example="100.50")
     country_code: str = Field(..., example="ru, us, gb, etc.")
     is_active: bool
+
+    model_config = ConfigDict(
+        json_encoders={
+            Decimal: float
+        }
+    )
 
 
 class ServerModelSchema(ModelBaseInfo):
