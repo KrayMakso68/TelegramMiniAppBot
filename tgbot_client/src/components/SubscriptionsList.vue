@@ -3,7 +3,7 @@ import NotFoundBanner from "components/NotFoundBanner.vue";
 import {onMounted, Ref, ref} from "vue";
 import {Subscription} from "src/api/types/subscriptionTypes";
 import {PanelService, SubscriberService} from "src/api";
-import TgInlineBtn from "components/TgInlineBtn.vue";
+import CountryFlag from 'vue-country-flag-next'
 
 const loading  = ref<boolean>(true);
 const subscriptionsByServer: Ref<Record<string, Subscription[]> | null> = ref<Record<string, Subscription[]> | null>(null);
@@ -126,8 +126,8 @@ onMounted(loadSubscriptions);
         </q-item>
         <q-separator v-if="index < subscriptions?.length" inset="item" class="tg-separator" />
       </template>
-
-      <div class="tg-line-button q-pt-sm">
+    </template>
+    <div class="tg-line-button q-pt-sm">
         <q-item
           dense
           clickable
@@ -159,9 +159,6 @@ onMounted(loadSubscriptions);
           </q-item-section>
         </q-item>
       </div>
-
-    </template>
-
   </q-list>
 
   <not-found-banner v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length === 0" title="Похоже, у вас нет подписок!">

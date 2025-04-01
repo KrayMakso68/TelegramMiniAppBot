@@ -6,24 +6,53 @@ import {useRouter} from "vue-router";
 import {computed, onMounted, ref} from "vue";
 import {Server} from "src/api/types/serverTypes";
 import {ServerService} from "src/api";
+import CountryFlag from 'vue-country-flag-next'
 
 const router = useRouter();
 
 const isLoadingServers = ref(true);
-const textValue = ref<string | null>(null);
+const inputValue = ref<string | null>(null);
 const serverValue = ref<Server | null>(null);
-const serverOptions = ref<Server[] | null>(null);
+const serverOptions = ref<Server[]>([{id: 0, label:"Не найдено", countryCode: "...", monthPrice: 0, isActive: false}]);
 const monthValue = ref<number>(1)
 
 const loadServerOptions = async () => {
   serverOptions.value = await ServerService.getServersInfo()
-  if (!serverOptions.value) {
-    serverOptions.value = [{id: 1, label:"Не найдено", country_code: "...", month_price: 0, is_active: false}]
+  if (serverOptions.value.length === 0) {
+    serverOptions.value = [{id: 1, label:"Не найдено", countryCode: "...", monthPrice: 0, isActive: false}]
   }
   isLoadingServers.value = false;
 };
 
-const amount = computed(() => serverValue.value ? serverValue.value.month_price * monthValue.value : 0);
+const amount = computed(() => serverValue.value ? serverValue.value.monthPrice * monthValue.value : 0);
+
+const inputRules = computed(() => [
+  (val: string | null) => {
+    if (val === null || val.trim() === '') return 'Обязательное поле';
+    return val.length <= 10 || 'Максимум 10 символов'
+  },
+  (val: string | null) => {
+    if (!val) return true;
+    return /^[A-Za-z0-9_-]+$/.test(val) || 'Только a-z, 0-9, - , _';
+  },
+  (val: string | null) => {
+    if (!val) return true;
+    return val === val.toLowerCase() || 'Только нижний регистр';
+  }
+]);
+
+const hasInputError = computed(() => {
+  return inputRules.value.some(rule =>
+    typeof rule(inputValue.value) === 'string'
+  );
+});
+
+const inputErrorMessage = computed(() => {
+  const messages = inputRules.value
+    .map(rule => rule(inputValue.value))
+    .filter(msg => typeof msg === 'string');
+  return messages.join(' ; ');
+});
 
 onMounted(() => {
   loadServerOptions();
@@ -38,33 +67,6 @@ onMounted(() => {
 
     <div class="q-gutter-y-md">
       <tg-section label="Новая подписка">
-<!--        <div class="q-mx-md q-mt-xl q-pb-lg">-->
-<!--          <div style="font-size: 16px;" class="tg-subtitle-text">Сумма пополнения</div>-->
-<!--          <q-input-->
-<!--            class="payment-input hide-spin-buttons"-->
-<!--            input-class="input"-->
-<!--            type="number"-->
-<!--            borderless-->
-<!--            clearable-->
-<!--            autofocus-->
-<!--            prefix="₽"-->
-<!--            mask="#.##"-->
-<!--            error-message="Cумма от 2₽ до 15000₽"-->
-<!--            :error="!isValid"-->
-<!--            v-model="inputValue"-->
-<!--          />-->
-<!--          <q-separator class="tg-separator"></q-separator>-->
-<!--          <q-select-->
-<!--            v-model="selectValue"-->
-<!--            :loading="isLoading"-->
-<!--            :options="options"-->
-<!--            borderless-->
-<!--            dark-->
-<!--            class="payment-type q-mt-sm"-->
-<!--            clearable-->
-<!--            label="Способ оплаты"-->
-<!--          />-->
-<!--        </div>-->
         <div class="q-mt-sm q-pa-sm">
           <q-input
             class="q-py-md"
@@ -73,11 +75,12 @@ onMounted(() => {
             autofocus
             dense
             borderless
-            v-model="textValue"
+            v-model="inputValue"
             label="Имя подключения"
             stack-label
-            error-message="Не более 10 символов"
-            :error="!isValid"
+            :rules="inputRules"
+            :error="hasInputError"
+            :error-message="inputErrorMessage"
           />
           <q-select
             class="select q-py-md"
@@ -86,12 +89,39 @@ onMounted(() => {
             dense
             borderless
             v-model="serverValue"
-            :loading="isLoadingServers"
             :options="serverOptions"
             label="Сервер"
             stack-label
-          />
-          {{serverOptions}}
+            :loading="isLoadingServers"
+          >
+            <template v-slot:option="scope">
+              <q-item v-bind="scope.itemProps">
+                <q-item-section avatar>
+                  <div>
+                    <country-flag :country="scope.opt.countryCode.toLowerCase()"/>
+                  </div>
+                </q-item-section>
+                <q-item-section>
+                  <q-item-label>{{ scope.opt.label }}</q-item-label>
+                </q-item-section>
+                <q-item-section side>
+                  <q-item-label>
+                    ₽ {{ scope.opt.monthPrice.toFixed(2) }} мес
+                  </q-item-label>
+                </q-item-section>
+              </q-item>
+            </template>
+            <template v-slot:selected-item="scope" class="row items-center">
+              <q-item-section avatar>
+                <div>
+                  <country-flag :country="scope.opt.countryCode.toLowerCase()"/>
+                </div>
+              </q-item-section>
+              <q-item-section>
+                <q-item-label>{{ scope.opt.label }}</q-item-label>
+              </q-item-section>
+            </template>
+          </q-select>
           <div class="q-py-sm">
             <div style="color: var(--tg-subtitle-text-color);font-weight: 600;font-size: 12px;
                 line-height: 147%; letter-spacing: 0.01em; padding-left: 14px;">
@@ -109,7 +139,6 @@ onMounted(() => {
               </div>
             </div>
           </div>
-
 
         </div>
       </tg-section>

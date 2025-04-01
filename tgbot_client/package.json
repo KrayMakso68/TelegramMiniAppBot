@@ -16,6 +16,7 @@
     "lottie-web": "^5.12.2",
     "quasar": "^2.8.0",
     "vue": "^3.4.18",
+    "vue-country-flag-next": "^2.3.2",
     "vue-router": "^4.0.12",
     "vue-tg": "^0.8.0"
   },

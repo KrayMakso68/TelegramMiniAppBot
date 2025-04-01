@@ -2,7 +2,7 @@ import {api} from "boot/axios";
 import {Server} from "src/api/types/serverTypes";
 import {HttpStatusCode} from "axios";
 
-export const getServersInfo = async (): Promise<Server[] | null> => {
+export const getServersInfo = async (): Promise<Server[]> => {
   try {
     const response = await api.get('/server/all/available-info');
     return response.data;
@@ -12,7 +12,7 @@ export const getServersInfo = async (): Promise<Server[] | null> => {
       return [];
     } else {
       console.error("Error getting servers info from server:", error);
-      return null;
+      return [];
     }
   }
 }
