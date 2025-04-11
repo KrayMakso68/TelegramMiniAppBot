@@ -1,9 +1,10 @@
 import functools
+import uuid
 
 from datetime import datetime, timedelta, UTC
 
 from httpx import HTTPStatusError
-from py3xui import AsyncApi
+from py3xui import AsyncApi, Inbound
 from fastapi import status, HTTPException
 
 from app.core.config import settings
@@ -11,7 +12,7 @@ from app.repository import subscription_repository
 from app.repository.interfaces import ISubscriptionRepository, IServerRepository
 from app.schema.connect_schema import ConnectSchema
 from app.schema.panel_schema import ClientSchema, ClientCreate
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import NotFoundError, UnsupportedProtocolError
 from app.schema.server_schema import ServerSchema
 from app.schema.subscription_schema import SubscriptionCreate
 from app.schema.user_schema import UserSchema
@@ -50,11 +51,11 @@ def ensure_panel_session_active(method):
 
 
 class PanelService:
+    _panel_sessions = {}
 
     def __init__(self, subscription_repository: ISubscriptionRepository, server_repository: IServerRepository):
         self.subscription_repository = subscription_repository
         self.server_repository = server_repository
-        self._panel_sessions = {}
 
     @ensure_panel_session_active
     async def get_client_info_by_id(self, server_id: int, client_uuid: str, panel_api) -> list[ClientSchema]:
@@ -74,26 +75,47 @@ class PanelService:
 
         return response
 
-    # @ensure_panel_session_active
-    # async def add_clients(self, add_list: list[ClientCreate], user: UserSchema):
-    #     for client in add_list:
-    #         new_client = ClientSchema(
-    #             email=client.email + uuid.uuid4(),
-    #             enable=True,
-    #             id=str(uuid.uuid4()),
-    #             expiry_time=28174912,
-    #             flow="xtls-rprx-vision",
-    #             sub_id=user.sub_uuid,
-    #             tg_id=user.tg_id
-    #
-    #         )
-    #     new_clients: list[ClientSchema] = []
-    #     new_client = ClientSchema(
-    #         id=str(uuid.uuid4()),
-    #         email="test",
-    #         enable=True
-    #     )
-    #     return
+    @ensure_panel_session_active
+    async def add_client(self, server_id: int, new_client_info: ClientCreate, user: UserSchema, panel_api):
+
+        inbounds: list[Inbound] = panel_api.inbound.get_list()
+        current_inbound: Inbound | None = None
+        for inbound in inbounds:
+            if inbound.protocol == new_client_info.protocol:
+                current_inbound = inbound
+                break
+        if current_inbound is None:
+            raise UnsupportedProtocolError(detail=f"Server does not support the {new_client_info.protocol} protocol.")
+
+        new_client = ClientSchema(
+            email=f"{new_client_info.short_name}@{str(uuid.uuid4())}",
+            enable=True,
+            id=str(uuid.uuid4()),
+            expiry_time=28174912,
+            flow="xtls-rprx-vision",
+            sub_id=user.sub_uuid,
+            tg_id=user.tg_id
+        )
+
+
+
+        # for client in add_list:
+        #     new_client = ClientSchema(
+        #         email=client.email + uuid.uuid4(),
+        #         enable=True,
+        #         id=str(uuid.uuid4()),
+        #         expiry_time=28174912,
+        #         flow="xtls-rprx-vision",
+        #         sub_id=user.sub_uuid,
+        #         tg_id=user.tg_id
+        #     )
+        # new_clients: list[ClientSchema] = []
+        # new_client = ClientSchema(
+        #     id=str(uuid.uuid4()),
+        #     email="test",
+        #     enable=True
+        # )
+        return
 
     # async def get_user_subscriptions_from_server(self, sub_uuid: str, server_id: int) -> list[ConnectSchema]:
     #     server = await self.server_repository.get_by_id(server_id)
@@ -112,6 +134,7 @@ class PanelService:
             try:
                 connects_data: list[ConnectSchema] = await sub_api.get_connects_for_user(user.sub_uuid)
             except Exception as e:
+                print(f"Ошибка получения данных подписки с сервера {server.name}")
                 continue
 
             existing_subscriptions = await self.subscription_repository.get_all_from_server(user.id, server.id)
