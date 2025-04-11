@@ -1,14 +1,15 @@
 <script setup lang="ts">
 
-import {BackButton, MainButton} from "vue-tg";
+import {BackButton, MainButton, useWebAppMainButton} from "vue-tg";
 import TgSection from "components/TgSection.vue";
 import {useRouter} from "vue-router";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watchEffect} from "vue";
 import {Server} from "src/api/types/serverTypes";
 import {ServerService} from "src/api";
 import CountryFlag from 'vue-country-flag-next'
 
 const router = useRouter();
+const {disableMainButton, enableMainButton} = useWebAppMainButton();
 
 const isLoadingServers = ref(true);
 const inputValue = ref<string | null>(null);
@@ -33,7 +34,7 @@ const inputRules = computed(() => [
   },
   (val: string | null) => {
     if (!val) return true;
-    return /^[A-Za-z0-9_-]+$/.test(val) || 'Только a-z, 0-9, - , _';
+    return /^[A-Za-z0-9_]+$/.test(val) || 'Только a-z, 0-9, _';
   },
   (val: string | null) => {
     if (!val) return true;
@@ -54,7 +55,16 @@ const inputErrorMessage = computed(() => {
   return messages.join(' ; ');
 });
 
+watchEffect(() => {
+  if (inputValue.value !== null && serverValue.value !== null && !hasInputError.value && monthValue.value) {
+    enableMainButton();
+  } else {
+    disableMainButton();
+  }
+});
+
 onMounted(() => {
+  disableMainButton();
   loadServerOptions();
 
 })
@@ -64,54 +74,36 @@ onMounted(() => {
   <BackButton @click="() => router.back()"></BackButton>
 
   <q-page class="tg-text overflow-auto">
-
-    <div class="q-gutter-y-md">
-      <tg-section label="Новая подписка">
-        <div class="q-mt-sm q-pa-sm">
-          <q-input
-            class="q-py-md"
-            type="text"
-            clearable
-            autofocus
-            dense
-            borderless
-            v-model="inputValue"
-            label="Имя подключения"
-            stack-label
-            :rules="inputRules"
-            :error="hasInputError"
-            :error-message="inputErrorMessage"
-          />
-          <q-select
-            class="select q-py-md"
-            type="text"
-            clearable
-            dense
-            borderless
-            v-model="serverValue"
-            :options="serverOptions"
-            label="Сервер"
-            stack-label
-            :loading="isLoadingServers"
-          >
-            <template v-slot:option="scope">
-              <q-item v-bind="scope.itemProps">
-                <q-item-section avatar>
-                  <div>
-                    <country-flag :country="scope.opt.countryCode.toLowerCase()"/>
-                  </div>
-                </q-item-section>
-                <q-item-section>
-                  <q-item-label>{{ scope.opt.label }}</q-item-label>
-                </q-item-section>
-                <q-item-section side>
-                  <q-item-label>
-                    ₽ {{ scope.opt.monthPrice.toFixed(2) }} мес
-                  </q-item-label>
-                </q-item-section>
-              </q-item>
-            </template>
-            <template v-slot:selected-item="scope" class="row items-center">
+    <tg-section label="Новая подписка">
+      <div class="q-mt-sm q-pa-sm">
+        <q-input
+          class="q-py-md"
+          type="text"
+          clearable
+          autofocus
+          dense
+          borderless
+          v-model="inputValue"
+          label="Имя подключения"
+          stack-label
+          :rules="inputRules"
+          :error="hasInputError"
+          :error-message="inputErrorMessage"
+        />
+        <q-select
+          class="select q-py-md"
+          type="text"
+          clearable
+          dense
+          borderless
+          v-model="serverValue"
+          :options="serverOptions"
+          label="Сервер"
+          stack-label
+          :loading="isLoadingServers"
+        >
+          <template v-slot:option="scope">
+            <q-item v-bind="scope.itemProps">
               <q-item-section avatar>
                 <div>
                   <country-flag :country="scope.opt.countryCode.toLowerCase()"/>
@@ -120,36 +112,51 @@ onMounted(() => {
               <q-item-section>
                 <q-item-label>{{ scope.opt.label }}</q-item-label>
               </q-item-section>
-            </template>
-          </q-select>
-          <div class="q-py-sm">
-            <div style="color: var(--tg-subtitle-text-color);font-weight: 600;font-size: 12px;
-                line-height: 147%; letter-spacing: 0.01em; padding-left: 14px;">
-              Количество месяцев
-            </div>
-            <div class="row items-center q-my-xs">
-              <q-slider
-                class="col-11 q-px-sm"
-                v-model="monthValue"
-                :min="0"
-                :max="12"
-              />
-              <div class="col-1 text-center" style="color: var(--tg-accent-text-color); font-size: 17px; font-weight: 600">
-                {{ monthValue }}
+              <q-item-section side>
+                <q-item-label>
+                  ₽ {{ scope.opt.monthPrice.toFixed(2) }} мес
+                </q-item-label>
+              </q-item-section>
+            </q-item>
+          </template>
+          <template v-slot:selected-item="scope" class="row items-center">
+            <q-item-section avatar>
+              <div>
+                <country-flag :country="scope.opt.countryCode.toLowerCase()"/>
               </div>
+            </q-item-section>
+            <q-item-section>
+              <q-item-label>{{ scope.opt.label }}</q-item-label>
+            </q-item-section>
+          </template>
+        </q-select>
+        <div class="q-py-sm">
+          <div style="color: var(--tg-subtitle-text-color);font-weight: 600;font-size: 12px;
+                line-height: 147%; letter-spacing: 0.01em; padding-left: 14px;">
+            Количество месяцев
+          </div>
+          <div class="row items-center q-my-xs">
+            <q-slider
+              class="col-11 q-px-sm"
+              v-model="monthValue"
+              :min="0"
+              :max="12"
+            />
+            <div class="col-1 text-center" style="color: var(--tg-accent-text-color); font-size: 17px; font-weight: 600">
+              {{ monthValue }}
             </div>
           </div>
-
         </div>
-      </tg-section>
 
-      <tg-section class="fixed-bottom">
-        <div class="total-text q-px-md q-pt-sm q-pt-sm" style="font-weight: 500">
-          Итого: {{amount}} ₽
-        </div>
-      </tg-section>
+      </div>
+    </tg-section>
 
-    </div>
+    <tg-section class="fixed-bottom">
+      <div class="total-text q-px-md q-pt-sm q-pt-sm" style="font-weight: 500">
+        Итого: {{amount.toFixed(2)}} ₽
+      </div>
+    </tg-section>
+
     <MainButton text="Приобрести" @click=""></MainButton>
   </q-page>
 </template>
