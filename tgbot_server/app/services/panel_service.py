@@ -86,12 +86,14 @@ class PanelService:
                 break
         if current_inbound is None:
             raise UnsupportedProtocolError(detail=f"Server does not support the {new_client_info.protocol} protocol.")
+        new_id = str(uuid.uuid4())
+        expiry_time = int(timedelta(days=30 * new_client_info.months).total_seconds())
 
         new_client = ClientSchema(
-            email=f"{new_client_info.short_name}@{str(uuid.uuid4())}",
+            email=f"{new_client_info.short_name}@{new_id}",
             enable=True,
-            id=str(uuid.uuid4()),
-            expiry_time=28174912,
+            id=new_id,
+            expiry_time=expiry_time,
             flow="xtls-rprx-vision",
             sub_id=user.sub_uuid,
             tg_id=user.tg_id
