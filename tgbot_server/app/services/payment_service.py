@@ -18,7 +18,7 @@ class PaymentService:
         self.user_repository = user_repository
 
     async def new_yoomoney_payment(self, user_id: int, amount: float) -> str:
-        create_payment = PaymentCreate(amount=amount,
+        create_payment = PaymentCreate(amount=Decimal(amount),
                                        user_id=user_id,
                                        operation_type=OperationType.DEPOSIT
                                        )

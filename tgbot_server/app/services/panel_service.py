@@ -90,7 +90,7 @@ class PanelService:
         expiry_time = int(timedelta(days=30 * new_client_info.months).total_seconds())
 
         new_client = ClientSchema(
-            email=f"{new_client_info.short_name}@{new_id}",
+            email=f"{new_client_info.short_name}@{new_id.replace('-', '_')}",
             enable=True,
             id=new_id,
             expiry_time=expiry_time,

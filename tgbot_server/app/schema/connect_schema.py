@@ -83,7 +83,14 @@ class ConnectSchema(BaseSchema):
         """Извлекает имя и email из очищенного фрагмента."""
         parts = cleaned_fragment.split("-")
         inbound_name = parts[0] if len(parts) > 0 else 'unknown'
-        email = parts[1] if len(parts) > 1 else 'unknown'
+        email = ""
+
+        if len(parts) > 1:
+            if '@' in parts[1]:
+                email = parts[1].split('@')[0]
+            else:
+                email = parts[1]
+        else:
+            email = 'unknown'
+
         return inbound_name, email
-
-
