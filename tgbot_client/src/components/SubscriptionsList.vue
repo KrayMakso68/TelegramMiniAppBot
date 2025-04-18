@@ -2,20 +2,24 @@
 import NotFoundBanner from "components/NotFoundBanner.vue";
 import {onMounted, Ref, ref} from "vue";
 import {Subscription} from "src/api/types/subscriptionTypes";
-import {PanelService, SubscriberService} from "src/api";
-import CountryFlag from 'vue-country-flag-next'
+import {PanelService, SubscriptionService} from "src/api";
 
 const loading  = ref<boolean>(true);
 const subscriptionsByServer: Ref<Record<string, Subscription[]> | null> = ref<Record<string, Subscription[]> | null>(null);
 
 const loadSubscriptions = async () => {
-  subscriptionsByServer.value = await SubscriberService.getUserSubscriptions();
+  subscriptionsByServer.value = await SubscriptionService.getUserSubscriptions();
   loading.value = false;
 };
 
 const updateSubscriptions = async () => {
   loading.value = true;
-  subscriptionsByServer.value =  await PanelService.updateUserSubscriptions()
+  let updateStatus = await PanelService.updateUserSubscriptions()
+  if (updateStatus.status == "OK") {
+    subscriptionsByServer.value = await SubscriptionService.getUserSubscriptions();
+  } else {
+    subscriptionsByServer.value = null
+  }
   loading.value = false;
 };
 
@@ -84,12 +88,13 @@ onMounted(loadSubscriptions);
         {{server}}
       </div>
 
-      <template v-for="(subscription, index) in subscriptions" :key="subscription.email_name">
+      <template v-for="(subscription, index) in subscriptions" :key="subscription.email">
         <q-item
           :to="{
             path: 'connect-info',
             query: {
-              emailName: subscription.emailName,
+              name: subscription.name,
+              email: subscription.email,
               serverId: subscription.serverId,
               url: subscription.url
             }
@@ -102,7 +107,7 @@ onMounted(loadSubscriptions);
           </q-item-section>
 
           <q-item-section>
-            <q-item-label lines="1">{{ subscription.emailName }}</q-item-label>
+            <q-item-label lines="1">{{ subscription.name }}</q-item-label>
             <q-item-label v-if="subscription.endDate" caption class="tg-subtitle-text">
               До: {{ formatDate(subscription.endDate) }}
             </q-item-label>

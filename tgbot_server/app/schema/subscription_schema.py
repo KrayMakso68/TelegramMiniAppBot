@@ -6,7 +6,8 @@ from app.schema.base_schema import BaseSchema, ModelBaseInfo
 
 
 class SubscriptionCreate(BaseSchema):
-    email_name: str = Field(..., example="connect-example")
+    name: str = Field(..., example="connect-example")
+    email: str = Field(..., example="connect-name@connect-uuid (uuid with '_')")
     url: str = Field(..., example="vless://16289ed8-3489-4f90...")
     user_id: int
     server_id: int
@@ -21,7 +22,8 @@ class SubscriptionUpdate(BaseSchema):
 
 class SubscriptionSchema(BaseSchema):
     id: int
-    email_name: str
+    name: str
+    email: str
     url: str
     user_id: int
     server_id: int
@@ -30,7 +32,8 @@ class SubscriptionSchema(BaseSchema):
 
 
 class SubscriptionModelSchema(ModelBaseInfo):
-    email_name: str
+    name: str
+    email: str
     url: str
     user_id: int
     server_id: int

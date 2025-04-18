@@ -33,8 +33,8 @@ async def get_client_by_email(
 @router.post("/subscription/update-all")
 async def update_clients(
         user: UserSchema = Depends(get_current_active_user),
-        service: PanelService = Depends(get_panel_service),
-) -> dict[str, list[SubscriptionSchema]]:
+        service: PanelService = Depends(get_panel_service)
+) -> dict[str, str]:
     return await service.update_user_subscriptions(user)
 
 

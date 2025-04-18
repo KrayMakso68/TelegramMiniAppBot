@@ -8,7 +8,6 @@ from py3xui import AsyncApi, Inbound
 from fastapi import status, HTTPException
 
 from app.core.config import settings
-from app.repository import subscription_repository
 from app.repository.interfaces import ISubscriptionRepository, IServerRepository
 from app.schema.connect_schema import ConnectSchema
 from app.schema.panel_schema import ClientSchema, ClientCreate
@@ -16,6 +15,7 @@ from app.core.exceptions import NotFoundError, UnsupportedProtocolError
 from app.schema.server_schema import ServerSchema
 from app.schema.subscription_schema import SubscriptionCreate
 from app.schema.user_schema import UserSchema
+from app.services.user_service import UserService
 from app.utils.panel_subscription_api import PanelSubscriptionApi
 
 
@@ -53,9 +53,15 @@ def ensure_panel_session_active(method):
 class PanelService:
     _panel_sessions = {}
 
-    def __init__(self, subscription_repository: ISubscriptionRepository, server_repository: IServerRepository):
+    def __init__(
+            self,
+            subscription_repository: ISubscriptionRepository,
+            server_repository: IServerRepository,
+            user_service: UserService
+    ):
         self.subscription_repository = subscription_repository
         self.server_repository = server_repository
+        self.user_service = user_service
 
     @ensure_panel_session_active
     async def get_client_info_by_id(self, server_id: int, client_uuid: str, panel_api) -> list[ClientSchema]:
@@ -99,6 +105,9 @@ class PanelService:
             tg_id=user.tg_id
         )
 
+        await panel_api.client.add(current_inbound.id, [new_client])
+        await self.update_user_subscriptions(user)
+
 
 
         # for client in add_list:
@@ -140,7 +149,7 @@ class PanelService:
                 continue
 
             existing_subscriptions = await self.subscription_repository.get_all_from_server(user.id, server.id)
-            existing_subscriptions_dict = {sub.email_name: sub for sub in existing_subscriptions}
+            existing_subscriptions_dict = {sub.email: sub for sub in existing_subscriptions}
 
             for connect_data in connects_data:
                 connect_schema = ConnectSchema.model_validate(connect_data)
@@ -151,7 +160,8 @@ class PanelService:
                     await self.subscription_repository.update_subscription_by_connect(existing_sub.id, connect_schema)
                 else:
                     new_subscription = SubscriptionCreate(
-                        email_name=connect_schema.email,
+                        email=connect_schema.email,
+                        name=connect_schema.name,
                         url=connect_schema.connect_url,
                         user_id=user.id,
                         server_id=server.id,
@@ -164,7 +174,7 @@ class PanelService:
                         new_subscription.end_date = datetime.now(UTC) - timedelta(days=1)
 
                     await self.subscription_repository.add(new_subscription)
-        return await self.subscription_repository.get_all_grouped(user.id)
+        return {"status": "OK"}
 
     @staticmethod
     def get_panel_api(server: ServerSchema) -> AsyncApi:

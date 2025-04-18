@@ -15,7 +15,7 @@ export const UserService = {
   getCurrentUserBalance
 };
 
-export const SubscriberService = {
+export const SubscriptionService = {
   getUserSubscriptions: getUserSubscriptionsByServer
 }
 

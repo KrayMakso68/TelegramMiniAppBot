@@ -21,6 +21,10 @@ class IUserRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_user_balance(self, id: int) -> float | None:
+        raise NotImplementedError
+
+    @abstractmethod
     async def update_balance(self, id: int, amount: float) -> UserSchema | None:
         raise NotImplementedError
 

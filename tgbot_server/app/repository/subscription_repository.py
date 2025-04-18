@@ -2,7 +2,7 @@ from datetime import datetime, UTC, timedelta
 from itertools import groupby
 
 from sqlalchemy import select, Result
-from sqlalchemy.exc import NoResultFound, DatabaseError, IntegrityError, SQLAlchemyError
+from sqlalchemy.exc import NoResultFound, DatabaseError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 

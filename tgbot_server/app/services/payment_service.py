@@ -5,6 +5,7 @@ from app.core.config import settings
 from app.repository.interfaces import IPaymentRepository, IUserRepository
 from app.schema.payment_schema import PaymentCreate, OperationType, PaymentStatus, PaymentUpdate, PaymentSchema, \
     YooMoneyData, PaymentOptionSchema
+from app.services.user_service import UserService
 from app.utils import validate_yoomoney
 
 
@@ -12,10 +13,10 @@ class PaymentService:
     def __init__(
             self,
             payment_repository: IPaymentRepository,
-            user_repository: IUserRepository
+            user_service: UserService
     ):
         self.payment_repository = payment_repository
-        self.user_repository = user_repository
+        self.user_service = user_service
 
     async def new_yoomoney_payment(self, user_id: int, amount: float) -> str:
         create_payment = PaymentCreate(amount=Decimal(amount),
@@ -29,9 +30,9 @@ class PaymentService:
     async def processing_yoomoney_payment(self, data: YooMoneyData) -> dict:
         if validate_yoomoney.verify_hash(data):
             payment_id = int(data.label)
-            amount = Decimal(data.withdraw_amount)
+            amount = data.withdraw_amount
             payment = await self.payment_repository.update(payment_id, PaymentUpdate(status=PaymentStatus.COMPLETED))
-            await self.user_repository.update_balance(payment.user_id, amount)
+            await self.user_service.top_up_balance(payment.user_id, amount)
 
             return {"status": "OK"}
         else:

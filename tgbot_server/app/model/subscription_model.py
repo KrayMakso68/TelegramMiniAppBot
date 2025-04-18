@@ -9,7 +9,8 @@ from app.model import BaseModel
 class Subscription(BaseModel):
     __tablename__ = "subscriptions"
 
-    email_name: Mapped[str] = mapped_column(String, nullable=False)
+    name: Mapped[str] = mapped_column(String, nullable=False)
+    email: Mapped[str] = mapped_column(String, nullable=False)
     url: Mapped[str] = mapped_column(String, nullable=False)
     user_id: Mapped[int] = mapped_column(Integer, ForeignKey("users.id"), nullable=False)
     server_id: Mapped[int] = mapped_column(Integer, ForeignKey("servers.id"), nullable=False)

@@ -1,6 +1,7 @@
 export interface Subscription {
   id: number;
-  emailName: string;
+  name: string;
+  email: string;
   url: string;
   userId: number;
   serverId: number;

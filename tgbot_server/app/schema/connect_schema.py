@@ -10,6 +10,7 @@ from app.schema.base_schema import BaseSchema
 class ConnectSchema(BaseSchema):
     connect_url: str
     uuid: str
+    name: str
     email: str
     inbound_name: str
     remaining_seconds: int | None
@@ -18,7 +19,7 @@ class ConnectSchema(BaseSchema):
     @model_validator(mode="before")
     @classmethod
     def check_fields_not_empty(cls, values):
-        required_fields = ['connect_url', 'uuid', 'inbound_name', 'email', 'active']
+        required_fields = ['connect_url', 'uuid', 'name', 'email', 'inbound_name', 'active']
         for field in required_fields:
             if values.get(field) is None:
                 raise ValueError(f"Field {field} cannot be empty!")
@@ -46,13 +47,14 @@ class ConnectSchema(BaseSchema):
         cleaned_fragment = cls._clean_fragment(fragment)
         cleaned_url = url.replace(f"#{parsed_url.fragment}", f"#{cleaned_fragment}")
 
-        inbound_name, email = cls._extract_name_email(cleaned_fragment)
+        inbound_name, email, name = cls._extract_name_email(cleaned_fragment)
 
         return cls(
             connect_url=cleaned_url,
             uuid=parsed_url.username,
             inbound_name=inbound_name,
             email=email,
+            name=name,
             remaining_seconds=remaining_seconds,
             active=active
         )
@@ -83,14 +85,12 @@ class ConnectSchema(BaseSchema):
         """Извлекает имя и email из очищенного фрагмента."""
         parts = cleaned_fragment.split("-")
         inbound_name = parts[0] if len(parts) > 0 else 'unknown'
-        email = ""
+        email = parts[1] if len(parts) > 1 else 'unknown'
+        name = ''
 
-        if len(parts) > 1:
-            if '@' in parts[1]:
-                email = parts[1].split('@')[0]
-            else:
-                email = parts[1]
+        if '@' in email:
+            name = parts[1].split('@')[0]
         else:
-            email = 'unknown'
+            name = email
 
-        return inbound_name, email
+        return inbound_name, email, name

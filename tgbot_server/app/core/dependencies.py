@@ -96,9 +96,10 @@ def get_sub_api() -> PanelSubscriptionApi:
 
 def get_panel_service(
         subscription_repository: SubscriptionRepository = Depends(get_subscription_repository),
-        server_repository: ServerRepository = Depends(get_server_repository)
+        server_repository: ServerRepository = Depends(get_server_repository),
+        user_service: UserService = Depends(get_user_service)
 ) -> PanelService:
-    return PanelService(subscription_repository, server_repository)
+    return PanelService(subscription_repository, server_repository, user_service)
 
 
 # _________________________________________________________________________________________________________
@@ -109,6 +110,6 @@ def get_payment_repository(async_session: AsyncSession = Depends(get_async_sessi
 
 def get_payment_service(
         payment_repository: PaymentRepository = Depends(get_payment_repository),
-        user_repository: UserRepository = Depends(get_user_repository)
+        user_service: UserService = Depends(get_user_service)
 ) -> PaymentService:
-    return PaymentService(payment_repository, user_repository)
+    return PaymentService(payment_repository, user_service)

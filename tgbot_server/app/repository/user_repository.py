@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.exc import IntegrityError, DatabaseError
+from sqlalchemy.exc import IntegrityError, DatabaseError, NoResultFound
 
 from app.repository.interfaces import IUserRepository
 from app.core.exceptions import NotFoundError, DuplicatedError, DBError
@@ -46,14 +46,23 @@ class UserRepository(IUserRepository):
         except DatabaseError:
             raise DBError(detail="Database error occurred.")
 
+    async def get_user_balance(self, id: int) -> float | None:
+        try:
+            user: User | None = await self.session.get(User, id)
+        except NoResultFound:
+            return None
+        except DatabaseError:
+            raise DBError(detail="Database error occurred.")
+        return UserSchema.model_validate(user).balance
+
     async def update_balance(self, id: int, amount: Decimal) -> UserSchema | None:
         try:
             user: User | None = await self.session.get(User, id)
-            if not user:
-                return None
-            user.balance += amount
+            user.balance = amount
             await self.session.commit()
             await self.session.refresh(user)
+        except NoResultFound:
+            return None
         except DatabaseError:
             raise DBError(detail="Database error occurred.")
         return UserSchema.model_validate(user)
