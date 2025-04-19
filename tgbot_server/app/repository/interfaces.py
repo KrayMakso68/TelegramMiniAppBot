@@ -57,7 +57,7 @@ class ISubscriptionRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_id(self, id: int) -> SubscriptionSchema | None:
+    async def get_by_email(self, email: str) -> SubscriptionSchema | None:
         raise NotImplementedError
 
     @abstractmethod

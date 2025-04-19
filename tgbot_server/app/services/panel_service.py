@@ -11,7 +11,7 @@ from app.core.config import settings
 from app.repository.interfaces import ISubscriptionRepository, IServerRepository
 from app.schema.connect_schema import ConnectSchema
 from app.schema.panel_schema import ClientSchema, ClientCreate
-from app.core.exceptions import NotFoundError, UnsupportedProtocolError
+from app.core.exceptions import NotFoundError, UnsupportedProtocolError, InsufficientBalanceError, InternalServerError
 from app.schema.server_schema import ServerSchema
 from app.schema.subscription_schema import SubscriptionCreate
 from app.schema.user_schema import UserSchema
@@ -82,7 +82,12 @@ class PanelService:
         return response
 
     @ensure_panel_session_active
-    async def add_client(self, server_id: int, new_client_info: ClientCreate, user: UserSchema, panel_api):
+    async def add_client(
+            self,
+            server_id: int,
+            new_client_info: ClientCreate,
+            user: UserSchema, panel_api
+    ) -> dict[str, str]:
 
         inbounds: list[Inbound] = panel_api.inbound.get_list()
         current_inbound: Inbound | None = None
@@ -92,11 +97,13 @@ class PanelService:
                 break
         if current_inbound is None:
             raise UnsupportedProtocolError(detail=f"Server does not support the {new_client_info.protocol} protocol.")
+
         new_id = str(uuid.uuid4())
+        new_email = f"{new_client_info.short_name}@{new_id.replace('-', '_')}"
         expiry_time = int(timedelta(days=30 * new_client_info.months).total_seconds())
 
         new_client = ClientSchema(
-            email=f"{new_client_info.short_name}@{new_id.replace('-', '_')}",
+            email=new_email,
             enable=True,
             id=new_id,
             expiry_time=expiry_time,
@@ -105,47 +112,47 @@ class PanelService:
             tg_id=user.tg_id
         )
 
-        await panel_api.client.add(current_inbound.id, [new_client])
-        await self.update_user_subscriptions(user)
+        if user.balance >= new_client_info.price:
+            await panel_api.client.add(current_inbound.id, [new_client])
+            await self.update_user_subscriptions_from_server(user, server_id)
 
+            new_subscription = self.subscription_repository.get_by_email(new_email)
+            if new_subscription:
+                try:
+                    await self.user_service.write_off_balance(user.id, new_client_info.price)
+                except NotFoundError:
+                    raise NotFoundError(detail="User for balance write-off not found.")
+            else:
+                raise InternalServerError(detail="Error adding subscription to server.")
+        else:
+            raise InsufficientBalanceError(detail="Insufficient balance in the user's account to make a purchase.")
 
+        return {"status": "OK"}
 
-        # for client in add_list:
-        #     new_client = ClientSchema(
-        #         email=client.email + uuid.uuid4(),
-        #         enable=True,
-        #         id=str(uuid.uuid4()),
-        #         expiry_time=28174912,
-        #         flow="xtls-rprx-vision",
-        #         sub_id=user.sub_uuid,
-        #         tg_id=user.tg_id
-        #     )
-        # new_clients: list[ClientSchema] = []
-        # new_client = ClientSchema(
-        #     id=str(uuid.uuid4()),
-        #     email="test",
-        #     enable=True
-        # )
-        return
+    async def update_user_subscriptions_from_server(
+            self, user: UserSchema,
+            server_id: int | None = None,
+            all_servers: bool = False
+    ) -> dict[str, str]:
 
-    # async def get_user_subscriptions_from_server(self, sub_uuid: str, server_id: int) -> list[ConnectSchema]:
-    #     server = await self.server_repository.get_by_id(server_id)
-    #     if server is None:
-    #         raise NotFoundError(detail="Server Not Found.")
-    #
-    #     sub_api = self.get_sub_api(server)
-    #
-    #     return await sub_api.get_connects_for_user(sub_uuid)
+        servers_list: list[ServerSchema] = []
+        if all_servers:
+            servers_list = await self.server_repository.get_all()
+            if len(servers_list) == 0:
+                raise NotFoundError(detail="Servers for update not found.")
+        elif server_id:
+            server = await self.server_repository.get_by_id(server_id)
+            if server is None:
+                raise NotFoundError(detail="Server not found.")
+            else:
+                servers_list = [server]
 
-    async def update_user_subscriptions(self, user: UserSchema):
-        servers: list[ServerSchema] = await self.server_repository.get_all()
-
-        for server in servers:
+        for server in servers_list:
             sub_api = self.get_sub_api(server)
             try:
                 connects_data: list[ConnectSchema] = await sub_api.get_connects_for_user(user.sub_uuid)
-            except Exception as e:
-                print(f"Ошибка получения данных подписки с сервера {server.name}")
+            except Exception:
+                print(f"Error retrieving subscription data from server: {server.name}")
                 continue
 
             existing_subscriptions = await self.subscription_repository.get_all_from_server(user.id, server.id)
@@ -191,12 +198,3 @@ class PanelService:
             server.subscription_url,
             use_tls_verify=settings.TLS_VERIFY
         )
-
-# import uuid
-#             api = py3xui.AsyncApi.from_env()
-#             await api.login()
-#
-#             new_client = py3xui.Client(id=str(uuid.uuid4()), email="test", enable=True)
-#             inbound_id = 1
-#
-#             await api.client.add(inbound_id, [new_client])

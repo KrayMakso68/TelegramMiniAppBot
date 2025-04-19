@@ -35,7 +35,7 @@ async def update_clients(
         user: UserSchema = Depends(get_current_active_user),
         service: PanelService = Depends(get_panel_service)
 ) -> dict[str, str]:
-    return await service.update_user_subscriptions(user)
+    return await service.update_user_subscriptions_from_server(user, all_servers=True)
 
 
 @router.post("/client/add")

@@ -29,3 +29,4 @@ class ClientCreate(BaseSchema):
     short_name: str = Field(..., example='connect1 (max 10 characters)')
     protocol: str = Field(..., example='vless, vmess, etc...')
     months: int = Field(..., example=1)
+    price: float = Field(..., example=100.00)
