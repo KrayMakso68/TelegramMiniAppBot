@@ -44,6 +44,7 @@ class UserRepository(IUserRepository):
                 return UserSchema.model_validate(user)
             return None
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")
 
     async def get_user_balance(self, id: int) -> float | None:
@@ -52,6 +53,7 @@ class UserRepository(IUserRepository):
         except NoResultFound:
             return None
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")
         return UserSchema.model_validate(user).balance
 
@@ -64,5 +66,6 @@ class UserRepository(IUserRepository):
         except NoResultFound:
             return None
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")
         return UserSchema.model_validate(user)

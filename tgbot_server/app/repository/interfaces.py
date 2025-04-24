@@ -72,6 +72,10 @@ class ISubscriptionRepository(ABC):
     async def update_subscription_by_connect(self, sub_id: int, connect: ConnectSchema) -> SubscriptionSchema:
         raise NotImplementedError
 
+    @abstractmethod
+    async def delete(self, sub_id: int) -> bool:
+        raise NotImplementedError
+
 
 class IServerRepository(ABC):
     @abstractmethod

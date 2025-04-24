@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.core.dependencies import get_panel_service, get_current_active_user
-from app.schema.panel_schema import ClientSchema
+from app.schema.panel_schema import ClientSchema, ClientCreate
 from app.schema.subscription_schema import SubscriptionSchema
 from app.schema.user_schema import UserSchema
 from app.services.panel_service import PanelService
@@ -40,7 +40,8 @@ async def update_clients(
 
 @router.post("/client/add")
 async def add_client(
+        new_client_info: ClientCreate,
         user: UserSchema = Depends(get_current_active_user),
         service: PanelService = Depends(get_panel_service)
-):
-    return ...
+) -> dict[str, str]:
+    return await service.add_client(new_client_info.server_id, new_client_info, user)

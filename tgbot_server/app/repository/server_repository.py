@@ -21,6 +21,7 @@ class ServerRepository(IServerRepository):
         except NoResultFound:
             return []
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")
 
     async def get_by_id(self, id: int) -> ServerSchema | None:
@@ -30,6 +31,7 @@ class ServerRepository(IServerRepository):
         except NoResultFound:
             return None
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")
 
     async def get_all_short_info(self) -> list[ServerInfo]:
@@ -41,4 +43,5 @@ class ServerRepository(IServerRepository):
         except NoResultFound:
             raise NotFoundError(detail="Servers not found.")
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")

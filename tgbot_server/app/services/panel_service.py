@@ -13,7 +13,7 @@ from app.schema.connect_schema import ConnectSchema
 from app.schema.panel_schema import ClientSchema, ClientCreate
 from app.core.exceptions import NotFoundError, UnsupportedProtocolError, InsufficientBalanceError, InternalServerError
 from app.schema.server_schema import ServerSchema
-from app.schema.subscription_schema import SubscriptionCreate
+from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema
 from app.schema.user_schema import UserSchema
 from app.services.user_service import UserService
 from app.utils.panel_subscription_api import PanelSubscriptionApi
@@ -89,7 +89,7 @@ class PanelService:
             user: UserSchema, panel_api
     ) -> dict[str, str]:
 
-        inbounds: list[Inbound] = panel_api.inbound.get_list()
+        inbounds: list[Inbound] = await panel_api.inbound.get_list()
         current_inbound: Inbound | None = None
         for inbound in inbounds:
             if inbound.protocol == new_client_info.protocol:
@@ -100,23 +100,46 @@ class PanelService:
 
         new_id = str(uuid.uuid4())
         new_email = f"{new_client_info.short_name}@{new_id.replace('-', '_')}"
-        expiry_time = int(timedelta(days=30 * new_client_info.months).total_seconds())
+        expiry_date = datetime.now() + timedelta(days=30.44 * new_client_info.months)
+        x_time = int(expiry_date.timestamp() * 1000)
 
         new_client = ClientSchema(
             email=new_email,
             enable=True,
             id=new_id,
-            expiry_time=expiry_time,
+            expiry_time=x_time,
             flow="xtls-rprx-vision",
             sub_id=user.sub_uuid,
-            tg_id=user.tg_id
+            tg_id=user.tg_id,
         )
 
         if user.balance >= new_client_info.price:
             await panel_api.client.add(current_inbound.id, [new_client])
-            await self.update_user_subscriptions_from_server(user, server_id)
 
-            new_subscription = self.subscription_repository.get_by_email(new_email)
+            server = await self.server_repository.get_by_id(server_id)
+            if server is None:
+                raise NotFoundError(detail="Server not found.")
+
+            sub_api = self.get_sub_api(server)
+            connects_data: list[ConnectSchema] = await sub_api.get_connects_for_user(user.sub_uuid)
+
+            new_connect = None
+            for connect in connects_data:
+                if connect.email == new_email:
+                    new_connect = connect
+                    break
+
+            subscription_create = SubscriptionCreate(
+                name=new_client_info.short_name,
+                email=new_email,
+                url=new_connect.connect_url,
+                user_id=user.id,
+                server_id=server_id,
+                end_date=expiry_date
+            )
+
+            new_subscription: SubscriptionSchema = await self.subscription_repository.add(subscription_create)
+
             if new_subscription:
                 try:
                     await self.user_service.write_off_balance(user.id, new_client_info.price)
@@ -158,30 +181,63 @@ class PanelService:
             existing_subscriptions = await self.subscription_repository.get_all_from_server(user.id, server.id)
             existing_subscriptions_dict = {sub.email: sub for sub in existing_subscriptions}
 
+            server_emails = {connect.email for connect in connects_data}
+
             for connect_data in connects_data:
-                connect_schema = ConnectSchema.model_validate(connect_data)
+                if connect_data.email in existing_subscriptions_dict:
+                    existing_sub = existing_subscriptions_dict[connect_data.email]
 
-                if connect_schema.email in existing_subscriptions_dict:
-                    existing_sub = existing_subscriptions_dict[connect_schema.email]
-
-                    await self.subscription_repository.update_subscription_by_connect(existing_sub.id, connect_schema)
+                    if not self.compare_connect_subscription(connect_data, existing_sub):
+                        await self.subscription_repository.update_subscription_by_connect(existing_sub.id, connect_data)
                 else:
                     new_subscription = SubscriptionCreate(
-                        email=connect_schema.email,
-                        name=connect_schema.name,
-                        url=connect_schema.connect_url,
+                        email=connect_data.email,
+                        name=connect_data.name,
+                        url=connect_data.connect_url,
                         user_id=user.id,
                         server_id=server.id,
-                        is_active=connect_schema.active
+                        is_active=connect_data.active
                     )
-                    if connect_schema.remaining_seconds:
+                    if connect_data.remaining_seconds:
                         new_subscription.end_date = datetime.now(UTC) + timedelta(
-                            seconds=connect_schema.remaining_seconds)
-                    elif not connect_schema.active:
+                            seconds=connect_data.remaining_seconds)
+                    elif not connect_data.active:
                         new_subscription.end_date = datetime.now(UTC) - timedelta(days=1)
 
                     await self.subscription_repository.add(new_subscription)
+
+            for existing_sub in existing_subscriptions:
+                if existing_sub.email not in server_emails:
+                    await self.subscription_repository.delete(existing_sub.id)
+                    print(f"Deleted subscription {existing_sub.email} as it no longer exists on server")
+
         return {"status": "OK"}
+
+    @staticmethod
+    def compare_connect_subscription(
+            connect: ConnectSchema,
+            sub: SubscriptionSchema,
+            time_tolerance: timedelta = timedelta(minutes=5)
+    ) -> bool:
+
+        if not all([
+            connect.email == sub.email,
+            connect.name == sub.name,
+            connect.active == sub.is_active
+        ]):
+            return False
+
+        if connect.remaining_seconds is not None:
+            if connect.remaining_seconds == 0:
+                return not sub.is_active
+            else:
+                if sub.end_date is not None:
+                    sub_remaining_seconds = (sub.end_date - datetime.now(UTC)).total_seconds()
+                else:
+                    sub_remaining_seconds = 0
+                return abs(connect.remaining_seconds - sub_remaining_seconds) <= time_tolerance.total_seconds()
+        else:
+            return sub.end_date is None
 
     @staticmethod
     def get_panel_api(server: ServerSchema) -> AsyncApi:

@@ -1,7 +1,7 @@
 from datetime import datetime, UTC, timedelta
 from itertools import groupby
 
-from sqlalchemy import select, Result
+from sqlalchemy import select, Result, delete
 from sqlalchemy.exc import NoResultFound, DatabaseError, IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -24,8 +24,10 @@ class SubscriptionRepository(ISubscriptionRepository):
             await self.session.commit()
             await self.session.refresh(query)
         except IntegrityError as e:
+            await self.session.rollback()
             raise DuplicatedError(detail=str(e.orig))
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")
 
         return SubscriptionSchema.model_validate(query)
@@ -38,6 +40,7 @@ class SubscriptionRepository(ISubscriptionRepository):
         except NoResultFound:
             return None
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")
 
         return SubscriptionSchema.model_validate(subscription)
@@ -57,6 +60,7 @@ class SubscriptionRepository(ISubscriptionRepository):
         except NoResultFound:
             raise NotFoundError(detail="Subscriptions not found.")
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")
 
         grouped_subscriptions = {
@@ -80,7 +84,7 @@ class SubscriptionRepository(ISubscriptionRepository):
             subscription: Subscription | None = await self.session.get(Subscription, sub_id)
 
             if subscription:
-
+                print(f"I have been updated: {subscription.email}")
                 subscription.url = connect.connect_url
                 subscription.is_active = connect.active
 
@@ -95,6 +99,17 @@ class SubscriptionRepository(ISubscriptionRepository):
         except NoResultFound:
             raise NotFoundError(detail="Subscription not found.")
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")
 
         return SubscriptionSchema.model_validate(subscription)
+
+    async def delete(self, sub_id: int) -> bool:
+        try:
+            stmt = delete(Subscription).where(Subscription.id == sub_id)
+            result = await self.session.execute(stmt)
+            await self.session.commit()
+            return result.rowcount > 0
+        except DatabaseError:
+            await self.session.rollback()
+            raise DBError(detail="Database error occurred.")
