@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {BackButton, MainButton} from "vue-tg";
 import {useRouter} from "vue-router";
-import {ConnectInfo} from "src/api/types/panelTypes";
+import {ClientInfo} from "src/api/types/panelTypes";
 import TgSection from "components/TgSection.vue";
 import TgCodeCard from "components/TgCodeCard.vue";
 import {Ref, ref} from "vue";
@@ -19,7 +19,7 @@ interface Props {
 }
 const props = defineProps<Props>();
 
-const connectInfo: Ref<ConnectInfo | null> = ref<ConnectInfo | null>(null)
+const connectInfo: Ref<ClientInfo | null> = ref<ClientInfo | null>(null)
 
 const loadInfo = async () => {
   if (!connectInfo.value) {

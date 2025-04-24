@@ -1,4 +1,4 @@
-export interface ConnectInfo {
+export interface ClientInfo {
   email: string;
   enable: true;
   id: number | string;
@@ -15,11 +15,19 @@ export interface ConnectInfo {
   totalGB: number;
 }
 
-export interface Connect {
-    connectUrl: string;
-    uuid: string;
-    email: string;
-    inboundName: string;
-    remainingSeconds: number;
-    active: boolean;
+export interface Client {
+  connectUrl: string;
+  uuid: string;
+  email: string;
+  inboundName: string;
+  remainingSeconds: number;
+  active: boolean;
+}
+
+export interface ClientCreate {
+  shortName: string;
+  protocol: string;
+  serverId: number;
+  months: number;
+  price: number;
 }

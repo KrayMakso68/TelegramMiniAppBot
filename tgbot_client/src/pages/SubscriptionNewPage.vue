@@ -5,8 +5,10 @@ import TgSection from "components/TgSection.vue";
 import {useRouter} from "vue-router";
 import {computed, onMounted, ref, watchEffect} from "vue";
 import {Server} from "src/api/types/serverTypes";
-import {ServerService} from "src/api";
+import {ServerService, UserService, PanelService} from "src/api";
+import {ClientCreate} from "src/api/types/panelTypes";
 import CountryFlag from 'vue-country-flag-next'
+
 
 const router = useRouter();
 const {disableMainButton, enableMainButton} = useWebAppMainButton();
@@ -16,6 +18,25 @@ const inputValue = ref<string | null>(null);
 const serverValue = ref<Server | null>(null);
 const serverOptions = ref<Server[]>([{id: 0, label:"Не найдено", countryCode: "...", monthPrice: 0, isActive: false}]);
 const monthValue = ref<number>(1)
+const userBalance = ref<number>(0)
+
+const addClient = async () => {
+  if (serverValue.value && inputValue.value) {
+    let data = {
+      shortName: inputValue.value,
+      protocol: 'vless',
+      serverId:  serverValue.value.id,
+      months: monthValue.value,
+      price: amount.value
+    }
+    await PanelService.addClient(data);
+    router.back()
+  }
+}
+
+const loadBalance = async () => {
+  userBalance.value = await UserService.getCurrentUserBalance();
+};
 
 const loadServerOptions = async () => {
   serverOptions.value = await ServerService.getServersInfo()
@@ -48,6 +69,10 @@ const hasInputError = computed(() => {
   );
 });
 
+const hasAmountError = computed(() => {
+  return amount.value > userBalance.value;
+})
+
 const inputErrorMessage = computed(() => {
   const messages = inputRules.value
     .map(rule => rule(inputValue.value))
@@ -56,7 +81,12 @@ const inputErrorMessage = computed(() => {
 });
 
 watchEffect(() => {
-  if (inputValue.value !== null && serverValue.value !== null && !hasInputError.value && monthValue.value) {
+  if (inputValue.value !== null &&
+      serverValue.value !== null &&
+      !hasInputError.value &&
+      monthValue.value &&
+      amount.value <= userBalance.value
+  ) {
     enableMainButton();
   } else {
     disableMainButton();
@@ -66,7 +96,7 @@ watchEffect(() => {
 onMounted(() => {
   disableMainButton();
   loadServerOptions();
-
+  loadBalance();
 })
 </script>
 
@@ -131,20 +161,36 @@ onMounted(() => {
           </template>
         </q-select>
         <div class="q-py-sm">
-          <div style="color: var(--tg-subtitle-text-color);font-weight: 600;font-size: 12px;
-                line-height: 147%; letter-spacing: 0.01em; padding-left: 14px;">
+          <div
+            class="slider-label"
+            :class="{ 'shake-animation': hasAmountError }"
+          >
             Количество месяцев
           </div>
-          <div class="row items-center q-my-xs">
+          <div class="row items-center q-mt-xs">
             <q-slider
               class="col-11 q-px-sm"
               v-model="monthValue"
               :min="0"
               :max="12"
+              :class="{ 'slider-error': hasAmountError }"
             />
             <div class="col-1 text-center" style="color: var(--tg-accent-text-color); font-size: 17px; font-weight: 600">
               {{ monthValue }}
             </div>
+          </div>
+          <div style="height: 10px">
+            <transition
+            enter-active-class="animated fadeInDown"
+            leave-active-class="animated fadeOutUp"
+          >
+            <div
+              v-show="hasAmountError"
+              class="slider-error-message"
+            >
+              <span>Недостаточно средств на балансе для оплаты!</span>
+            </div>
+          </transition>
           </div>
         </div>
 
@@ -157,11 +203,62 @@ onMounted(() => {
       </div>
     </tg-section>
 
-    <MainButton text="Приобрести" @click=""></MainButton>
+    <MainButton text="Приобрести" @click="addClient"></MainButton>
   </q-page>
 </template>
 
 <style scoped>
+
+
+/* Анимация встряхивания (как в q-input) */
+.shake-animation {
+  animation: q-field-label 0.36s;
+  animation-duration: 0.36s;
+  animation-timing-function: ease;
+  animation-delay: 0s;
+  animation-iteration-count: 1;
+  animation-direction: normal;
+  animation-fill-mode: none;
+  animation-play-state: running;
+  animation-name: q-field-label;
+  animation-timeline: auto;
+  animation-range-start: normal;
+  animation-range-end: normal;
+}
+.slider-error-message {
+  height: 15px;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--q-negative);
+  margin-left: 15px;
+}
+.slider-label {
+  color: var(--tg-subtitle-text-color);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 147%;
+  letter-spacing: 0.01em;
+  padding-left: 14px;
+}
+
+/* Анимации (используем встроенные в Quasar) */
+.fadeInDown {
+  animation: fadeInDown 0.3s;
+}
+.fadeOutUp {
+  animation: fadeOutUp 0.3s;
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeOutUp {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-10px); }
+}
+
 ::v-deep(.q-field__label) {
   position: absolute;
   top: -4px;
