@@ -12,10 +12,11 @@ const router = useRouter();
 // const {openLink} = useWebAppNavigation();
 
 interface Props {
-  name: string;
-  email: string;
-  serverId: number;
-  url: string
+  name: string,
+  email: string,
+  serverId: number,
+  url: string,
+  unlimited: boolean
 }
 const props = defineProps<Props>();
 
@@ -56,10 +57,12 @@ function datetimeToString(dateTime: number): string {
 //     openLink(configUrl);
 //   }
 // };
+
 </script>
 
 <template>
   <BackButton @click="() => router.back()"></BackButton>
+
   <q-page class="tg-text overflow-auto">
     <div class="q-gutter-y-md">
       <tg-section>
@@ -154,18 +157,12 @@ function datetimeToString(dateTime: number): string {
                   </div>
                 </div>
               </div>
-              <div class="col row">
-
-              </div>
-              <div class="col row">
-
-              </div>
             </q-card-section>
           </q-card>
         </q-expansion-item>
       </tg-section>
     </div>
-    <MainButton text="Продлить подписку"/>
+    <MainButton :visible="!props.unlimited" text="Продлить подписку"/>
   </q-page>
 </template>
 

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import NotFoundBanner from "components/NotFoundBanner.vue";
 import {onMounted, Ref, ref} from "vue";
 import {Subscription} from "src/api/types/subscriptionTypes";
 import {PanelService, SubscriptionService} from "src/api";
+import AnimatedBanner from "components/AnimatedBanner.vue";
 
 const loading  = ref<boolean>(true);
 const subscriptionsByServer: Ref<Record<string, Subscription[]> | null> = ref<Record<string, Subscription[]> | null>(null);
@@ -96,7 +96,8 @@ onMounted(loadSubscriptions);
               name: subscription.name,
               email: subscription.email,
               serverId: subscription.serverId,
-              url: subscription.url
+              url: subscription.url,
+              unlimited: subscription.endDate === null
             }
           }"
           v-ripple
@@ -166,20 +167,28 @@ onMounted(loadSubscriptions);
       </div>
   </q-list>
 
-  <not-found-banner v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length === 0" title="Похоже, у вас нет подписок!">
+  <animated-banner
+    v-else-if="subscriptionsByServer && Object.keys(subscriptionsByServer).length === 0"
+    title="Похоже, у вас нет подписок!"
+    path="stickers/ResistanceDog.json"
+  >
     <template #button>
       <div class="row q-gutter-sm">
         <q-btn class="col tg-btn" :to="'subscription-new'">Подключить</q-btn>
         <q-btn class="col tg-btn" @click="updateSubscriptions">Обновить</q-btn>
       </div>
     </template>
-  </not-found-banner>
+  </animated-banner>
 
-  <not-found-banner v-else title="Ошибка получения подписок ;(">
+  <animated-banner
+    v-else
+    title="Ошибка получения подписок ;("
+    path="stickers/ResistanceDog.json"
+  >
     <template #button>
       <q-btn class="tg-btn" @click="updateSubscriptions">Обновить</q-btn>
     </template>
-  </not-found-banner>
+  </animated-banner>
 
 </template>
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import NotFoundBanner from "components/NotFoundBanner.vue";
+import AnimatedBanner from "components/AnimatedBanner.vue";
 import {onMounted, Ref, ref} from "vue";
 import {PaymentService} from "src/api";
 import {OperationType, Payment, PaymentStatus} from "src/api/types/paymentTypes";
@@ -105,7 +105,7 @@ onMounted(loadHistory);
       </div>
     </q-list>
 
-    <not-found-banner v-else title="Нет записей" class="q-mt-md"/>
+    <animated-banner v-else title="Нет записей" path="stickers/ResistanceDog.json" class="q-mt-md"/>
 
   </div>
 </template>

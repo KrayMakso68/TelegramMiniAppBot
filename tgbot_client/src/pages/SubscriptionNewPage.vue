@@ -3,11 +3,12 @@
 import {BackButton, MainButton, useWebAppMainButton} from "vue-tg";
 import TgSection from "components/TgSection.vue";
 import {useRouter} from "vue-router";
-import {computed, onMounted, ref, watchEffect} from "vue";
+import {computed, onMounted, Ref, ref, watchEffect} from "vue";
 import {Server} from "src/api/types/serverTypes";
 import {ServerService, UserService, PanelService} from "src/api";
 import {ClientCreate} from "src/api/types/panelTypes";
 import CountryFlag from 'vue-country-flag-next'
+import AnimatedBanner from "components/AnimatedBanner.vue";
 
 
 const router = useRouter();
@@ -20,19 +21,6 @@ const serverOptions = ref<Server[]>([{id: 0, label:"Не найдено", countr
 const monthValue = ref<number>(1)
 const userBalance = ref<number>(0)
 
-const addClient = async () => {
-  if (serverValue.value && inputValue.value) {
-    let data = {
-      shortName: inputValue.value,
-      protocol: 'vless',
-      serverId:  serverValue.value.id,
-      months: monthValue.value,
-      price: amount.value
-    }
-    await PanelService.addClient(data);
-    router.back()
-  }
-}
 
 const loadBalance = async () => {
   userBalance.value = await UserService.getCurrentUserBalance();
@@ -93,6 +81,37 @@ watchEffect(() => {
   }
 });
 
+const loadingDialog = ref<boolean>(false);
+const loadingStatus = ref<boolean>(true);
+const loadingError = ref<boolean>(false);
+
+const addClient = async (): Promise<Record<string, string>> => {
+  if (serverValue.value && inputValue.value) {
+    let data: ClientCreate = {
+      shortName: inputValue.value,
+      protocol: 'vless',
+      serverId:  serverValue.value.id,
+      months: monthValue.value,
+      price: amount.value
+    }
+    return await PanelService.addClient(data);
+  } else {
+    return {'status': 'Error'};
+  }
+}
+
+const addClientHandler = async () => {
+  loadingDialog.value = true;
+  let status = await addClient();
+  if (status.status === 'OK') {
+    loadingStatus.value = false;
+  } else {
+    loadingStatus.value = false;
+    loadingError.value = true;
+  }
+  setTimeout(() => router.back(), 2000)
+};
+
 onMounted(() => {
   disableMainButton();
   loadServerOptions();
@@ -107,6 +126,7 @@ onMounted(() => {
     <tg-section label="Новая подписка">
       <div class="q-mt-sm q-pa-sm">
         <q-input
+          lang="en"
           class="q-py-md"
           type="text"
           clearable
@@ -203,12 +223,32 @@ onMounted(() => {
       </div>
     </tg-section>
 
-    <MainButton text="Приобрести" @click="addClient"></MainButton>
+    <MainButton text="Приобрести" @click="addClientHandler"></MainButton>
   </q-page>
+
+   <q-dialog
+     persistent
+     v-model="loadingDialog"
+     backdrop-filter="blur(4px)"
+   >
+<!--      <q-card class="dialog-card content-center text-center">-->
+<!--        <q-card-section>-->
+<!--          <q-spinner-gears color="cyan" size="5.5em"/>-->
+<!--        </q-card-section>-->
+<!--      </q-card>-->
+     <animated-banner v-if="loadingStatus" title="Добавление подписки..." path="stickers/LoadingDuckSticker.json"/>
+     <animated-banner v-else-if="!loadingError" title="Подписка добавлена!" path="stickers/OkDuckSticker.json" :loop="false"/>
+     <animated-banner v-else title="Ошибка добавления" path="stickers/NotFoundDuckSticker.json"/>
+   </q-dialog>
+
 </template>
 
 <style scoped>
-
+.dialog-card {
+  background-color: var(--tg-section-bg-color);
+  height: 200px;
+  width: 200px;
+}
 
 /* Анимация встряхивания (как в q-input) */
 .shake-animation {

@@ -33,8 +33,8 @@ const routes: RouteRecordRaw[] = [
           email: route.query.email as string ?? "",
           serverId: Number(route.query.serverId) ?? 0,
           url: route.query.url as string ?? "",
+          unlimited: route.query.unlimited === 'true' ?? false,
         }),
-        meta: { transition: 'slide-right' },
       },
       {
         path: 'subscription-new',
