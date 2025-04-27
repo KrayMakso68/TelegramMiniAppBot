@@ -93,6 +93,7 @@ onMounted(loadSubscriptions);
           :to="{
             path: 'connect-info',
             query: {
+              id: subscription.id,
               name: subscription.name,
               email: subscription.email,
               serverId: subscription.serverId,

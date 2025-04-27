@@ -27,7 +27,7 @@ const loadBalance = async () => {
 };
 
 const loadServerOptions = async () => {
-  serverOptions.value = await ServerService.getServersInfo()
+  serverOptions.value = await ServerService.getAllServersInfo()
   if (serverOptions.value.length === 0) {
     serverOptions.value = [{id: 1, label:"Не найдено", countryCode: "...", monthPrice: 0, isActive: false}]
   }
@@ -109,7 +109,7 @@ const addClientHandler = async () => {
     loadingStatus.value = false;
     loadingError.value = true;
   }
-  setTimeout(() => router.back(), 2000)
+  setTimeout(() => router.push('/'), 2000)
 };
 
 onMounted(() => {
@@ -231,11 +231,6 @@ onMounted(() => {
      v-model="loadingDialog"
      backdrop-filter="blur(4px)"
    >
-<!--      <q-card class="dialog-card content-center text-center">-->
-<!--        <q-card-section>-->
-<!--          <q-spinner-gears color="cyan" size="5.5em"/>-->
-<!--        </q-card-section>-->
-<!--      </q-card>-->
      <animated-banner v-if="loadingStatus" title="Добавление подписки..." path="stickers/LoadingDuckSticker.json"/>
      <animated-banner v-else-if="!loadingError" title="Подписка добавлена!" path="stickers/OkDuckSticker.json" :loop="false"/>
      <animated-banner v-else title="Ошибка добавления" path="stickers/NotFoundDuckSticker.json"/>
@@ -244,13 +239,7 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.dialog-card {
-  background-color: var(--tg-section-bg-color);
-  height: 200px;
-  width: 200px;
-}
 
-/* Анимация встряхивания (как в q-input) */
 .shake-animation {
   animation: q-field-label 0.36s;
   animation-duration: 0.36s;
@@ -281,7 +270,6 @@ onMounted(() => {
   padding-left: 14px;
 }
 
-/* Анимации (используем встроенные в Quasar) */
 .fadeInDown {
   animation: fadeInDown 0.3s;
 }

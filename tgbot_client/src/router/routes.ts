@@ -29,6 +29,7 @@ const routes: RouteRecordRaw[] = [
         path: 'connect-info',
         component: () => import('pages/ConnectInfoPage.vue'),
         props: (route) => ({
+          id: Number(route.query.id) ?? 0,
           name: route.query.name as string ?? "",
           email: route.query.email as string ?? "",
           serverId: Number(route.query.serverId) ?? 0,
@@ -40,6 +41,15 @@ const routes: RouteRecordRaw[] = [
         path: 'subscription-new',
         component: () => import('pages/SubscriptionNewPage.vue')
       },
+      {
+        path: 'subscription-extension',
+        component: () => import('pages/ExtensionSubscriptionPage.vue'),
+        props: (route) => ({
+          id: Number(route.query.id) ?? 0,
+          name: route.query.name as string ?? "",
+          serverId: Number(route.query.serverId) ?? 0
+        }),
+      }
     ],
   },
   {

@@ -10,7 +10,7 @@ from app.core.exceptions import DBError, NotFoundError, DuplicatedError
 from app.model import Subscription, Server
 from app.repository.interfaces import ISubscriptionRepository
 from app.schema.connect_schema import ConnectSchema
-from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema
+from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema, SubscriptionUpdate
 
 
 class SubscriptionRepository(ISubscriptionRepository):
@@ -31,6 +31,16 @@ class SubscriptionRepository(ISubscriptionRepository):
             raise DBError(detail="Database error occurred.")
 
         return SubscriptionSchema.model_validate(query)
+
+    async def get_by_id(self, id: int ) -> SubscriptionSchema | None:
+        try:
+            result: Subscription | None = await self.session.get(Subscription, id)
+            if result:
+                return SubscriptionSchema.model_validate(result)
+            return None
+        except DatabaseError:
+            await self.session.rollback()
+            raise DBError(detail="Database error occurred.")
 
     async def get_by_email(self, email: str) -> SubscriptionSchema | None:
         try:
@@ -81,7 +91,7 @@ class SubscriptionRepository(ISubscriptionRepository):
 
     async def update_subscription_by_connect(self, sub_id: int, connect: ConnectSchema) -> SubscriptionSchema:
         try:
-            subscription: Subscription | None = await self.session.get(Subscription, sub_id)
+            subscription: Subscription | None = await self.session.get(Subscription, sub_id, with_for_update=True)
 
             if subscription:
                 print(f"I have been updated: {subscription.email}")
@@ -103,6 +113,31 @@ class SubscriptionRepository(ISubscriptionRepository):
             raise DBError(detail="Database error occurred.")
 
         return SubscriptionSchema.model_validate(subscription)
+
+    async def update(self, sub_id: int, update_info: SubscriptionUpdate) -> SubscriptionSchema:
+        try:
+            subscription: Subscription | None = await self.session.get(Subscription, sub_id, with_for_update=True)
+
+            if update_info.end_date is not None:
+                subscription.end_date = update_info.end_date
+
+            if update_info.is_active is not None:
+                subscription.is_active = update_info.is_active
+
+            if subscription.end_date and subscription.end_date < datetime.now(UTC):
+                subscription.is_active = False
+
+            await self.session.commit()
+            await self.session.refresh(subscription)
+
+        except NoResultFound:
+            raise NotFoundError(detail=f"Subscription with ID {sub_id} not found")
+        except DatabaseError:
+            await self.session.rollback()
+            raise DBError(detail="Database error occurred.")
+
+        return SubscriptionSchema.model_validate(subscription)
+
 
     async def delete(self, sub_id: int) -> bool:
         try:

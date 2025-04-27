@@ -17,3 +17,11 @@ async def get_servers_short_info(
         service: ServerService = Depends(get_server_service)
 ) -> list[ServerInfo]:
     return await service.get_servers_short_info()
+
+@router.get("/{server_id}/available-info")
+async def get_server_short_info_by_id(
+        server_id: int,
+        user: UserSchema = Depends(get_current_active_user),
+        service: ServerService = Depends(get_server_service)
+) -> ServerInfo:
+    return await service.get_server_short_info_by_id(server_id)

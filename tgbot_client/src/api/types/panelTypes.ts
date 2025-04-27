@@ -31,3 +31,10 @@ export interface ClientCreate {
   months: number;
   price: number;
 }
+
+export interface ClientUpdate {
+  id: number;
+  serverId: number;
+  months: number;
+  price: number;
+}

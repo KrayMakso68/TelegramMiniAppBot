@@ -10,10 +10,10 @@ from fastapi import status, HTTPException
 from app.core.config import settings
 from app.repository.interfaces import ISubscriptionRepository, IServerRepository
 from app.schema.connect_schema import ConnectSchema
-from app.schema.panel_schema import ClientSchema, ClientCreate
+from app.schema.panel_schema import ClientSchema, ClientCreate, ClientUpdate
 from app.core.exceptions import NotFoundError, UnsupportedProtocolError, InsufficientBalanceError, InternalServerError
 from app.schema.server_schema import ServerSchema
-from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema
+from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema, SubscriptionUpdate
 from app.schema.user_schema import UserSchema
 from app.services.user_service import UserService
 from app.utils.panel_subscription_api import PanelSubscriptionApi
@@ -86,7 +86,8 @@ class PanelService:
             self,
             server_id: int,
             new_client_info: ClientCreate,
-            user: UserSchema, panel_api
+            user: UserSchema,
+            panel_api
     ) -> dict[str, str]:
 
         inbounds: list[Inbound] = await panel_api.inbound.get_list()
@@ -147,6 +148,60 @@ class PanelService:
                     raise NotFoundError(detail="User for balance write-off not found.")
             else:
                 raise InternalServerError(detail="Error adding subscription to server.")
+        else:
+            raise InsufficientBalanceError(detail="Insufficient balance in the user's account to make a purchase.")
+
+        return {"status": "OK"}
+
+    @ensure_panel_session_active
+    async def update_client(
+            self,
+            server_id: int,
+            update_client_info: ClientUpdate,
+            user: UserSchema,
+            panel_api
+    ) -> dict[str, str]:
+        subscription: SubscriptionSchema | None = await self.subscription_repository.get_by_id(update_client_info.id)
+        if subscription is None:
+            raise NotFoundError(detail="Subscription not found.")
+
+        new_end_date: datetime | None = None
+        if subscription.end_date and subscription.end_date.replace(tzinfo=UTC) > datetime.now(UTC):
+            new_end_date = subscription.end_date + timedelta(days=30.44 * update_client_info.months)
+        else:
+            new_end_date = datetime.now() + timedelta(days=30.44 * update_client_info.months)
+        new_x_time = int(new_end_date.timestamp() * 1000)
+
+        client: ClientSchema = await self.get_client_info_by_email(server_id, subscription.email)
+        print(client)
+        client.expiry_time = new_x_time
+
+        server = await self.server_repository.get_by_id(server_id)
+        if server is None:
+            raise NotFoundError(detail="Server not found.")
+        sub_api = self.get_sub_api(server)
+        connects_data: list[ConnectSchema] = await sub_api.get_connects_for_user(user.sub_uuid)
+
+        client_uuid = None
+        for connect in connects_data:
+            if connect.email == subscription.email:
+                client_uuid = connect.uuid
+                break
+
+        if user.balance >= update_client_info.price:
+            await panel_api.client.update(client_uuid, client) #TODO: Response status is not successful, message: Something went wrong! Failed: empty client ID
+
+            update_data = SubscriptionUpdate(
+                end_date=new_end_date,
+                is_active=True
+            )
+
+            await self.subscription_repository.update(update_client_info.id, update_data)
+
+            try:
+                await self.user_service.write_off_balance(user.id, update_client_info.price)
+            except NotFoundError:
+                raise NotFoundError(detail="User for balance write-off not found.")
         else:
             raise InsufficientBalanceError(detail="Insufficient balance in the user's account to make a purchase.")
 

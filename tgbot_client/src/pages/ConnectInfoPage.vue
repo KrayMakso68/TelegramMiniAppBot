@@ -12,6 +12,7 @@ const router = useRouter();
 // const {openLink} = useWebAppNavigation();
 
 interface Props {
+  id: number;
   name: string,
   email: string,
   serverId: number,
@@ -162,7 +163,17 @@ function datetimeToString(dateTime: number): string {
         </q-expansion-item>
       </tg-section>
     </div>
-    <MainButton :visible="!props.unlimited" text="Продлить подписку"/>
+    <MainButton
+      :visible="!props.unlimited"
+      @click="router.push({
+            path: 'subscription-extension',
+            query: {
+              id: props.id,
+              name: props.name,
+              serverId: props.serverId
+            }
+      })"
+      text="Продлить подписку"/>
   </q-page>
 </template>
 

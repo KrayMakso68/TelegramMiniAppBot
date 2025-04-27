@@ -3,7 +3,7 @@ from abc import ABC, abstractmethod
 from app.schema.connect_schema import ConnectSchema
 from app.schema.payment_schema import PaymentCreate, PaymentSchema, PaymentUpdate, PaymentOptionSchema
 from app.schema.server_schema import ServerSchema, ServerInfo
-from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema
+from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema, SubscriptionUpdate
 from app.schema.user_schema import UserCreate, UserSchema
 
 
@@ -57,6 +57,10 @@ class ISubscriptionRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def get_by_id(self, id: int) -> SubscriptionSchema | None:
+        raise NotImplementedError
+
+    @abstractmethod
     async def get_by_email(self, email: str) -> SubscriptionSchema | None:
         raise NotImplementedError
 
@@ -70,6 +74,10 @@ class ISubscriptionRepository(ABC):
 
     @abstractmethod
     async def update_subscription_by_connect(self, sub_id: int, connect: ConnectSchema) -> SubscriptionSchema:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update(self, sub_id: int, update_info: SubscriptionUpdate):
         raise NotImplementedError
 
     @abstractmethod

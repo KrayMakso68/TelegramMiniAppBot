@@ -1,9 +1,9 @@
 import {login} from './authService';
 import {getCurrentUser, getCurrentUserBalance, getUserAvatarUrl} from './userService';
 import {getUserSubscriptionsByServer} from "src/api/subscriptionService";
-import {getConnectInfoByEmail, updateUserSubscriptions, addClient} from "src/api/panelService";
+import {getConnectInfoByEmail, updateUserSubscriptions, addClient, updateClient} from "src/api/panelService";
 import {getPaymentHistoryByDay, newPayment, getPaymentOptions} from "src/api/paymentService";
-import {getServersInfo} from "src/api/serverService"
+import {getAllServersInfo, getServerInfoById} from "src/api/serverService"
 
 export const AuthService = {
   login,
@@ -22,7 +22,8 @@ export const SubscriptionService = {
 export const PanelService = {
   getConnectInfoByEmail,
   updateUserSubscriptions,
-  addClient
+  addClient,
+  updateClient
 }
 
 export const PaymentService = {
@@ -32,5 +33,6 @@ export const PaymentService = {
 }
 
 export const ServerService = {
-  getServersInfo
+  getAllServersInfo,
+  getServerInfoById
 }

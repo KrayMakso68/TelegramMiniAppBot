@@ -1,5 +1,5 @@
 import {api} from "boot/axios";
-import {ClientCreate, ClientInfo} from "src/api/types/panelTypes";
+import {ClientCreate, ClientInfo, ClientUpdate} from "src/api/types/panelTypes";
 import {HttpStatusCode} from "axios";
 import {Subscription} from "src/api/types/subscriptionTypes";
 
@@ -37,3 +37,14 @@ export const addClient = async (clientCreate: ClientCreate): Promise<Record<stri
     return {status: "Error"}
   }
 }
+
+export const updateClient = async (clientUpdate: ClientUpdate): Promise<Record<string, string>> => {
+  try {
+    const response = await api.post(`/panel/client/update`, clientUpdate);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update client:", error)
+    return {status: "Error"}
+  }
+}
+
