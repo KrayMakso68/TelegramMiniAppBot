@@ -1,4 +1,5 @@
 from py3xui import Client
+from pydantic import Field
 
 from app.schema.base_schema import BaseSchema
 
@@ -25,4 +26,15 @@ class ClientSchema(Client, BaseSchema):
 
 
 class ClientCreate(BaseSchema):
-    ...
+    short_name: str = Field(..., example='connect1 (max 10 characters)')
+    protocol: str = Field(..., example='vless, vmess, etc...')
+    server_id: int = Field(..., example=1)
+    months: int = Field(..., example=1)
+    price: float = Field(..., example=100.00)
+
+
+class ClientUpdate(BaseSchema):
+    id: int = Field(..., example='1')
+    server_id: int = Field(..., example=1)
+    months: int = Field(..., example=1)
+    price: float = Field(..., example=100.00)

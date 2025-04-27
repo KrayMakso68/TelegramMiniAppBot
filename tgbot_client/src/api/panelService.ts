@@ -1,10 +1,11 @@
 import {api} from "boot/axios";
-import {ConnectInfo} from "src/api/types/panelTypes";
+import {ClientCreate, ClientInfo, ClientUpdate} from "src/api/types/panelTypes";
 import {HttpStatusCode} from "axios";
+import {Subscription} from "src/api/types/subscriptionTypes";
 
-export const getConnectInfoByEmail = async (email: string): Promise<ConnectInfo | null> => {
+export const getConnectInfoByEmail = async (serverId: number, email: string): Promise<ClientInfo | null> => {
   try {
-    const response = await api.get(`/panel/client/info_by_email/${email}`);
+    const response = await api.get(`/panel/${serverId}/client/info-by-email/${email}`);
     return response.data;
   } catch (error: any) {
     if (error.response.status === HttpStatusCode.NotFound) {
@@ -16,3 +17,34 @@ export const getConnectInfoByEmail = async (email: string): Promise<ConnectInfo 
     }
   }
 }
+
+export const updateUserSubscriptions = async (): Promise<Record<string, string>> => {
+  try {
+    const response = await api.post(`/panel/subscription/update-all`);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error updating subscriptions:", error);
+    return {status: "Error"};
+  }
+}
+
+export const addClient = async (clientCreate: ClientCreate): Promise<Record<string, string>> => {
+  try {
+    const response = await api.post(`/panel/client/add`, clientCreate);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to add client:", error)
+    return {status: "Error"}
+  }
+}
+
+export const updateClient = async (clientUpdate: ClientUpdate): Promise<Record<string, string>> => {
+  try {
+    const response = await api.post(`/panel/client/update`, clientUpdate);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update client:", error)
+    return {status: "Error"}
+  }
+}
+

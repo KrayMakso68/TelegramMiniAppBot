@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ConnectionsList from "components/ConnectionsList.vue";
+import SubscriptionsList from "components/SubscriptionsList.vue";
 import UserWelcome from "components/UserWelcome.vue";
 import TgSection from "components/TgSection.vue";
 import WalletBalance from "components/WalletBalance.vue";
@@ -18,8 +18,8 @@ import WalletBalance from "components/WalletBalance.vue";
         <wallet-balance/>
       </tg-section>
 
-      <tg-section label="Подключения" class="column">
-        <connections-list/>
+      <tg-section label="Подключения">
+        <subscriptions-list/>
       </tg-section>
 
     </div>

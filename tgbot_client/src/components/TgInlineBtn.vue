@@ -1,12 +1,15 @@
 <script setup lang="ts">
 
 interface Props {
+  label: string;
   icon?: string;
   to?: string;
-  label: string;
+  size?: string;
 }
 
-defineProps<Props>();
+withDefaults(defineProps<Props>(), {
+  size: 'md'
+})
 
 // const emit = defineEmits<{
 //   (e: 'click'): void;
@@ -18,9 +21,9 @@ defineProps<Props>();
 </script>
 
 <template>
-  <q-btn :to="to" rounded stack flat unelevated no-caps draggable="false">
+  <q-btn :to="to" :size="size" rounded stack flat unelevated no-caps draggable="false">
     <div class="flex flex-center column tg-inline-btn">
-      <q-icon size="md" :name=icon />
+      <q-icon :size="size" :name=icon />
       <span>{{ label }}</span>
     </div>
   </q-btn>

@@ -1,5 +1,8 @@
+from decimal import Decimal
 from enum import Enum
 from datetime import datetime
+
+from pydantic import Field
 
 from app.schema.base_schema import BaseSchema, ModelBaseInfo
 
@@ -16,13 +19,13 @@ class OperationType(str, Enum):
 
 
 class PaymentRequest(BaseSchema):
-    amount: float
+    amount: Decimal = Field(..., gt=0, example="100.50")
 
 
 class PaymentCreate(BaseSchema):
     user_id: int
-    amount: float
-    title: str | None = None
+    amount: Decimal = Field(..., gt=0, example="100.50")
+    title: str | None = Field(None, example="Оплата подписки")
     operation_type: OperationType
 
 
@@ -32,7 +35,7 @@ class PaymentUpdate(BaseSchema):
 
 class PaymentSchema(ModelBaseInfo):
     user_id: int
-    amount: float
+    amount: Decimal
     status: PaymentStatus
     title: str | None = None
     operation_type: OperationType

@@ -20,8 +20,10 @@ class PaymentRepository(IPaymentRepository):
             await self.session.commit()
             await self.session.refresh(query)
         except IntegrityError as e:
+            await self.session.rollback()
             raise DuplicatedError(detail=str(e.orig))
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")
         return PaymentSchema.model_validate(query)
 
@@ -32,6 +34,7 @@ class PaymentRepository(IPaymentRepository):
                 return PaymentSchema.model_validate(result)
             return None
         except DatabaseError:
+            await self.session.rollback()
             raise DBError(detail="Database error occurred.")
 
     async def update(self, payment_id: int, payment_update: PaymentUpdate) -> PaymentSchema | None:
@@ -50,15 +53,21 @@ class PaymentRepository(IPaymentRepository):
             return payment
         except NoResultFound:
             return None
+        except DatabaseError:
+            await self.session.rollback()
+            raise DBError(detail="Database error occurred.")
 
     async def get_all(self, user_id: int) -> list[PaymentSchema]:
         try:
             stmt = select(Payment).where(Payment.user_id == user_id).order_by(Payment.created_at.desc())
             result: Result = await self.session.execute(stmt)
             payments_history = result.scalars().all()
-            return [PaymentSchema.from_orm(payment) for payment in payments_history]
+            return [PaymentSchema.model_validate(payment) for payment in payments_history]
         except NoResultFound:
             return []
+        except DatabaseError:
+            await self.session.rollback()
+            raise DBError(detail="Database error occurred.")
 
     async def get_options(self) -> list[PaymentOptionSchema]:
         try:
@@ -66,6 +75,9 @@ class PaymentRepository(IPaymentRepository):
                 select(PaymentOptions)
             )
             options = result.scalars().all()
-            return [PaymentOptionSchema.from_orm(option) for option in options]
+            return [PaymentOptionSchema.model_validate(option) for option in options]
         except NoResultFound:
             return []
+        except DatabaseError:
+            await self.session.rollback()
+            raise DBError(detail="Database error occurred.")

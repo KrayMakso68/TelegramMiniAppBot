@@ -3,13 +3,13 @@ import {onMounted, ref} from "vue";
 import lottie from "lottie-web";
 
 interface Props {
-  title?: string;
-  path?: string;
+  title: string;
+  path: string;
+  loop?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Не найдено',
-  path: 'stickers/ResistanceDog.json'
+  loop: true
 })
 
 const lottieContainer = ref<HTMLElement | null>(null);
@@ -18,7 +18,7 @@ onMounted(() => {
     lottie.loadAnimation({
       container: lottieContainer.value,
       renderer: 'svg',
-      loop: true,
+      loop: props.loop,
       autoplay: true,
       path: props.path
     });

@@ -29,13 +29,27 @@ const routes: RouteRecordRaw[] = [
         path: 'connect-info',
         component: () => import('pages/ConnectInfoPage.vue'),
         props: (route) => ({
-          connectUrl: route.query.connectUrl as string,
-          uuid: route.query.uuid as string,
-          email: route.query.email as string,
-          inboundName: route.query.inboundName as string
+          id: Number(route.query.id) ?? 0,
+          name: route.query.name as string ?? "",
+          email: route.query.email as string ?? "",
+          serverId: Number(route.query.serverId) ?? 0,
+          url: route.query.url as string ?? "",
+          unlimited: route.query.unlimited === 'true' ?? false,
         }),
-        meta: { transition: 'slide-right' },
       },
+      {
+        path: 'subscription-new',
+        component: () => import('pages/SubscriptionNewPage.vue')
+      },
+      {
+        path: 'subscription-extension',
+        component: () => import('pages/ExtensionSubscriptionPage.vue'),
+        props: (route) => ({
+          id: Number(route.query.id) ?? 0,
+          name: route.query.name as string ?? "",
+          serverId: Number(route.query.serverId) ?? 0
+        }),
+      }
     ],
   },
   {

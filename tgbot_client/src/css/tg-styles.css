@@ -51,3 +51,9 @@
 .tg-separator {
   background-color: var(--tg-section-separator-color);
 }
+
+.q-menu {
+  background: var(--tg-secondary-bg-color);
+  border-radius: 14px;
+  color: var(--tg-text-color);
+}

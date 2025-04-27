@@ -40,11 +40,7 @@ class Settings(BaseSettings):
     # ALLOWED_ORIGINS: list[str] = [url for url in os.getenv('ALLOWED_ORIGINS', "*").split(',')]
 
     # 3x-ui
-    TLS_VERIFY: bool = False
-    PANEL_HOST: str = os.getenv("PANEL_HOST")
-    PANEL_USERNAME: str = os.getenv("PANEL_USERNAME")
-    PANEL_PASSWORD: str = os.getenv("PANEL_PASSWORD")
-    SUBSCRIBE_API_URL: str = os.getenv("SUBSCRIBE_API_URL")
+    TLS_VERIFY: bool = os.getenv('TLS_VERIFY', False)
 
 
 settings = Settings()

@@ -13,7 +13,7 @@ const router = useRouter();
   <q-page class="tg-text overflow-auto">
     <div class="column">
 
-      <tg-section label="История операций" class="column">
+      <tg-section label="История операций" class="column" :reload="true">
         <payments-list/>
       </tg-section>
 
