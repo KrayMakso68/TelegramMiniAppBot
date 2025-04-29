@@ -111,7 +111,6 @@ class PanelService:
             expiry_time=x_time,
             flow="xtls-rprx-vision",
             sub_id=user.sub_uuid,
-            tg_id=user.tg_id,
         )
 
         if user.balance >= new_client_info.price:
@@ -172,10 +171,6 @@ class PanelService:
             new_end_date = datetime.now() + timedelta(days=30.44 * update_client_info.months)
         new_x_time = int(new_end_date.timestamp() * 1000)
 
-        client: ClientSchema = await self.get_client_info_by_email(server_id, subscription.email)
-        print(client)
-        client.expiry_time = new_x_time
-
         server = await self.server_repository.get_by_id(server_id)
         if server is None:
             raise NotFoundError(detail="Server not found.")
@@ -188,8 +183,16 @@ class PanelService:
                 client_uuid = connect.uuid
                 break
 
+        client: ClientSchema = await self.get_client_info_by_email(server_id, subscription.email)
+        client.enable = True
+        client.expiry_time = new_x_time
+        client.id = client_uuid
+        client.flow = 'xtls-rprx-vision'
+        client.sub_id = user.sub_uuid
+        client.limit_ip = 1
+
         if user.balance >= update_client_info.price:
-            await panel_api.client.update(client_uuid, client) #TODO: Response status is not successful, message: Something went wrong! Failed: empty client ID
+            await panel_api.client.update(client_uuid, client)
 
             update_data = SubscriptionUpdate(
                 end_date=new_end_date,
@@ -272,7 +275,7 @@ class PanelService:
     def compare_connect_subscription(
             connect: ConnectSchema,
             sub: SubscriptionSchema,
-            time_tolerance: timedelta = timedelta(minutes=5)
+            time_tolerance: timedelta = timedelta(minutes=30)
     ) -> bool:
 
         if not all([
@@ -287,7 +290,7 @@ class PanelService:
                 return not sub.is_active
             else:
                 if sub.end_date is not None:
-                    sub_remaining_seconds = (sub.end_date - datetime.now(UTC)).total_seconds()
+                    sub_remaining_seconds = int((sub.end_date - datetime.now(UTC)).total_seconds())
                 else:
                     sub_remaining_seconds = 0
                 return abs(connect.remaining_seconds - sub_remaining_seconds) <= time_tolerance.total_seconds()

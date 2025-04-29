@@ -32,7 +32,7 @@ class SubscriptionRepository(ISubscriptionRepository):
 
         return SubscriptionSchema.model_validate(query)
 
-    async def get_by_id(self, id: int ) -> SubscriptionSchema | None:
+    async def get_by_id(self, id: int) -> SubscriptionSchema | None:
         try:
             result: Subscription | None = await self.session.get(Subscription, id)
             if result:
@@ -45,7 +45,7 @@ class SubscriptionRepository(ISubscriptionRepository):
     async def get_by_email(self, email: str) -> SubscriptionSchema | None:
         try:
             stmt = select(Subscription).where(Subscription.email == email)
-            result: Result  = await self.session.execute(stmt)
+            result: Result = await self.session.execute(stmt)
             subscription = result.scalar().one_or_none()
         except NoResultFound:
             return None
@@ -124,7 +124,7 @@ class SubscriptionRepository(ISubscriptionRepository):
             if update_info.is_active is not None:
                 subscription.is_active = update_info.is_active
 
-            if subscription.end_date and subscription.end_date < datetime.now(UTC):
+            if subscription.end_date and subscription.end_date.astimezone(UTC) < datetime.now(UTC):
                 subscription.is_active = False
 
             await self.session.commit()
@@ -137,7 +137,6 @@ class SubscriptionRepository(ISubscriptionRepository):
             raise DBError(detail="Database error occurred.")
 
         return SubscriptionSchema.model_validate(subscription)
-
 
     async def delete(self, sub_id: int) -> bool:
         try:
