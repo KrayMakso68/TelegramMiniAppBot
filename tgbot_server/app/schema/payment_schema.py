@@ -25,6 +25,7 @@ class PaymentRequest(BaseSchema):
 class PaymentCreate(BaseSchema):
     user_id: int
     amount: Decimal = Field(..., gt=0, example="100.50")
+    status: PaymentStatus = Field(PaymentStatus.PENDING, example="PENDING, COMPLETED, FAILED")
     title: str | None = Field(None, example="Оплата подписки")
     operation_type: OperationType
 

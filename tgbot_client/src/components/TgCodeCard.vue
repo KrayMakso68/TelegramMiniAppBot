@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import {copyToClipboard, useQuasar} from "quasar";
+import {useWebAppHapticFeedback} from "vue-tg";
 
 interface Props {
   title?: string | undefined,
   text: string
 }
 
-const props = defineProps<Props>()
+const props = defineProps<Props>();
 const $q = useQuasar();
+const {notificationOccurred} = useWebAppHapticFeedback();
 
 const onCopy = () => {
   copyToClipboard(props.text)
@@ -17,6 +19,7 @@ const onCopy = () => {
         message: "Текст скопирован!",
         timeout: 1000,
       });
+      notificationOccurred('success');
     })
     .catch(() => {
       $q.notify({
@@ -24,6 +27,7 @@ const onCopy = () => {
         message: "Ошибка при копировании текста.",
         timeout: 1000,
       });
+      notificationOccurred('error');
     });
 };
 </script>

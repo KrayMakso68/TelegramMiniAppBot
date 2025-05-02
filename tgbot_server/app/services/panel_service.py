@@ -11,10 +11,11 @@ from app.core.config import settings
 from app.repository.interfaces import ISubscriptionRepository, IServerRepository
 from app.schema.connect_schema import ConnectSchema
 from app.schema.panel_schema import ClientSchema, ClientCreate, ClientUpdate
-from app.core.exceptions import NotFoundError, UnsupportedProtocolError, InsufficientBalanceError, InternalServerError
+from app.core.exceptions import NotFoundError, UnsupportedProtocolError, InsufficientBalanceError, InternalServerError, InvalidSubscriptionTypeError
 from app.schema.server_schema import ServerSchema
 from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema, SubscriptionUpdate
 from app.schema.user_schema import UserSchema
+from app.services.payment_service import PaymentService
 from app.services.user_service import UserService
 from app.utils.panel_subscription_api import PanelSubscriptionApi
 
@@ -57,11 +58,13 @@ class PanelService:
             self,
             subscription_repository: ISubscriptionRepository,
             server_repository: IServerRepository,
-            user_service: UserService
+            user_service: UserService,
+            payment_service: PaymentService
     ):
         self.subscription_repository = subscription_repository
         self.server_repository = server_repository
         self.user_service = user_service
+        self.payment_service = payment_service
 
     @ensure_panel_session_active
     async def get_client_info_by_id(self, server_id: int, client_uuid: str, panel_api) -> list[ClientSchema]:
@@ -100,7 +103,7 @@ class PanelService:
             raise UnsupportedProtocolError(detail=f"Server does not support the {new_client_info.protocol} protocol.")
 
         new_id = str(uuid.uuid4())
-        new_email = f"{new_client_info.short_name}@{new_id.replace('-', '_')}"
+        new_email = f"{new_client_info.short_name}@@{new_id.replace('-', '_')}"
         expiry_date = datetime.now() + timedelta(days=30.44 * new_client_info.months)
         x_time = int(expiry_date.timestamp() * 1000)
 
@@ -145,6 +148,12 @@ class PanelService:
                     await self.user_service.write_off_balance(user.id, new_client_info.price)
                 except NotFoundError:
                     raise NotFoundError(detail="User for balance write-off not found.")
+
+                await self.payment_service.create_subscription_payment(
+                    user.id,
+                    new_client_info.price,
+                    new_client_info.short_name
+                )
             else:
                 raise InternalServerError(detail="Error adding subscription to server.")
         else:
@@ -160,9 +169,15 @@ class PanelService:
             user: UserSchema,
             panel_api
     ) -> dict[str, str]:
+
         subscription: SubscriptionSchema | None = await self.subscription_repository.get_by_id(update_client_info.id)
         if subscription is None:
             raise NotFoundError(detail="Subscription not found.")
+
+        if subscription.end_date is None:
+            raise InvalidSubscriptionTypeError(detail="Update is not available for premium subscriptions")
+
+        client_uuid: str = subscription.email.split('@@')[1].replace("_", "-")
 
         new_end_date: datetime | None = None
         if subscription.end_date and subscription.end_date.replace(tzinfo=UTC) > datetime.now(UTC):
@@ -170,18 +185,6 @@ class PanelService:
         else:
             new_end_date = datetime.now() + timedelta(days=30.44 * update_client_info.months)
         new_x_time = int(new_end_date.timestamp() * 1000)
-
-        server = await self.server_repository.get_by_id(server_id)
-        if server is None:
-            raise NotFoundError(detail="Server not found.")
-        sub_api = self.get_sub_api(server)
-        connects_data: list[ConnectSchema] = await sub_api.get_connects_for_user(user.sub_uuid)
-
-        client_uuid = None
-        for connect in connects_data:
-            if connect.email == subscription.email:
-                client_uuid = connect.uuid
-                break
 
         client: ClientSchema = await self.get_client_info_by_email(server_id, subscription.email)
         client.enable = True
@@ -205,6 +208,12 @@ class PanelService:
                 await self.user_service.write_off_balance(user.id, update_client_info.price)
             except NotFoundError:
                 raise NotFoundError(detail="User for balance write-off not found.")
+
+            await self.payment_service.create_subscription_payment(
+                user.id,
+                update_client_info.price,
+                subscription.name
+            )
         else:
             raise InsufficientBalanceError(detail="Insufficient balance in the user's account to make a purchase.")
 

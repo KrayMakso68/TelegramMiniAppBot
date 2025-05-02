@@ -2,7 +2,6 @@ from typing import Any, Dict, Optional
 from fastapi import HTTPException, status
 
 
-# DB
 class DuplicatedError(HTTPException):
     def __init__(self, detail: Any = None, headers: Optional[Dict[str, Any]] = None) -> None:
         super().__init__(status.HTTP_400_BAD_REQUEST, detail, headers)
@@ -63,5 +62,10 @@ class UnsupportedProtocolError(HTTPException):
 
 
 class InsufficientBalanceError(HTTPException):
+    def __init__(self, detail: Any = None, headers: Optional[Dict[str, Any]] = None) -> None:
+        super().__init__(status.HTTP_403_FORBIDDEN, detail, headers)
+
+
+class InvalidSubscriptionTypeError(HTTPException):
     def __init__(self, detail: Any = None, headers: Optional[Dict[str, Any]] = None) -> None:
         super().__init__(status.HTTP_403_FORBIDDEN, detail, headers)

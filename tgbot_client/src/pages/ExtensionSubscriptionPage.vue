@@ -1,14 +1,16 @@
 <script setup lang="ts">
 
 import TgSection from "components/TgSection.vue";
-import {BackButton, MainButton} from "vue-tg";
+import {BackButton, MainButton, useWebAppMainButton, useWebAppHapticFeedback} from "vue-tg";
 import {useRouter} from "vue-router";
-import {computed, onMounted, ref} from "vue";
+import {computed, onMounted, ref, watchEffect} from "vue";
 import {PanelService, ServerService, UserService} from "src/api";
 import AnimatedBanner from "components/AnimatedBanner.vue";
-import {ClientCreate, ClientUpdate} from "src/api/types/panelTypes";
+import {ClientUpdate} from "src/api/types/panelTypes";
 
 const router = useRouter();
+const {enableMainButton, disableMainButton} = useWebAppMainButton();
+const {impactOccurred, notificationOccurred} = useWebAppHapticFeedback();
 
 interface Props {
   id: number,
@@ -53,17 +55,30 @@ const extendClient = async (): Promise<Record<string, string>> => {
   }
 }
 
-const ExtendClientHandler = async () => {
+const extendClientHandler = async () => {
   loadingDialog.value = true;
+  impactOccurred('light');
   let status = await extendClient();
   if (status.status === 'OK') {
     loadingStatus.value = false;
+    notificationOccurred('success');
   } else {
     loadingStatus.value = false;
     loadingError.value = true;
+    notificationOccurred('warning');
   }
   setTimeout(() => router.push('/'), 2000)
 };
+
+watchEffect(() => {
+  if (monthValue.value && !hasAmountError.value && monthPrice.value) {
+    enableMainButton();
+    impactOccurred('light');
+  } else {
+    disableMainButton();
+    impactOccurred('medium');
+  }
+});
 
 onMounted(() => {
   loadBalance();
@@ -131,7 +146,7 @@ onMounted(() => {
 
   </q-page>
 
-  <MainButton text="Продлить" @click="ExtendClientHandler"></MainButton>
+  <MainButton text="Продлить" @click="extendClientHandler"></MainButton>
 
   <q-dialog
      persistent

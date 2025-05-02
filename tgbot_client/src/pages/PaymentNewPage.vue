@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {useRouter} from "vue-router";
 import TgSection from "components/TgSection.vue";
-import {BackButton, MainButton, useWebAppNavigation, useWebAppMainButton} from "vue-tg";
+import {BackButton, MainButton, useWebAppNavigation, useWebAppMainButton, useWebAppHapticFeedback} from "vue-tg";
 import {PaymentService} from "src/api";
 import {computed, onMounted, ref, watchEffect} from "vue";
 import {PaymentOption} from "src/api/types/paymentTypes";
@@ -9,6 +9,7 @@ import {PaymentOption} from "src/api/types/paymentTypes";
 const router = useRouter();
 const {openLink} = useWebAppNavigation();
 const {disableMainButton, enableMainButton} = useWebAppMainButton();
+const {impactOccurred} = useWebAppHapticFeedback();
 
 
 const inputValue = ref<number | null>(null);
@@ -23,6 +24,7 @@ const loadPaymentOptions = async () => {
 };
 
 const newPayment = async () => {
+  impactOccurred('medium');
   let path = selectValue.value?.path
   let amount = inputValue.value;
 
@@ -42,8 +44,10 @@ const newPayment = async () => {
 watchEffect(() => {
   if (inputValue.value !== null && selectValue.value !== null && isValid.value) {
     enableMainButton();
+    impactOccurred('light');
   } else {
     disableMainButton();
+    impactOccurred('medium');
   }
 });
 

@@ -76,6 +76,19 @@ def get_server_service(server_repository: ServerRepository = Depends(get_server_
 
 
 # _________________________________________________________________________________________________________
+# payment
+def get_payment_repository(async_session: AsyncSession = Depends(get_async_session)) -> PaymentRepository:
+    return PaymentRepository(async_session)
+
+
+def get_payment_service(
+        payment_repository: PaymentRepository = Depends(get_payment_repository),
+        user_service: UserService = Depends(get_user_service),
+) -> PaymentService:
+    return PaymentService(payment_repository, user_service)
+
+
+# _________________________________________________________________________________________________________
 # panel
 def get_panel_api() -> PanelAsyncApi:
     return PanelAsyncApi(
@@ -97,19 +110,8 @@ def get_sub_api() -> PanelSubscriptionApi:
 def get_panel_service(
         subscription_repository: SubscriptionRepository = Depends(get_subscription_repository),
         server_repository: ServerRepository = Depends(get_server_repository),
-        user_service: UserService = Depends(get_user_service)
+        user_service: UserService = Depends(get_user_service),
+        payment_service: PaymentService = Depends(get_payment_service)
 ) -> PanelService:
-    return PanelService(subscription_repository, server_repository, user_service)
+    return PanelService(subscription_repository, server_repository, user_service, payment_service)
 
-
-# _________________________________________________________________________________________________________
-# payment
-def get_payment_repository(async_session: AsyncSession = Depends(get_async_session)) -> PaymentRepository:
-    return PaymentRepository(async_session)
-
-
-def get_payment_service(
-        payment_repository: PaymentRepository = Depends(get_payment_repository),
-        user_service: UserService = Depends(get_user_service)
-) -> PaymentService:
-    return PaymentService(payment_repository, user_service)

@@ -48,3 +48,12 @@ class PaymentService:
 
     async def get_payment_options(self) -> list[PaymentOptionSchema]:
         return await self.payment_repository.get_options()
+
+    async def create_subscription_payment(self, user_id: int, amount: float, title: str) -> PaymentSchema:
+        create_payment = PaymentCreate(amount=Decimal(amount),
+                                       user_id=user_id,
+                                       operation_type=OperationType.WITHDRAWAL,
+                                       status=PaymentStatus.COMPLETED,
+                                       title=title
+                                       )
+        return await self.payment_repository.add(create_payment)

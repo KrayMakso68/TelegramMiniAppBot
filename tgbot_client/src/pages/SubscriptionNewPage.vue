@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import {BackButton, MainButton, useWebAppMainButton} from "vue-tg";
+import {BackButton, MainButton, useWebAppMainButton, useWebAppHapticFeedback} from "vue-tg";
 import TgSection from "components/TgSection.vue";
 import {useRouter} from "vue-router";
 import {computed, onMounted, Ref, ref, watchEffect} from "vue";
@@ -13,6 +13,7 @@ import AnimatedBanner from "components/AnimatedBanner.vue";
 
 const router = useRouter();
 const {disableMainButton, enableMainButton} = useWebAppMainButton();
+const {notificationOccurred, impactOccurred} = useWebAppHapticFeedback();
 
 const isLoadingServers = ref(true);
 const inputValue = ref<string | null>(null);
@@ -76,8 +77,10 @@ watchEffect(() => {
       amount.value <= userBalance.value
   ) {
     enableMainButton();
+    impactOccurred('light');
   } else {
     disableMainButton();
+    impactOccurred('medium');
   }
 });
 
@@ -102,12 +105,15 @@ const addClient = async (): Promise<Record<string, string>> => {
 
 const addClientHandler = async () => {
   loadingDialog.value = true;
+  impactOccurred('light');
   let status = await addClient();
   if (status.status === 'OK') {
     loadingStatus.value = false;
+    notificationOccurred('success');
   } else {
     loadingStatus.value = false;
     loadingError.value = true;
+    notificationOccurred('error');
   }
   setTimeout(() => router.push('/'), 2000)
 };

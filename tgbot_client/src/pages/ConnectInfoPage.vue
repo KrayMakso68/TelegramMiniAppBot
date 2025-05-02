@@ -172,7 +172,7 @@ function datetimeToString(dateTime: number): string {
               name: props.name,
               serverId: props.serverId
             }
-      })"
+      });"
       text="Продлить подписку"/>
   </q-page>
 </template>
