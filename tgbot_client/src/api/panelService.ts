@@ -1,7 +1,6 @@
 import {api} from "boot/axios";
 import {ClientCreate, ClientInfo, ClientUpdate} from "src/api/types/panelTypes";
 import {HttpStatusCode} from "axios";
-import {Subscription} from "src/api/types/subscriptionTypes";
 
 export const getConnectInfoByEmail = async (serverId: number, email: string): Promise<ClientInfo | null> => {
   try {
@@ -48,3 +47,12 @@ export const updateClient = async (clientUpdate: ClientUpdate): Promise<Record<s
   }
 }
 
+export const deleteClient = async (clientId: number): Promise<Record<string, string>> => {
+  try {
+    const response = await api.post(`/panel/client/${clientId}/delete`);
+    return response.data;
+  } catch (error) {
+    console.error("Failed to add client:", error)
+    return {status: "Error"}
+  }
+}

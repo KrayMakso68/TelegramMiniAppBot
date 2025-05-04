@@ -98,7 +98,8 @@ onMounted(loadSubscriptions);
               email: subscription.email,
               serverId: subscription.serverId,
               url: subscription.url,
-              unlimited: subscription.endDate === null
+              unlimited: subscription.endDate === null,
+              isActive: subscription.isActive
             }
           }"
           v-ripple

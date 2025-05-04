@@ -35,6 +35,7 @@ const routes: RouteRecordRaw[] = [
           serverId: Number(route.query.serverId) ?? 0,
           url: route.query.url as string ?? "",
           unlimited: route.query.unlimited === 'true' ?? false,
+          isActive: route.query.isActive === 'true' ?? false
         }),
       },
       {

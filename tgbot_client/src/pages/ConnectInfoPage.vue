@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import {BackButton, MainButton} from "vue-tg";
 import {useRouter} from "vue-router";
-import {ClientInfo} from "src/api/types/panelTypes";
+import {ClientCreate, ClientInfo} from "src/api/types/panelTypes";
 import TgSection from "components/TgSection.vue";
 import TgCodeCard from "components/TgCodeCard.vue";
 import {Ref, ref} from "vue";
 import {PanelService} from "src/api";
+import AnimatedBanner from "components/AnimatedBanner.vue";
 
 
 const router = useRouter();
@@ -17,7 +18,8 @@ interface Props {
   email: string,
   serverId: number,
   url: string,
-  unlimited: boolean
+  unlimited: boolean,
+  isActive: boolean
 }
 const props = defineProps<Props>();
 
@@ -49,6 +51,33 @@ function datetimeToString(dateTime: number): string {
   }
 }
 
+const loadingDialog = ref<boolean>(false);
+const loadingStatus = ref<boolean>(true);
+const loadingError = ref<boolean>(false);
+
+const deleteClient = async (): Promise<Record<string, string>> => {
+  if (props.id) {
+    return await PanelService.addClient(data);
+  } else {
+    return {'status': 'Error'};
+  }
+}
+
+const addClientHandler = async () => {
+  loadingDialog.value = true;
+  impactOccurred('light');
+  let status = await addClient();
+  if (status.status === 'OK') {
+    loadingStatus.value = false;
+    notificationOccurred('success');
+  } else {
+    loadingStatus.value = false;
+    loadingError.value = true;
+    notificationOccurred('error');
+  }
+  setTimeout(() => router.push('/'), 2000)
+};
+
 // const importConfig = () => {
 //   if (props.connectUrl) {
 //     let encodedConfig = encodeURIComponent(props.connectUrl);
@@ -78,7 +107,7 @@ function datetimeToString(dateTime: number): string {
         <div class="q-pa-sm">
           <tg-code-card title="Connection url" :text=url />
         </div>
-<!--        <q-btn @click="importConfig">Импортировать</q-btn>-->
+        <!--        <q-btn @click="importConfig">Импортировать</q-btn>-->
       </tg-section>
 
       <tg-section>
@@ -162,6 +191,25 @@ function datetimeToString(dateTime: number): string {
           </q-card>
         </q-expansion-item>
       </tg-section>
+
+      <tg-section v-if="!props.isActive">
+        <q-item
+          dense
+          clickable
+          draggable="false"
+          class="q-py-none close-btn"
+          :to="''"
+        >
+          <q-item-section avatar>
+            <q-avatar icon='close' font-size="28px"/>
+          </q-item-section>
+
+          <q-item-section class="q-pl-sm">
+            <q-item-label>Удалить подписку</q-item-label>
+          </q-item-section>
+        </q-item>
+      </tg-section>
+
     </div>
     <MainButton
       :visible="!props.unlimited"
@@ -175,8 +223,21 @@ function datetimeToString(dateTime: number): string {
       });"
       text="Продлить подписку"/>
   </q-page>
+
+  <q-dialog
+     persistent
+     v-model="loadingDialog"
+     backdrop-filter="blur(4px)"
+   >
+     <animated-banner v-if="loadingStatus" title="Удаление подписки..." path="stickers/LoadingDuckSticker.json"/>
+     <animated-banner v-else-if="!loadingError" title="Подписка удалена!" path="stickers/OkDuckSticker.json" :loop="false"/>
+     <animated-banner v-else title="Ошибка удаления" path="stickers/NotFoundDuckSticker.json"/>
+   </q-dialog>
+
 </template>
 
 <style scoped>
-
+.close-btn {
+  color: var(--tg-destructive-text-color);
+}
 </style>
