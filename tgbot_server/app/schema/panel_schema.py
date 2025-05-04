@@ -38,3 +38,8 @@ class ClientUpdate(BaseSchema):
     server_id: int = Field(..., example=1)
     months: int = Field(..., example=1)
     price: float = Field(..., example=100.00)
+
+
+class ClientDelete(BaseSchema):
+    id: int = Field(..., example='1')
+    server_id: int = Field(..., example=1)
