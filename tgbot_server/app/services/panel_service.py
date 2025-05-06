@@ -219,82 +219,82 @@ class PanelService:
 
         return {"status": "OK"}
 
-    # @ensure_panel_session_active
-    # async def delete_client(
-    #         self,
-    #         server_id: int,
-    #         client_info: ClientDelete,
-    #         user: UserSchema,
-    #         panel_api
-    # ) -> dict[str, str]:
-    #
-    #     inbounds: list[Inbound] = await panel_api.inbound.get_list()
-    #     current_inbound: Inbound | None = None
-    #     for inbound in inbounds:
-    #         if inbound.protocol == new_client_info.protocol:
-    #             current_inbound = inbound
-    #             break
-    #     if current_inbound is None:
-    #         raise UnsupportedProtocolError(detail=f"Server does not support the {new_client_info.protocol} protocol.")
-    #
-    #     new_id = str(uuid.uuid4())
-    #     new_email = f"{new_client_info.short_name}@@{new_id.replace('-', '_')}"
-    #     expiry_date = datetime.now() + timedelta(days=30.44 * new_client_info.months)
-    #     x_time = int(expiry_date.timestamp() * 1000)
-    #
-    #     new_client = ClientSchema(
-    #         email=new_email,
-    #         enable=True,
-    #         id=new_id,
-    #         expiry_time=x_time,
-    #         flow="xtls-rprx-vision",
-    #         sub_id=user.sub_uuid,
-    #     )
-    #
-    #     if user.balance >= new_client_info.price:
-    #         await panel_api.client.add(current_inbound.id, [new_client])
-    #
-    #         server = await self.server_repository.get_by_id(server_id)
-    #         if server is None:
-    #             raise NotFoundError(detail="Server not found.")
-    #
-    #         sub_api = self.get_sub_api(server)
-    #         connects_data: list[ConnectSchema] = await sub_api.get_connects_for_user(user.sub_uuid)
-    #
-    #         new_connect = None
-    #         for connect in connects_data:
-    #             if connect.email == new_email:
-    #                 new_connect = connect
-    #                 break
-    #
-    #         subscription_create = SubscriptionCreate(
-    #             name=new_client_info.short_name,
-    #             email=new_email,
-    #             url=new_connect.connect_url,
-    #             user_id=user.id,
-    #             server_id=server_id,
-    #             end_date=expiry_date
-    #         )
-    #
-    #         new_subscription: SubscriptionSchema = await self.subscription_repository.add(subscription_create)
-    #
-    #         if new_subscription:
-    #             try:
-    #                 await self.user_service.write_off_balance(user.id, new_client_info.price)
-    #             except NotFoundError:
-    #                 raise NotFoundError(detail="User for balance write-off not found.")
-    #
-    #             await self.payment_service.create_subscription_payment(
-    #                 user.id,
-    #                 new_client_info.price,
-    #                 new_client_info.short_name
-    #             )
-    #         else:
-    #             raise InternalServerError(detail="Error adding subscription to server.")
-    #     else:
-    #         raise InsufficientBalanceError(detail="Insufficient balance in the user's account to make a purchase.")
-    #
-    #     return {"status": "OK"}
+    @ensure_panel_session_active
+    async def delete_client(
+            self,
+            server_id: int,
+            delete_client_info: ClientDelete,
+            user: UserSchema,
+            panel_api
+    ) -> dict[str, str]:
+
+        inbounds: list[Inbound] = await panel_api.inbound.get_list()
+        current_inbound: Inbound | None = None
+        for inbound in inbounds:
+            if inbound.protocol == new_client_info.protocol:
+                current_inbound = inbound
+                break
+        if current_inbound is None:
+            raise UnsupportedProtocolError(detail=f"Server does not support the {new_client_info.protocol} protocol.")
+
+        new_id = str(uuid.uuid4())
+        new_email = f"{new_client_info.short_name}@@{new_id.replace('-', '_')}"
+        expiry_date = datetime.now() + timedelta(days=30.44 * new_client_info.months)
+        x_time = int(expiry_date.timestamp() * 1000)
+
+        new_client = ClientSchema(
+            email=new_email,
+            enable=True,
+            id=new_id,
+            expiry_time=x_time,
+            flow="xtls-rprx-vision",
+            sub_id=user.sub_uuid,
+        )
+
+        if user.balance >= new_client_info.price:
+            await panel_api.client.add(current_inbound.id, [new_client])
+
+            server = await self.server_repository.get_by_id(server_id)
+            if server is None:
+                raise NotFoundError(detail="Server not found.")
+
+            sub_api = self.get_sub_api(server)
+            connects_data: list[ConnectSchema] = await sub_api.get_connects_for_user(user.sub_uuid)
+
+            new_connect = None
+            for connect in connects_data:
+                if connect.email == new_email:
+                    new_connect = connect
+                    break
+
+            subscription_create = SubscriptionCreate(
+                name=new_client_info.short_name,
+                email=new_email,
+                url=new_connect.connect_url,
+                user_id=user.id,
+                server_id=server_id,
+                end_date=expiry_date
+            )
+
+            new_subscription: SubscriptionSchema = await self.subscription_repository.add(subscription_create)
+
+            if new_subscription:
+                try:
+                    await self.user_service.write_off_balance(user.id, new_client_info.price)
+                except NotFoundError:
+                    raise NotFoundError(detail="User for balance write-off not found.")
+
+                await self.payment_service.create_subscription_payment(
+                    user.id,
+                    new_client_info.price,
+                    new_client_info.short_name
+                )
+            else:
+                raise InternalServerError(detail="Error adding subscription to server.")
+        else:
+            raise InsufficientBalanceError(detail="Insufficient balance in the user's account to make a purchase.")
+
+        return {"status": "OK"}
 
     async def update_user_subscriptions_from_server(
             self, user: UserSchema,

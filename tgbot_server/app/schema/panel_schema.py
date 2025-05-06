@@ -43,3 +43,4 @@ class ClientUpdate(BaseSchema):
 class ClientDelete(BaseSchema):
     id: int = Field(..., example='1')
     server_id: int = Field(..., example=1)
+    protocol: str = Field(..., example='vless, vmess, etc...')

@@ -1,5 +1,5 @@
 import {api} from "boot/axios";
-import {ClientCreate, ClientInfo, ClientUpdate} from "src/api/types/panelTypes";
+import {ClientCreate, ClientDelete, ClientInfo, ClientUpdate} from "src/api/types/panelTypes";
 import {HttpStatusCode} from "axios";
 
 export const getConnectInfoByEmail = async (serverId: number, email: string): Promise<ClientInfo | null> => {
@@ -29,7 +29,8 @@ export const updateUserSubscriptions = async (): Promise<Record<string, string>>
 
 export const addClient = async (clientCreate: ClientCreate): Promise<Record<string, string>> => {
   try {
-    const response = await api.post(`/panel/client/add`, clientCreate);
+    let serverId = clientCreate.serverId;
+    const response = await api.post(`/panel/${serverId}/client/add`, clientCreate);
     return response.data;
   } catch (error) {
     console.error("Failed to add client:", error)
@@ -47,12 +48,13 @@ export const updateClient = async (clientUpdate: ClientUpdate): Promise<Record<s
   }
 }
 
-export const deleteClient = async (clientId: number): Promise<Record<string, string>> => {
+export const deleteClient = async (clientDelete: ClientDelete): Promise<Record<string, string>> => {
   try {
-    const response = await api.post(`/panel/client/${clientId}/delete`);
+    let serverId = clientDelete.serverId;
+    const response = await api.post(`/panel/${serverId}/client/delete`, clientDelete);
     return response.data;
   } catch (error) {
-    console.error("Failed to add client:", error)
+    console.error("Failed to delete client:", error)
     return {status: "Error"}
   }
 }

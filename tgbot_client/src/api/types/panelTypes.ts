@@ -38,3 +38,9 @@ export interface ClientUpdate {
   months: number;
   price: number;
 }
+
+export interface ClientDelete {
+  id: number;
+  serverId: number;
+  protocol: string;
+}

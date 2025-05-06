@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.core.dependencies import get_panel_service, get_current_active_user
-from app.schema.panel_schema import ClientSchema, ClientCreate, ClientUpdate
+from app.schema.panel_schema import ClientSchema, ClientCreate, ClientUpdate, ClientDelete
 from app.schema.subscription_schema import SubscriptionSchema
 from app.schema.user_schema import UserSchema
 from app.services.panel_service import PanelService
@@ -38,19 +38,31 @@ async def update_clients(
     return await service.update_user_subscriptions_from_server(user, all_servers=True)
 
 
-@router.post("/client/add")
+@router.post("/{server_id}/client/add")
 async def add_client(
+        server_id: int,
         new_client_info: ClientCreate,
         user: UserSchema = Depends(get_current_active_user),
         service: PanelService = Depends(get_panel_service)
 ) -> dict[str, str]:
-    return await service.add_client(new_client_info.server_id, new_client_info, user)
+    return await service.add_client(server_id, new_client_info, user)
 
 
-@router.post("/client/update")
+@router.post("/{server_id}/client/update")
 async def update_client(
+        server_id: int,
         update_client_info: ClientUpdate,
         user: UserSchema = Depends(get_current_active_user),
         service: PanelService = Depends(get_panel_service)
 ) -> dict[str, str]:
-    return await service.update_client(update_client_info.server_id, update_client_info, user)
+    return await service.update_client(server_id, update_client_info, user)
+
+
+@router.post("/{server_id}/client/delete")
+async def delete_client(
+        server_id: int,
+        delete_client_info: ClientDelete,
+        user: UserSchema = Depends(get_current_active_user),
+        service: PanelService = Depends(get_panel_service)
+) -> dict[str, str]:
+    return await service.update_client(server_id, delete_client_info, user)

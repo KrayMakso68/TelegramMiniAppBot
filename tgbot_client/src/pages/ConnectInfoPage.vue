@@ -1,15 +1,17 @@
 <script setup lang="ts">
-import {BackButton, MainButton} from "vue-tg";
+import {BackButton, MainButton, useWebAppHapticFeedback} from "vue-tg";
 import {useRouter} from "vue-router";
-import {ClientCreate, ClientInfo} from "src/api/types/panelTypes";
+import {ClientDelete, ClientInfo} from "src/api/types/panelTypes";
 import TgSection from "components/TgSection.vue";
 import TgCodeCard from "components/TgCodeCard.vue";
 import {Ref, ref} from "vue";
 import {PanelService} from "src/api";
 import AnimatedBanner from "components/AnimatedBanner.vue";
+import TgInlineBtn from "components/TgInlineBtn.vue";
 
 
 const router = useRouter();
+const {notificationOccurred, impactOccurred} = useWebAppHapticFeedback();
 // const {openLink} = useWebAppNavigation();
 
 interface Props {
@@ -51,22 +53,34 @@ function datetimeToString(dateTime: number): string {
   }
 }
 
-const loadingDialog = ref<boolean>(false);
-const loadingStatus = ref<boolean>(true);
+const showDialog = ref<boolean>(false);
+const confirmDialog = ref<boolean>(true);
+const loadingStatus = ref<boolean>(false);
 const loadingError = ref<boolean>(false);
 
 const deleteClient = async (): Promise<Record<string, string>> => {
   if (props.id) {
-    return await PanelService.addClient(data);
+    let data: ClientDelete = {
+      id: props.id,
+      serverId: props.serverId,
+      protocol: "vless",
+    }
+    return await PanelService.deleteClient(data);
   } else {
     return {'status': 'Error'};
   }
 }
 
-const addClientHandler = async () => {
-  loadingDialog.value = true;
+const openDialog = () => {
+  showDialog.value = true;
   impactOccurred('light');
-  let status = await addClient();
+}
+
+const deleteClientHandler = async () => {
+  confirmDialog.value = false;
+  loadingStatus.value = true;
+  impactOccurred('light');
+  let status = await deleteClient();
   if (status.status === 'OK') {
     loadingStatus.value = false;
     notificationOccurred('success');
@@ -198,7 +212,7 @@ const addClientHandler = async () => {
           clickable
           draggable="false"
           class="q-py-none close-btn"
-          :to="''"
+          @click="openDialog"
         >
           <q-item-section avatar>
             <q-avatar icon='close' font-size="28px"/>
@@ -225,14 +239,21 @@ const addClientHandler = async () => {
   </q-page>
 
   <q-dialog
-     persistent
-     v-model="loadingDialog"
-     backdrop-filter="blur(4px)"
-   >
-     <animated-banner v-if="loadingStatus" title="Удаление подписки..." path="stickers/LoadingDuckSticker.json"/>
-     <animated-banner v-else-if="!loadingError" title="Подписка удалена!" path="stickers/OkDuckSticker.json" :loop="false"/>
-     <animated-banner v-else title="Ошибка удаления" path="stickers/NotFoundDuckSticker.json"/>
-   </q-dialog>
+    persistent
+    v-model="showDialog"
+    backdrop-filter="blur(5px)"
+  >
+    <div v-if="confirmDialog">
+      <animated-banner title="Удалить подписку?" path="stickers/DeleteDuckSticker.json"/>
+      <div class="row justify-around">
+        <tg-inline-btn label="Отмена" icon="close" class="col" v-close-popup/>
+        <tg-inline-btn label="Удалить" icon="delete" class="col" @click="deleteClientHandler"/>
+      </div>
+    </div>
+<!--    <animated-banner v-if="!confirmDialog && loadingStatus" title="Удаление подписки..." path="stickers/LoadingDuckSticker.json"/>-->
+<!--    <animated-banner v-else-if="!confirmDialog && !loadingError" title="Подписка удалена!" path="stickers/OkDuckSticker.json" :loop="false"/>-->
+<!--    <animated-banner v-else title="Ошибка удаления" path="stickers/NotFoundDuckSticker.json"/>-->
+  </q-dialog>
 
 </template>
 
