@@ -6,15 +6,15 @@ from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, MenuButtonWebApp
 
-from config import TOKEN, WEBAPP_URL
+from config import config
 
-bot = Bot(token=TOKEN)
+bot = Bot(token=config.TOKEN)
 dp = Dispatcher()
 
 
 async def on_startup(bot: Bot):
     await bot.set_chat_menu_button(
-        menu_button=MenuButtonWebApp(text="Запустить 🚀", web_app=WebAppInfo(url=WEBAPP_URL))
+        menu_button=MenuButtonWebApp(text="Запустить 🚀", web_app=WebAppInfo(url=config.WEBAPP_URL))
     )
 
 
@@ -25,7 +25,7 @@ async def command_start(message: Message):
             [
                 InlineKeyboardButton(
                     text="Запустить приложение 🚀",
-                    web_app=WebAppInfo(url=WEBAPP_URL),
+                    web_app=WebAppInfo(url=config.WEBAPP_URL),
                 )
             ]
         ]

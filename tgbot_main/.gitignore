@@ -1,6 +1,6 @@
 __pycache__
 *.db
-config.py
+bot/config.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
