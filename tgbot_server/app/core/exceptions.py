@@ -69,3 +69,7 @@ class InsufficientBalanceError(HTTPException):
 class InvalidSubscriptionTypeError(HTTPException):
     def __init__(self, detail: Any = None, headers: Optional[Dict[str, Any]] = None) -> None:
         super().__init__(status.HTTP_403_FORBIDDEN, detail, headers)
+
+class NotSubscriptionOwnerError(HTTPException):
+    def __init__(self, detail: Any = None, headers: Optional[Dict[str, Any]] = None) -> None:
+        super().__init__(status.HTTP_403_FORBIDDEN, detail, headers)

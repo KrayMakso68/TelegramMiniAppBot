@@ -65,4 +65,4 @@ async def delete_client(
         user: UserSchema = Depends(get_current_active_user),
         service: PanelService = Depends(get_panel_service)
 ) -> dict[str, str]:
-    return await service.update_client(server_id, delete_client_info, user)
+    return await service.delete_client(server_id, delete_client_info, user)
