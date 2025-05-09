@@ -50,6 +50,19 @@ const routes: RouteRecordRaw[] = [
           name: route.query.name as string ?? "",
           serverId: Number(route.query.serverId) ?? 0
         }),
+      },
+      {
+        path: 'help',
+        children: [
+          {
+            path: 'mobile',
+            component: () => import('pages/help/MobileConnect.vue')
+          },
+          {
+            path: 'desktop',
+            component: () => import('pages/help/DesktopConnect.vue')
+          },
+        ]
       }
     ],
   },
