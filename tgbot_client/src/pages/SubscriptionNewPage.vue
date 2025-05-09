@@ -30,7 +30,7 @@ const loadBalance = async () => {
 const loadServerOptions = async () => {
   serverOptions.value = await ServerService.getAllServersInfo()
   if (serverOptions.value.length === 0) {
-    serverOptions.value = [{id: 1, label:"Не найдено", countryCode: "...", monthPrice: 0, isActive: false}]
+    serverOptions.value = [{id: 0, label:"Не найдено", countryCode: "...", monthPrice: 0, isActive: false}]
   }
   isLoadingServers.value = false;
 };
@@ -72,6 +72,7 @@ const inputErrorMessage = computed(() => {
 watchEffect(() => {
   if (inputValue.value !== null &&
       serverValue.value !== null &&
+      serverValue.value.id &&
       !hasInputError.value &&
       monthValue.value &&
       amount.value <= userBalance.value

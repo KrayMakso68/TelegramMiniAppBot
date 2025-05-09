@@ -56,13 +56,13 @@ onMounted(loadSubscriptions);
           <q-skeleton type="QBadge"/>
         </q-item-section>
 
-        <q-item-section side top>
-          <q-avatar icon='navigate_next' class="tg-subtitle-text"/>
-        </q-item-section>
+<!--        <q-item-section side top>-->
+<!--          <q-avatar icon='navigate_next' class="tg-subtitle-text"/>-->
+<!--        </q-item-section>-->
       </q-item>
       <q-separator v-if="index < 3" inset="item" class="tg-separator"/>
     </template>
-    <div class="q-pt-sm">
+    <div class="q-py-sm">
       <q-item
         v-for="index in 2" :key="index"
         v-ripple
@@ -128,9 +128,9 @@ onMounted(loadSubscriptions);
             </template>
           </q-item-section>
 
-          <q-item-section side>
-            <q-avatar icon='navigate_next' class="tg-subtitle-text"/>
-          </q-item-section>
+<!--          <q-item-section side>-->
+<!--            <q-avatar icon='navigate_next' class="tg-subtitle-text"/>-->
+<!--          </q-item-section>-->
         </q-item>
         <q-separator v-if="index < subscriptions?.length" inset="item" class="tg-separator" />
       </template>

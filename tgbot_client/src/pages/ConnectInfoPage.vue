@@ -80,7 +80,15 @@ const deleteClientHandler = async () => {
   confirmDialog.value = false;
   loadingStatus.value = true;
   impactOccurred('light');
-  let status = await deleteClient();
+
+  let data: ClientDelete = {
+    id: props.id,
+    serverId: props.serverId,
+    protocol: 'vless',
+  };
+
+  let status = await PanelService.deleteClient(data);
+
   if (status.status === 'OK') {
     loadingStatus.value = false;
     notificationOccurred('success');
@@ -241,7 +249,7 @@ const deleteClientHandler = async () => {
   <q-dialog
     persistent
     v-model="showDialog"
-    backdrop-filter="blur(5px)"
+    backdrop-filter="blur(4px)"
   >
     <div v-if="confirmDialog">
       <animated-banner title="Удалить подписку?" path="stickers/DeleteDuckSticker.json"/>
@@ -250,9 +258,12 @@ const deleteClientHandler = async () => {
         <tg-inline-btn label="Удалить" icon="delete" class="col" @click="deleteClientHandler"/>
       </div>
     </div>
-<!--    <animated-banner v-if="!confirmDialog && loadingStatus" title="Удаление подписки..." path="stickers/LoadingDuckSticker.json"/>-->
-<!--    <animated-banner v-else-if="!confirmDialog && !loadingError" title="Подписка удалена!" path="stickers/OkDuckSticker.json" :loop="false"/>-->
-<!--    <animated-banner v-else title="Ошибка удаления" path="stickers/NotFoundDuckSticker.json"/>-->
+    <template v-else>
+      <animated-banner v-if="loadingStatus" title="Удаление подписки..." path="stickers/LoadingDuckSticker.json"/>
+      <animated-banner v-else-if="!loadingError" title="Подписка удалена!" path="stickers/OkDuckSticker.json" :loop="false"/>
+      <animated-banner v-else title="Ошибка удаления" path="stickers/NotFoundDuckSticker.json"/>
+    </template>
+
   </q-dialog>
 
 </template>
