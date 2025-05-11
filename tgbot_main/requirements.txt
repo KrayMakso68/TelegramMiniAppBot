@@ -1,3 +1,7 @@
 aiogram
 asyncio
 python-dotenv
+asyncpg
+SQLAlchemy
+pydantic
+aioschedule

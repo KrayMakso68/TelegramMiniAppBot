@@ -40,7 +40,8 @@ export const addClient = async (clientCreate: ClientCreate): Promise<Record<stri
 
 export const updateClient = async (clientUpdate: ClientUpdate): Promise<Record<string, string>> => {
   try {
-    const response = await api.post(`/panel/client/update`, clientUpdate);
+    let serverId = clientUpdate.serverId;
+    const response = await api.post(`/panel/${serverId}/client/update`, clientUpdate);
     return response.data;
   } catch (error) {
     console.error("Failed to update client:", error)

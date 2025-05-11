@@ -17,6 +17,10 @@ class Subscription(BaseModel):
     end_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
 
+    notified_3_days: Mapped[bool] = mapped_column(Boolean, default=False)
+    notified_1_day: Mapped[bool] = mapped_column(Boolean, default=False)
+    notified_expired: Mapped[bool] = mapped_column(Boolean, default=False)
+
     server_rel = relationship("Server", back_populates="subscriptions")
     user_rel = relationship("User", back_populates="subscriptions")
 

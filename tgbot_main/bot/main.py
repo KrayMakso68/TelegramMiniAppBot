@@ -2,14 +2,10 @@ import asyncio
 import logging
 
 from aiogram import Bot, Dispatcher
-from aiogram.enums import ParseMode
-from aiogram.filters import CommandStart
-from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, WebAppInfo, MenuButtonWebApp
+from aiogram.types import WebAppInfo, MenuButtonWebApp
 
+from bot.services.scheduler import Scheduler
 from config import config
-
-bot = Bot(token=config.TOKEN)
-dp = Dispatcher()
 
 
 async def on_startup(bot: Bot):
@@ -18,33 +14,32 @@ async def on_startup(bot: Bot):
     )
 
 
-@dp.message(CommandStart())
-async def command_start(message: Message):
-    markup = InlineKeyboardMarkup(
-        inline_keyboard=[
-            [
-                InlineKeyboardButton(
-                    text="Запустить приложение 🚀",
-                    web_app=WebAppInfo(url=config.WEBAPP_URL),
-                )
-            ]
-        ]
-    )
-    await message.answer(text="<b>Привет!</b>\n"
-                              "Запускай приложение для погружения в интернет!",
-                         reply_markup=markup,
-                         parse_mode=ParseMode.HTML)
-
-
 async def main():
-    dp.startup.register(on_startup)
-    await dp.start_polling(bot)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+
+    bot = Bot(token=config.TOKEN)
+    dp = Dispatcher()
+
+    from bot.handlers import commands
+    dp.include_router(commands.router)
+
+    try:
+        dp.startup.register(on_startup)
+        scheduler = Scheduler(bot)
+        asyncio.create_task(scheduler.start())
+
+        await dp.start_polling(bot)
+    finally:
+        await scheduler.stop()
+        await bot.session.close()
 
 
 if __name__ == '__main__':
-    print('Run')
-    logging.basicConfig(level=logging.INFO)
     try:
         asyncio.run(main())
+        print('Run')
     except KeyboardInterrupt:
         print('Exit')
