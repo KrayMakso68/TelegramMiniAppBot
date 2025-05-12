@@ -29,7 +29,6 @@ class SubscriptionChecker:
         except Exception as e:
             logger.error(f"Ошибка при проверке подписок: {e}", exc_info=True)
 
-
     async def _process_single_subscription(self, sub: SubscriptionSchema):
         try:
             if not sub.end_date:
@@ -45,7 +44,6 @@ class SubscriptionChecker:
 
         except Exception as e:
             logger.error(f"Ошибка обработки подписки {sub.id}: {e}", exc_info=True)
-
 
     async def _check_reminders(self, sub: SubscriptionSchema, remaining: timedelta):
         if remaining <= timedelta(days=3) and not sub.notified_3_days:
@@ -88,28 +86,28 @@ class SubscriptionChecker:
     def _build_reminder_message(self, sub: SubscriptionSchema, days_left: int) -> str:
         return (
             "🔔 <b><u>УВЕДОМЛЕНИЕ</u></b> 🔔\n\n"
-            
-            f"⚡️ <i>Подключение:</i> <code>{sub.name}</code> ⚡️\n\n"
-            
+
+            f"⚡️ <i>Подключение:  </i> <code>{sub.name}</code> ⚡️\n\n"
+
             "🕒 <b>Истекает через:</b> \n"
             "┏━━━━━━━━━━━━━┓\n"
-            f"┃  <b>{days_left} {self._days_text(days_left)}!</b> 🚨                                  ┃\n"
+            f"              <b>{days_left} {self._days_text(days_left)}!</b> 🚨\n"
             "┗━━━━━━━━━━━━━┛\n\n"
-            
+
             "🔄 <u>Продлите сейчас</u>"
         )
 
     def _build_expired_message(self, sub: SubscriptionSchema) -> str:
         return (
-             "🔔 <b><u>СРОЧНОЕ УВЕДОМЛЕНИЕ</u></b> 🔔\n\n"
-    
+            "🔔 <b><u>СРОЧНОЕ УВЕДОМЛЕНИЕ</u></b> 🔔\n\n"
+
             f"⚡ <i>Подключение:</i> <code>{sub.name}</code> ⚡\n\n"
-    
+
             "🕒 <b>Статус подписки:</b>\n"
             "┏━━━━━━━━━━━━━┓\n"
-            "┃   <b>ИСТЕКЛО</b> 🚫                                  ┃\n"
+            "              <b>ИСТЕКЛО</b> 🚫\n"
             "┗━━━━━━━━━━━━━┛\n\n"
-    
+
             "⚠️ <b>Доступ приостановлен!</b>\n"
             "🔄 <u>Продлите сейчас</u> "
         )

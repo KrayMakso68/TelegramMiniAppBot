@@ -105,7 +105,7 @@ class PanelService:
 
         new_id = str(uuid.uuid4())
         new_email = f"{new_client_info.short_name}@@{new_id.replace('-', '_')}"
-        expiry_date = datetime.now() + timedelta(days=30.44 * new_client_info.months)
+        expiry_date = datetime.now(UTC) + timedelta(days=30.44 * new_client_info.months)
         x_time = int(expiry_date.timestamp() * 1000)
 
         new_client = ClientSchema(
@@ -184,7 +184,7 @@ class PanelService:
         if subscription.end_date and subscription.end_date.replace(tzinfo=UTC) > datetime.now(UTC):
             new_end_date = subscription.end_date + timedelta(days=30.44 * update_client_info.months)
         else:
-            new_end_date = datetime.now() + timedelta(days=30.44 * update_client_info.months)
+            new_end_date = datetime.now(UTC) + timedelta(days=30.44 * update_client_info.months)
         new_x_time = int(new_end_date.timestamp() * 1000)
 
         client: ClientSchema = await self.get_client_info_by_email(server_id, subscription.email)
@@ -247,7 +247,8 @@ class PanelService:
                 current_inbound = inbound
                 break
         if current_inbound is None:
-            raise UnsupportedProtocolError(detail=f"Server does not support the {delete_client_info.protocol} protocol.")
+            raise UnsupportedProtocolError(
+                detail=f"Server does not support the {delete_client_info.protocol} protocol.")
 
         client_uuid: str = subscription.email.split('@@')[1].replace("_", "-")
 
@@ -256,7 +257,6 @@ class PanelService:
         delete_result: bool = await self.subscription_repository.delete(delete_client_info.id)
 
         return {"status": "OK"} if delete_result else {"status": "Error"}
-
 
     async def update_user_subscriptions_from_server(
             self,
