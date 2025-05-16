@@ -1,5 +1,5 @@
 from fastapi import Depends
-from py3xui import AsyncApi as PanelAsyncApi
+from py3xui import AsyncApi as PanelAsyncApi, AsyncApi
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -10,10 +10,11 @@ from app.repository.payment_repository import PaymentRepository
 from app.repository.server_repository import ServerRepository
 from app.repository.subscription_repository import SubscriptionRepository
 from app.schema.auth_schema import TokenData
+from app.schema.server_schema import ServerSchema
 from app.schema.user_schema import UserSchema
 from app.services.auth_service import AuthService
 from app.repository.user_repository import UserRepository
-from app.services.panel_service import PanelService
+from app.services.panel_service import PanelService, PanelSessionManager
 from app.services.payment_service import PaymentService
 from app.services.server_service import ServerService
 from app.services.subscription_service import SubscriptionService
@@ -90,28 +91,33 @@ def get_payment_service(
 
 # _________________________________________________________________________________________________________
 # panel
-def get_panel_api() -> PanelAsyncApi:
-    return PanelAsyncApi(
-        settings.PANEL_HOST,
-        settings.PANEL_USERNAME,
-        settings.PANEL_PASSWORD,
+# def get_panel_api() -> PanelAsyncApi:
+#     return PanelAsyncApi(
+#         settings.PANEL_HOST,
+#         settings.PANEL_USERNAME,
+#         settings.PANEL_PASSWORD,
+#         use_tls_verify=settings.TLS_VERIFY
+#     )
+#
+#
+# def get_sub_api() -> PanelSubscriptionApi:
+#     return PanelSubscriptionApi(
+#         settings.SUBSCRIPTION_API_PORT,
+#         settings.SUBSCRIPTION_API_PATH,
+#         use_tls_verify=settings.TLS_VERIFY
+#     )
+
+def get_panel_api(server: ServerSchema) -> AsyncApi:
+    return AsyncApi(
+        server.panel_url,
+        server.username,
+        server.password_enc,
         use_tls_verify=settings.TLS_VERIFY
     )
 
 
-def get_sub_api() -> PanelSubscriptionApi:
-    return PanelSubscriptionApi(
-        settings.SUBSCRIPTION_API_PORT,
-        settings.SUBSCRIPTION_API_PATH,
-        use_tls_verify=settings.TLS_VERIFY
-    )
+shared_session_manager = PanelSessionManager(get_panel_api_func=get_panel_api)
 
 
-def get_panel_service(
-        subscription_repository: SubscriptionRepository = Depends(get_subscription_repository),
-        server_repository: ServerRepository = Depends(get_server_repository),
-        user_service: UserService = Depends(get_user_service),
-        payment_service: PaymentService = Depends(get_payment_service)
-) -> PanelService:
-    return PanelService(subscription_repository, server_repository, user_service, payment_service)
-
+def get_panel_service() -> PanelService:
+    return PanelService(shared_session_manager)

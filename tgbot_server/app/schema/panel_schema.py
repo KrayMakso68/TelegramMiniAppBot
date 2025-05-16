@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from py3xui import Client
 from pydantic import Field
 
@@ -25,7 +27,7 @@ class ClientSchema(Client, BaseSchema):
     """
 
 
-class ClientCreate(BaseSchema):
+class ClientCreateRequest(BaseSchema):
     short_name: str = Field(..., example='connect1 (max 10 characters)')
     protocol: str = Field(..., example='vless, vmess, etc...')
     server_id: int = Field(..., example=1)
@@ -33,14 +35,34 @@ class ClientCreate(BaseSchema):
     price: float = Field(..., example=100.00)
 
 
-class ClientUpdate(BaseSchema):
-    id: int = Field(..., example='1')
+class ClientCreateDTO(BaseSchema):
+    short_name: str
+    protocol: str
+    months: int
+
+
+class ClientUpdateRequest(BaseSchema):
+    # id: int = Field(..., example='1')
+    sub_id: int = Field(..., example='1')
+    client_email: str = Field(..., example='<EMAIL>')
     server_id: int = Field(..., example=1)
     months: int = Field(..., example=1)
     price: float = Field(..., example=100.00)
 
 
-class ClientDelete(BaseSchema):
-    id: int = Field(..., example='1')
+class ClientUpdateDTO(BaseSchema):
+    client_email: str
+    months: int
+    end_date: datetime | None = None
+
+
+class ClientDeleteRequest(BaseSchema):
+    sub_id: int = Field(..., example='1')
+    client_email: str = Field(..., example='<EMAIL>')
     server_id: int = Field(..., example=1)
     protocol: str = Field(..., example='vless, vmess, etc...')
+
+
+class ClientDeleteDTO(BaseSchema):
+    client_email: str
+    protocol: str

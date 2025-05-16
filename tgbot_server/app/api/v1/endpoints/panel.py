@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.core.dependencies import get_panel_service, get_current_active_user
-from app.schema.panel_schema import ClientSchema, ClientCreate, ClientUpdate, ClientDelete
+from app.schema.panel_schema import ClientSchema, ClientCreateRequest, ClientUpdateRequest, ClientDeleteRequest
 from app.schema.subscription_schema import SubscriptionSchema
 from app.schema.user_schema import UserSchema
 from app.services.panel_service import PanelService
@@ -41,7 +41,7 @@ async def update_clients(
 @router.post("/{server_id}/client/add")
 async def add_client(
         server_id: int,
-        new_client_info: ClientCreate,
+        new_client_info: ClientCreateRequest,
         user: UserSchema = Depends(get_current_active_user),
         service: PanelService = Depends(get_panel_service)
 ) -> dict[str, str]:
@@ -51,7 +51,7 @@ async def add_client(
 @router.post("/{server_id}/client/update")
 async def update_client(
         server_id: int,
-        update_client_info: ClientUpdate,
+        update_client_info: ClientUpdateRequest,
         user: UserSchema = Depends(get_current_active_user),
         service: PanelService = Depends(get_panel_service)
 ) -> dict[str, str]:
@@ -61,7 +61,7 @@ async def update_client(
 @router.post("/{server_id}/client/delete")
 async def delete_client(
         server_id: int,
-        delete_client_info: ClientDelete,
+        delete_client_info: ClientDeleteRequest,
         user: UserSchema = Depends(get_current_active_user),
         service: PanelService = Depends(get_panel_service)
 ) -> dict[str, str]:
