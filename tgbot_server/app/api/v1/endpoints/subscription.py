@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from app.core.dependencies import get_subscription_service, get_current_active_user
+from app.api.dependencies import get_subscription_service, get_current_active_user
 from app.schema.subscription_schema import SubscriptionSchema
 from app.schema.user_schema import UserSchema
 from app.services.subscription_service import SubscriptionService

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.schema.auth_schema import TokenInfo, InitAuthData
-from app.core.dependencies import get_auth_service
+from app.api.dependencies import get_auth_service
 from app.services.auth_service import AuthService
 
 router = APIRouter(

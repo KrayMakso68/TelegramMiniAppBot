@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.exceptions import DBError, DuplicatedError
 from app.model import Payment
 from app.model.payment_model import PaymentOptions
-from app.repository.interfaces import IPaymentRepository
+from app.repositories.interfaces import IPaymentRepository
 from app.schema.payment_schema import PaymentCreate, PaymentSchema, PaymentUpdate, PaymentOptionSchema
 
 

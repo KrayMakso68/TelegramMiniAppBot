@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends
 from fastapi.responses import JSONResponse
 
-from app.core.dependencies import get_current_active_user
-from app.core.dependencies import get_user_service
+from app.api.dependencies import get_current_active_user
+from app.api.dependencies import get_user_service
 from app.schema.user_schema import UserSchema
 from app.services.user_service import UserService
 

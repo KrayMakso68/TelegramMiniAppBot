@@ -2,7 +2,7 @@ from datetime import datetime
 
 from fastapi import APIRouter, Depends, Form
 
-from app.core.dependencies import get_current_active_user, get_payment_service
+from app.api.dependencies import get_current_active_user, get_payment_service
 from app.schema.payment_schema import PaymentRequest, PaymentSchema, YooMoneyData, PaymentOptionSchema
 from app.schema.user_schema import UserSchema
 from app.services.payment_service import PaymentService

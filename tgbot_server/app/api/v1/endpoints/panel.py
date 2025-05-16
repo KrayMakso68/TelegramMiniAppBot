@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Depends
 
-from app.core.dependencies import get_panel_service, get_current_active_user
+from app.api.dependencies import get_panel_service, get_current_active_user
 from app.schema.panel_schema import ClientSchema, ClientCreateRequest, ClientUpdateRequest, ClientDeleteRequest
-from app.schema.subscription_schema import SubscriptionSchema
 from app.schema.user_schema import UserSchema
 from app.services.panel_service import PanelService
 

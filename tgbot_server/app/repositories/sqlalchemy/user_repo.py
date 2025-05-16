@@ -4,7 +4,7 @@ from sqlalchemy import select, Result
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError, DatabaseError, NoResultFound
 
-from app.repository.interfaces import IUserRepository
+from app.repositories.interfaces import IUserRepository
 from app.core.exceptions import NotFoundError, DuplicatedError, DBError
 from app.model.user_model import User
 from app.schema.user_schema import UserCreate, UserSchema
