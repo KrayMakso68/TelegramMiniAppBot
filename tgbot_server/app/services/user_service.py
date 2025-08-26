@@ -1,5 +1,5 @@
 from app.core.exceptions import NotFoundError
-from app.repository.interfaces import IUserRepository
+from app.repositories.interfaces import IUserRepository
 from app.core.config import settings
 from app.utils.telegram_api import TelegramApi
 

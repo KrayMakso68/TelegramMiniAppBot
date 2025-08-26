@@ -10,7 +10,7 @@ from py3xui import AsyncApi, Inbound
 from fastapi import status, HTTPException
 
 from app.core.config import settings
-from app.repository.interfaces import ISubscriptionRepository, IServerRepository
+from app.repositories.interfaces import ISubscriptionRepository, IServerRepository
 from app.schema.connect_schema import ConnectSchema
 from app.schema.panel_schema import ClientSchema, ClientCreateRequest, ClientUpdateRequest, ClientDeleteRequest, \
     ClientCreateDTO, ClientUpdateDTO, ClientDeleteDTO
@@ -20,6 +20,7 @@ from app.schema.server_schema import ServerSchema
 from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema, SubscriptionUpdate
 from app.schema.user_schema import UserSchema
 from app.services.payment_service import PaymentService
+from app.services.server_service import ServerService
 from app.services.user_service import UserService
 from app.utils.panel_subscription_api import PanelSubscriptionApi
 
@@ -394,10 +395,18 @@ class PanelSessionManager:
 #         )
 
 class PanelService:
-    def __init__(self, session_manager: PanelSessionManager):
+    def __init__(
+            self,
+            session_manager: PanelSessionManager,
+            server_repo: IServerRepository,
+    ):
         self.session_manager = session_manager
+        self.server_repo = server_repo
 
-    async def get_client_info_by_id(self, server: ServerSchema, client_uuid: str) -> list[ClientSchema]:
+    async def get_client_info_by_id(self, server_id: int, client_uuid: str) -> list[ClientSchema]:
+
+        server: ServerSchema = await self.server_repo.get_by_id(server_id)
+
         async with self.session_manager.get_session(server) as panel_api:
             response: list[ClientSchema] = await panel_api.client.get_traffic_by_id(client_uuid)
 
@@ -406,7 +415,10 @@ class PanelService:
 
         return response
 
-    async def get_client_info_by_email(self, server: ServerSchema, client_email: str) -> ClientSchema:
+    async def get_client_info_by_email(self, server_id: int, client_email: str) -> ClientSchema:
+
+        server: ServerSchema = await self.server_repo.get_by_id(server_id)
+
         async with self.session_manager.get_session(server) as panel_api:
             response: ClientSchema | None = await panel_api.client.get_by_email(client_email)
 
@@ -417,10 +429,12 @@ class PanelService:
 
     async def add_client(
             self,
-            server: ServerSchema,
+            server_id: int,
             user: UserSchema,
             data: ClientCreateDTO
     ) -> ConnectSchema:
+
+        server: ServerSchema = await self.server_repo.get_by_id(server_id)
 
         async with self.session_manager.get_session(server) as panel_api:
             inbound = await self._find_supported_inbound(panel_api, data.protocol)
@@ -433,10 +447,12 @@ class PanelService:
 
     async def update_client(
             self,
-            server: ServerSchema,
-            data: ClientUpdateDTO,
-            user: UserSchema
+            server_id: int,
+            user: UserSchema,
+            data: ClientUpdateDTO
     ) -> ConnectSchema:
+
+        server: ServerSchema = await self.server_repo.get_by_id(server_id)
 
         # subscription: SubscriptionSchema | None = await self.subscription_repository.get_by_id(update_client_info.id)
         # if subscription is None:
@@ -462,7 +478,7 @@ class PanelService:
 
         new_x_time = self._calculate_x_time(new_end_date)
 
-        client: ClientSchema = await self.get_client_info_by_email(server, data.client_email)
+        client: ClientSchema = await self.get_client_info_by_email(server.id, data.client_email)
         client.enable = True
         client.expiry_time = new_x_time
         client.id = connect.uuid
@@ -501,10 +517,12 @@ class PanelService:
 
     async def delete_client(
             self,
-            server: ServerSchema,
-            data: ClientDeleteDTO,
-            user: UserSchema
+            server_id: int,
+            user: UserSchema,
+            data: ClientDeleteDTO
     ) -> None:
+
+        server: ServerSchema = await self.server_repo.get_by_id(server_id)
 
         # subscription: SubscriptionSchema | None = await self.subscription_repository.get_by_id(delete_client_info.id)
         # if subscription is None:

@@ -1,9 +1,12 @@
 from fastapi import APIRouter, Depends
 
-from app.api.dependencies import get_panel_service, get_current_active_user
-from app.schema.panel_schema import ClientSchema, ClientCreateRequest, ClientUpdateRequest, ClientDeleteRequest
+from app.api.dependencies import get_panel_service, get_current_active_user, get_subscription_service
+from app.schema.connect_schema import ConnectSchema
+from app.schema.panel_schema import ClientSchema, ClientCreateRequest, ClientUpdateRequest, ClientDeleteRequest, \
+    ClientCreateDTO, ClientUpdateDTO, ClientDeleteDTO
 from app.schema.user_schema import UserSchema
 from app.services.panel_service import PanelService
+from app.services.subscription_service import SubscriptionService
 
 router = APIRouter(
     prefix="/panel",
@@ -38,30 +41,46 @@ async def update_clients(
 
 
 @router.post("/{server_id}/client/add")
-async def add_client(
+async def add_client_and_check(
         server_id: int,
         new_client_info: ClientCreateRequest,
         user: UserSchema = Depends(get_current_active_user),
         service: PanelService = Depends(get_panel_service)
 ) -> dict[str, str]:
-    return await service.add_client(server_id, new_client_info, user)
+
+    data = ClientCreateDTO.model_validate(new_client_info, from_attributes=True)
+    connect: ConnectSchema = await service.add_client(server_id, user, data)
+
+    if connect:
+        return {"status": "OK"}
 
 
 @router.post("/{server_id}/client/update")
-async def update_client(
+async def update_client_and_check(
         server_id: int,
         update_client_info: ClientUpdateRequest,
         user: UserSchema = Depends(get_current_active_user),
         service: PanelService = Depends(get_panel_service)
 ) -> dict[str, str]:
-    return await service.update_client(server_id, update_client_info, user)
+
+    data = ClientUpdateDTO.model_validate(update_client_info, from_attributes=True)
+    connect = await service.update_client(server_id, user, data)
+
+    if connect:
+        return {"status": "OK"}
 
 
 @router.post("/{server_id}/client/delete")
-async def delete_client(
+async def delete_client_and_check(
         server_id: int,
         delete_client_info: ClientDeleteRequest,
         user: UserSchema = Depends(get_current_active_user),
-        service: PanelService = Depends(get_panel_service)
+        panel_service: PanelService = Depends(get_panel_service),
+        subscription_service: SubscriptionService = Depends(get_subscription_service)
 ) -> dict[str, str]:
-    return await service.delete_client(server_id, delete_client_info, user)
+
+    data = ClientDeleteDTO.model_validate(delete_client_info, from_attributes=True)
+    await panel_service.delete_client(server_id, user, data)
+
+    if subscription_service.delete_subscription(delete_client_info.sub_id):
+        return {"status": "OK"}

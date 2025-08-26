@@ -1,19 +1,16 @@
 from fastapi import Depends
-from py3xui import AsyncApi as PanelAsyncApi, AsyncApi
+from py3xui import AsyncApi
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
 from app.core.database import get_async_session
 from app.core.exceptions import JwtCredentialsError, IsActiveUserError
 from app.core.security import oauth_scheme, decode_access_token
-from app.repository.payment_repository import PaymentRepository
-from app.repository.server_repository import ServerRepository
-from app.repository.subscription_repository import SubscriptionRepository
+from app.repositories.sqlalchemy import PaymentRepository, UserRepository, ServerRepository, SubscriptionRepository
 from app.schema.auth_schema import TokenData
 from app.schema.server_schema import ServerSchema
 from app.schema.user_schema import UserSchema
 from app.services.auth_service import AuthService
-from app.repository.user_repository import UserRepository
 from app.services.panel_service import PanelService, PanelSessionManager
 from app.services.payment_service import PaymentService
 from app.services.server_service import ServerService
@@ -119,5 +116,7 @@ def get_panel_api(server: ServerSchema) -> AsyncApi:
 shared_session_manager = PanelSessionManager(get_panel_api_func=get_panel_api)
 
 
-def get_panel_service() -> PanelService:
-    return PanelService(shared_session_manager)
+def get_panel_service(
+    server_repository: ServerRepository = Depends(get_server_repository)
+) -> PanelService:
+    return PanelService(shared_session_manager, server_repository)

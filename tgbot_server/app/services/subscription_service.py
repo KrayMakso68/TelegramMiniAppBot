@@ -1,5 +1,6 @@
 from app.repositories.interfaces import ISubscriptionRepository
-from app.schema.subscription_schema import SubscriptionSchema
+from app.schema.subscription_schema import SubscriptionSchema, SubscriptionCreate
+from app.schema.user_schema import UserSchema
 
 
 # class SubscriptionService:
@@ -44,3 +45,7 @@ class SubscriptionService:
 
     async def user_subscriptions_filtered_by_server(self, user_id: int) -> dict[str, list[SubscriptionSchema]]:
         return await self.repository.get_all_grouped(user_id)
+
+    async def delete_subscription(self, sub_id: int) -> bool:
+        return await self.repository.delete(sub_id)
+

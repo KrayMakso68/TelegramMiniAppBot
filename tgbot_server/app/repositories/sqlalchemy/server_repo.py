@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.exceptions import DBError, NotFoundError
 from app.model import Server
-from app.repository.interfaces import IServerRepository
+from app.repositories.interfaces import IServerRepository
 from app.schema.server_schema import ServerSchema, ServerInfo
 
 

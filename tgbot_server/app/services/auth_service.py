@@ -1,6 +1,6 @@
 from app.core.security import create_access_token
 from app.utils.validate_telegram import get_webapp_data
-from app.repository.interfaces import IUserRepository
+from app.repositories.interfaces import IUserRepository
 from app.schema.auth_schema import WebAppInitData, TokenInfo, InitAuthData
 from app.schema.user_schema import UserSchema, UserCreate
 

@@ -1,5 +1,5 @@
 from app.core.exceptions import NotFoundError
-from app.repository.interfaces import IServerRepository
+from app.repositories.interfaces import IServerRepository
 from app.schema.server_schema import ServerInfo
 
 

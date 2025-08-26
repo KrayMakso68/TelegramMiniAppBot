@@ -8,7 +8,7 @@ from sqlalchemy.orm import selectinload
 
 from app.core.exceptions import DBError, NotFoundError, DuplicatedError
 from app.model import Subscription, Server
-from app.repository.interfaces import ISubscriptionRepository
+from app.repositories.interfaces import ISubscriptionRepository
 from app.schema.connect_schema import ConnectSchema
 from app.schema.subscription_schema import SubscriptionCreate, SubscriptionSchema, SubscriptionUpdate
 

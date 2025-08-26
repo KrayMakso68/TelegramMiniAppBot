@@ -2,7 +2,7 @@ from collections import defaultdict
 from decimal import Decimal
 
 from app.core.config import settings
-from app.repository.interfaces import IPaymentRepository, IUserRepository
+from app.repositories.interfaces import IPaymentRepository, IUserRepository
 from app.schema.payment_schema import PaymentCreate, OperationType, PaymentStatus, PaymentUpdate, PaymentSchema, \
     YooMoneyData, PaymentOptionSchema
 from app.services.user_service import UserService
