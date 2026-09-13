@@ -72,9 +72,9 @@ flowchart TD
     TG_USER -->|1. Clicks WebApp Button in Telegram| NGINX
     NGINX -->|Serves SPA| SPA
     SPA --> AUTH_GUARD
-    AUTH_GUARD -- "No (External Browser)" --> DENY_PAGE
-    AUTH_GUARD -- "Yes (Telegram Client)" -->|2. Exchange initData for JWT| NGINX
-    NGINX -->|3. Proxy /api/v1/| AUTH_EP
+    AUTH_GUARD -->|No: External Browser| DENY_PAGE
+    AUTH_GUARD -->|Yes: Telegram Client| NGINX
+    NGINX -->|2. Exchange initData for JWT /api/v1/auth/login| AUTH_EP
 
     %% API Internals
     AUTH_EP --> SVC_LAYER

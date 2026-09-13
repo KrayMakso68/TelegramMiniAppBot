@@ -72,9 +72,9 @@ flowchart TD
     TG_USER -->|1. Нажатие кнопки WebApp в боте| NGINX
     NGINX -->|Отдает статику SPA| SPA
     SPA --> AUTH_GUARD
-    AUTH_GUARD -- "Нет (Обычный браузер)" --> DENY_PAGE
-    AUTH_GUARD -- "Да (Telegram клиент)" -->|2. Обмен initData на Bearer JWT| NGINX
-    NGINX -->|3. Проксирование /api/v1/| AUTH_EP
+    AUTH_GUARD -->|Нет: Обычный браузер| DENY_PAGE
+    AUTH_GUARD -->|Да: Telegram клиент| NGINX
+    NGINX -->|2. Обмен initData на Bearer JWT /api/v1/auth/login| AUTH_EP
 
     %% Внутренняя логика API
     AUTH_EP --> SVC_LAYER
