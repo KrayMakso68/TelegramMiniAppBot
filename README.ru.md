@@ -37,25 +37,25 @@
 
 ```mermaid
 flowchart TD
-    subgraph Telegram_Ecosystem["Клиент и Экосистема Telegram"]
+    subgraph Telegram_Ecosystem["Клиент и экосистема Telegram"]
         TG_USER["Пользователь Telegram"]
         TG_BOT["Telegram-бот (Воркер Aiogram 3)"]
     end
 
-    subgraph Edge["Шлюз и Обратный прокси"]
-        NGINX["Nginx Reverse Proxy & SSL Termination\n(:80 / :443)"]
+    subgraph Edge["Шлюз и обратный прокси"]
+        NGINX["Nginx Reverse Proxy и SSL Termination (:80 / :443)"]
     end
 
     subgraph Frontend["Клиентское приложение"]
-        SPA["Telegram Mini App (TMA)\nVue 3 + Quasar + TypeScript + vue-tg"]
-        AUTH_GUARD{"Запуск внутри\nTelegram (есть initData)?"}
-        DENY_PAGE["403 Access Denied\n(/not-from-telegram)"]
+        SPA["Telegram Mini App (TMA) - Vue 3 + Quasar + TypeScript"]
+        AUTH_GUARD{"Запуск внутри Telegram?"}
+        DENY_PAGE["403 Access Denied (/not-from-telegram)"]
     end
 
     subgraph Backend_Core["Бэкенд Core API (FastAPI)"]
-        AUTH_EP["Слой роутеров\n(/api/v1/*)"]
-        SVC_LAYER["Слой сервисов\n(Auth, Payment, Panel, Subscription)"]
-        REPO_LAYER["Слой репозиториев\n(Async SQLAlchemy 2.0)"]
+        AUTH_EP["Слой роутеров (/api/v1)"]
+        SVC_LAYER["Слой сервисов (Auth, Payment, Panel, Subscription)"]
+        REPO_LAYER["Слой репозиториев (Async SQLAlchemy 2.0)"]
     end
 
     subgraph Persistence["База данных"]
@@ -64,8 +64,8 @@ flowchart TD
     end
 
     subgraph External_Services["Внешние сервисы и интеграции"]
-        XUI["Ноды 3X-UI\n(API создания VLESS / Xray конфигураций)"]
-        YOOMONEY["Шлюз ЮMoney\n(HTTP IPN Webhook)"]
+        XUI["Ноды 3X-UI (API VLESS / Xray)"]
+        YOOMONEY["Шлюз ЮMoney (HTTP IPN Webhook)"]
     end
 
     %% Трафик клиента и проверка окружения
@@ -74,20 +74,21 @@ flowchart TD
     SPA --> AUTH_GUARD
     AUTH_GUARD -->|Нет: Обычный браузер| DENY_PAGE
     AUTH_GUARD -->|Да: Telegram клиент| NGINX
-    NGINX -->|2. Обмен initData на Bearer JWT /api/v1/auth/login| AUTH_EP
+    NGINX -->|2. Обмен initData на Bearer JWT| AUTH_EP
 
     %% Внутренняя логика API
     AUTH_EP --> SVC_LAYER
     SVC_LAYER --> REPO_LAYER
-    REPO_LAYER <-->|Асинхронный пул соединений (asyncpg)| PG
+    REPO_LAYER -->|Асинхронный пул через asyncpg| PG
+    PG -->|Результаты запросов| REPO_LAYER
 
     %% Внешние интеграции
     SVC_LAYER -->|Создание VLESS-клиента и получение ключей| XUI
-    YOOMONEY -->|Вебхук оплаты POST /payment/check/yoomoney| NGINX
+    YOOMONEY -->|HTTP POST IPN Webhook| NGINX
 
     %% Бот и фоновый шедулер
-    TG_BOT <-->|Запрос истекающих подписок| PG
-    TG_BOT -->|Отправка уведомлений и инлайн-кнопок| TG_USER
+    TG_BOT -->|Запрос истекающих подписок| PG
+    TG_BOT -->|Отправка уведомлений и кнопок| TG_USER
 ```
 
 ---

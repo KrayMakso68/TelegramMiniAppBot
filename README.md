@@ -37,25 +37,25 @@ The system automates the entire customer lifecycle:
 
 ```mermaid
 flowchart TD
-    subgraph Telegram_Ecosystem["Telegram Client & Ecosystem"]
+    subgraph Telegram_Ecosystem["Telegram Client and Ecosystem"]
         TG_USER["Telegram User / Client"]
         TG_BOT["Telegram Bot (Aiogram 3 Worker)"]
     end
 
-    subgraph Edge["Reverse Proxy & Gateway"]
-        NGINX["Nginx Reverse Proxy & SSL Termination\n(:80 / :443)"]
+    subgraph Edge["Reverse Proxy and Gateway"]
+        NGINX["Nginx Reverse Proxy and SSL Termination (:80 / :443)"]
     end
 
     subgraph Frontend["Client Application"]
-        SPA["Telegram Mini App (TMA)\nVue 3 + Quasar + TypeScript + vue-tg"]
-        AUTH_GUARD{"Has Telegram\ninitData?"}
-        DENY_PAGE["403 Access Denied\n(/not-from-telegram)"]
+        SPA["Telegram Mini App (TMA) - Vue 3 + Quasar + TypeScript"]
+        AUTH_GUARD{"Has Telegram initData?"}
+        DENY_PAGE["403 Access Denied (/not-from-telegram)"]
     end
 
     subgraph Backend_Core["Core API (FastAPI)"]
-        AUTH_EP["Router Layer\n(/api/v1/*)"]
-        SVC_LAYER["Service Layer\n(Auth, Payment, Panel, Subscription)"]
-        REPO_LAYER["Repository Layer\n(Async SQLAlchemy 2.0)"]
+        AUTH_EP["Router Layer (/api/v1)"]
+        SVC_LAYER["Service Layer (Auth, Payment, Panel, Subscription)"]
+        REPO_LAYER["Repository Layer (Async SQLAlchemy 2.0)"]
     end
 
     subgraph Persistence["Database"]
@@ -63,31 +63,32 @@ flowchart TD
         PGADMIN["pgAdmin 4 (GUI Admin)"]
     end
 
-    subgraph External_Services["External Services & Integrations"]
-        XUI["3X-UI Node Panels\n(VLESS / Xray Configuration API)"]
-        YOOMONEY["YooMoney Gateway\n(HTTP IPN Webhook)"]
+    subgraph External_Services["External Services and Integrations"]
+        XUI["3X-UI Node Panels (VLESS / Xray API)"]
+        YOOMONEY["YooMoney Gateway (HTTP IPN Webhook)"]
     end
 
-    %% Client traffic & Auth Guard
+    %% Client traffic and Auth Guard
     TG_USER -->|1. Clicks WebApp Button in Telegram| NGINX
     NGINX -->|Serves SPA| SPA
     SPA --> AUTH_GUARD
     AUTH_GUARD -->|No: External Browser| DENY_PAGE
     AUTH_GUARD -->|Yes: Telegram Client| NGINX
-    NGINX -->|2. Exchange initData for JWT /api/v1/auth/login| AUTH_EP
+    NGINX -->|2. Exchange initData for JWT| AUTH_EP
 
     %% API Internals
     AUTH_EP --> SVC_LAYER
     SVC_LAYER --> REPO_LAYER
-    REPO_LAYER <-->|Async Connection Pool (asyncpg)| PG
+    REPO_LAYER -->|Async connection pool via asyncpg| PG
+    PG -->|Result sets| REPO_LAYER
 
     %% Integrations
-    SVC_LAYER -->|Provision VLESS client & sync keys| XUI
-    YOOMONEY -->|HTTP POST IPN Webhook /payment/check/yoomoney| NGINX
+    SVC_LAYER -->|Provision VLESS client and sync keys| XUI
+    YOOMONEY -->|HTTP POST IPN Webhook| NGINX
 
-    %% Bot & Background Scheduler
-    TG_BOT <-->|Queries active subscriptions| PG
-    TG_BOT -->|Pushes expiration alerts & WebApp launch buttons| TG_USER
+    %% Bot and Background Scheduler
+    TG_BOT -->|Polls active subscriptions| PG
+    TG_BOT -->|Pushes expiration alerts and launch buttons| TG_USER
 ```
 
 ---
